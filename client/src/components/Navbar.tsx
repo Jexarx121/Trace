@@ -5,18 +5,15 @@ import { AiOutlineClose } from 'react-icons/ai';
 
 type NavbarItemProps = {
   title: string,
+  classprops: string
 };
 
-const NavbarItem = ({title} : NavbarItemProps) => (
-  <li className={`mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4`}>{title}</li>
+const NavbarItem = ({title, classprops} : NavbarItemProps) => (
+  <li className={`mx-4 cursor-pointer font-bold ${classprops}`}>{title}</li>
 )
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  const [toggleMenu, setToggleMenu] = useState(false)
 
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
@@ -24,42 +21,36 @@ const Navbar = () => {
         <h1 className="text-white font-bold text-2xl cursor-pointer">
           Trace
         </h1>
-        <div className="ml-auto lg:hidden">
-          {isMobileMenuOpen ? (
-            <AiOutlineClose
-              className="text-white text-3xl cursor-pointer"
-              onClick={toggleMobileMenu}
-            />
-          ) : (
-            <HiMenuAlt4
-              className="text-white text-3xl cursor-pointer"
-              onClick={toggleMobileMenu}
-            />
-          )}
-        </div>
-        <ul className={`${
-          isMobileMenuOpen ? "flex" : "hidden"
-        } lg:flex lg:flex-row list-none items-center px-4 ml-auto text-white`}>
+        <ul className='md:flex hidden flex-row list-none items-center px-4 ml-auto text-white flex-initial'>
           {["Services", "About", "Resources"].map((item, index) => (
-            <NavbarItem key={item + index} title={item} />
+            <NavbarItem key={item + index} title={item} classprops="px-3 hover:underline hover:underline-offset-4" />
           ))}
-          <li className="px-4 flex cursor-pointer font-bold hover:underline hover:underline-offset-4">
-            Sign In
-          </li>
           <li className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold">
-            Login
+            Sign Up
           </li>
         </ul>
-        {isMobileMenuOpen && (
-          <ul
-            className="z-10 fixed -top-0 w-[100vw] h-screen md:hidden list-non flex flex-col
-            justify-start rounded-md bg-white text-[#1f2421] animate-slide-in">
-          <li className="text-xl w-full my-2"><AiOutlineClose onClick={toggleMobileMenu}/></li>
-          {["Services", "About", "Resources"].map((item, index) => (
-            <NavbarItem key={item + index} title={item} />
-          ))}
-          </ul>
-        )}
+        <div className="flex relative ml-auto md:hidden">
+          {!toggleMenu && (
+            <HiMenuAlt4 fontSize={28} className="text-white md:hidden cursor-pointer" onClick={() => setToggleMenu(true)} />
+          )}
+          {toggleMenu && (
+            <AiOutlineClose fontSize={28} className="text-[#1f2421] md:hidden cursor-pointer" onClick={() => setToggleMenu(false)} />
+          )}
+          {toggleMenu && (
+            <ul
+              className="z-10 fixed -left-0 -top-0 w-[100vw] h-screen md:hidden list-non flex flex-col
+              justify-start rounded-md bg-white text-[#1f2421] animate-slide-in">
+              <li className="text-3xl w-full my-2 mx-2"><AiOutlineClose className="cursor-pointer ml-2" onClick={() => setToggleMenu(false)}/></li>
+              {["Services", "About", "Resources"].map((item, index) => (
+                <NavbarItem key={item + index} title={item} classprops="text-xl pb-5"/>
+              ))}
+              <li className="mx-4 text-xl cursor-pointer font-bold text-[#49A078]">
+                Sign Up
+              </li>
+            </ul>
+          )}
+        </div>
+        
       </div>
     </nav>
   );
