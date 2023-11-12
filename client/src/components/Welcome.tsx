@@ -3,10 +3,10 @@ const Welcome = () => {
     <div className="bg-[#216869]">
       <div className="w-[70vw] m-auto pt-12 flex flex-col md:flex-row">
         <div className="md:w-1/2">
-          <h1 className="text-white text-4xl md:text-6xl font-bold pb-5 text-center md:text-left">
+          <h1 className="text-white text-4xl md:text-5xl lg:text-6xl font-bold pb-5 text-center md:text-left">
             Track Volunteer Work Effortlessly
           </h1>
-          <p className="text-white text-2xl md:text-3xl pb-5 text-center md:text-left">
+          <p className="text-white text-2xl lg:text-3xl pb-5 text-center md:text-left">
             Securing a generational contract through crediting volunteering effort with the help of Distributed Ledger Technology (DLT).
           </p>
           <div className="flex flex-col md:flex-row items-center md:items-start text-white py-2">

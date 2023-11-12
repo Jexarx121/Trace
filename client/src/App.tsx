@@ -1,4 +1,4 @@
-import { Navbar, Welcome, About, Footer, BlockchainInfo } from "./components";
+import { Navbar, Welcome, About, Footer, FAQ } from "./components";
 
 const App = () => {
   return (
@@ -8,7 +8,7 @@ const App = () => {
         <Welcome/>
       </div>
       <About/>
-      <BlockchainInfo/>
+      <FAQ/>
       <Footer/>
     </div>
   )

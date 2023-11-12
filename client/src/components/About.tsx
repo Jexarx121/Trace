@@ -25,8 +25,8 @@ const AboutItem = ({title, content} : aboutItemProps) => (
 const About = () => {
   return (
     <div className="bg-[#FFFFFF]">
-      <div className="w-full md:w-[70vw] mx-auto flex flex-col md:flex-row mt-6">
-        <div className="md:w-1/2 sm:p-5 md:p-0">
+      <div className="w-full md:w-[70vw] mx-auto flex flex-col lg:flex-row mt-20">
+        <div className="lg:w-1/2 sm:p-5 md:p-0">
           <h1 className="font-bold mb-4 mt-4 uppercase text-[#1f2421]">About</h1>
           <div>
             {aboutTitles.map((item, index) => (
@@ -34,11 +34,11 @@ const About = () => {
             ))}
           </div>
         </div>
-        <div className="w-full md:w-1/2 p-4 text-center text-xl ml-5 flex flex-col justify-center items-center">
-        <img className="w-full mb-4 max-w-[500px] h-auto" src="../images/volunteering_about.svg" alt="Volunteering by cleaning up garbage"/>
-        <p className="font-bold">Free forever</p>
-        <a className="text-[#49A078] hover:underline hover:underline-offset-4 cursor-pointer">Get started now</a>
-      </div>
+        <div className="w-full lg:w-1/2 p-4 text-center text-xl ml-5 flex flex-col justify-center items-center">
+          <img className="w-full mb-4 max-w-[500px] h-auto" src="../images/volunteering_about.svg" alt="Volunteering by cleaning up garbage"/>
+          <p className="font-bold">Free forever</p>
+          <a className="text-[#49A078] hover:underline hover:underline-offset-4 cursor-pointer">Get started now</a>
+        </div>
       </div>
     </div>
   )
