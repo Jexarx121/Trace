@@ -1,16 +1,8 @@
-import { Navbar, Welcome, About, Footer, FAQ } from "./components";
+import { Homepage } from "./pages";
 
 const App = () => {
   return (
-    <div>
-      <div >
-        <Navbar/>
-        <Welcome/>
-      </div>
-      <About/>
-      <FAQ/>
-      <Footer/>
-    </div>
+    <Homepage/>
   )
 }
 
