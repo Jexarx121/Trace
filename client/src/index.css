@@ -26,6 +26,23 @@ h1, h2 {
   height: 100vh;
 }
 
+.authentication-button {
+  background: linear-gradient(90deg, #263228 50%, #fff 50%);
+  background-size: 200% 100%;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: 3px solid #263228;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.5s ease;
+
+  &:hover {
+    background-position: -100% 0;
+    color: #263228;
+  }
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
