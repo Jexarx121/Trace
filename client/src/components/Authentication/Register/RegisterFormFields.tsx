@@ -22,19 +22,19 @@ const RegisterForm = () => {
       <form className="flex flex-col p-5 pr-8 border-r border-gray-400" onSubmit={handleSubmit(onSubmit)}>
         <label className='uppercase text-[#49A078] text-md'>First Name</label>
         <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
-          {...register("firstName")} />
+          {...register("firstName")} placeholder="John"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.firstName?.message}</span>
         <label className='uppercase text-[#49A078] text-md'>Surname</label>
         <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
-          {...register("surname")} />
+          {...register("surname")} placeholder="Doe"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.surname?.message}</span>
         <label className='uppercase text-[#49A078] text-md'>Email Address</label>
         <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
-          {...register("email")} />
+          {...register("email")} placeholder="john@example.com"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.email?.message}</span>
         <label className='uppercase text-[#49A078] text-md'>Password</label>
         <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
-          {...register("password")} />
+          {...register("password")} placeholder="Password"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.password?.message}</span>
         <button className="bg-[#263228] text-white p-3 mt-3 hover:text-[#263228] border-2
          hover:bg-white border-[#263228] font-bold authentication-button" type="submit">
