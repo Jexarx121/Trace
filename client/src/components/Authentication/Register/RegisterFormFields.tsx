@@ -2,10 +2,17 @@ import RegisterSchema from "./RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 
 type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    surname: "",
+    email: "",
+    password: ""
+  });
 
   const {
     register,
@@ -14,7 +21,13 @@ const RegisterForm = () => {
   } = useForm<RegisterSchemaType>({ resolver: zodResolver(RegisterSchema), mode: "onBlur"});
   
   const onSubmit = (data: RegisterSchemaType) => {
-    console.log(data);
+    setFormData({
+      firstName: data.firstName,
+      surname: data.surname,
+      email: data.email,
+      password: data.password
+    });
+    console.log(formData);
   }; 
   
   return (

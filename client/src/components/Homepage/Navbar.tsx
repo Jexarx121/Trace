@@ -50,8 +50,8 @@ const Navbar = () => {
               {["Services", "About", "Resources"].map((item, index) => (
                 <NavbarItem key={item + index} title={item} classprops="text-xl pb-5"/>
               ))}
-              <li className="mx-4 text-xl cursor-pointer font-bold text-[#49A078]">
-                Sign Up
+              <li className="mx-4 text-xl cursor-pointer font-bold text-[#49A078]" onClick={goToLogin}>
+                Login
               </li>
             </ul>
           )}
