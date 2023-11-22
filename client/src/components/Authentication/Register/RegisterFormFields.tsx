@@ -1,35 +1,29 @@
 import RegisterSchema from "./RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    surname: "",
-    email: "",
-    password: ""
-  });
 
   const {
     register,
     handleSubmit,
-    formState: { errors }
-  } = useForm<RegisterSchemaType>({ resolver: zodResolver(RegisterSchema), mode: "onBlur"});
+    control,
+    formState: { errors },
+    reset
+  } = useForm<RegisterSchemaType>({ resolver: zodResolver(RegisterSchema), mode: "onBlur",});
   
-  const onSubmit = (data: RegisterSchemaType) => {
-    setFormData({
-      firstName: data.firstName,
-      surname: data.surname,
-      email: data.email,
-      password: data.password
-    });
-    console.log(formData);
+  const onSubmit = async (data: RegisterSchemaType) => {
+    
+
   }; 
   
   return (
@@ -49,6 +43,28 @@ const RegisterForm = () => {
         <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
           {...register("email")} placeholder="john@example.com"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.email?.message}</span>
+
+        <label className='uppercase text-[#49A078] text-md'>Date of Birth</label>
+        <div className="relative">
+          <Controller
+            name="dateOfBirth"
+            control={control}
+            defaultValue={new Date(1990, 12, 1)} // Set the default value to null or a specific date
+            render={({ field }) => (
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date) => field.onChange(date)}
+                className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
+              />
+            )}
+          />
+          <span
+          className="cursor-pointer absolute right-2 top-4 text-[#263228]">
+              {/* Font Awesome Eye Icon */}
+              <i className="far fa-calendar"></i>
+            </span>
+        </div>
+        <span className="text-red-500 text-sm mt-0 mb-4">{errors.dateOfBirth?.message}</span>
 
         <label className='uppercase text-[#49A078] text-md'>Password</label>
         <div className="relative">
