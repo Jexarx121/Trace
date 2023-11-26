@@ -1,29 +1,56 @@
 import RegisterSchema from "./RegisterSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { useState } from "react";
-import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css';
+import { useForm } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { capitalize } from "../../../helpers/functions";
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import { supabase } from "../../../supabase/supabaseClient";
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 type RegisterSchemaType = z.infer<typeof RegisterSchema>;
 
 const RegisterForm = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isSafeToReset, setIsSafeToReset] = useState(false);
 
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
     reset
-  } = useForm<RegisterSchemaType>({ resolver: zodResolver(RegisterSchema), mode: "onBlur",});
-  
-  const onSubmit = async (data: RegisterSchemaType) => {
-    
+  } = useForm<RegisterSchemaType>({ resolver: zodResolver(RegisterSchema), mode: "onBlur"});
 
+  useEffect(() => {
+    if (!isSafeToReset) return;
+ 
+    reset(); // asynchronously reset your form values
+  }, [reset])
+  
+  const onSubmit = async (userData: RegisterSchemaType) => {
+    const firstName = capitalize(userData.firstName);
+    const surname = capitalize(userData.surname);
+    const { age, email, password } = userData;
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            first_name: firstName,
+            surname: surname,
+            age: age
+          }
+        }
+      });
+      console.log('Success!')
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.log("Error occured", {error});
+    }
   }; 
   
   return (
@@ -39,32 +66,15 @@ const RegisterForm = () => {
           {...register("surname")} placeholder="Doe"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.surname?.message}</span>
 
+        <label className='uppercase text-[#49A078] text-md'>Age</label>
+        <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
+          {...register("age", {valueAsNumber: true})} placeholder="22"/> 
+        <span className="text-red-500 text-sm mt-0 mb-4">{errors.age?.message}</span>
+
         <label className='uppercase text-[#49A078] text-md'>Email Address</label>
         <input className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
           {...register("email")} placeholder="john@example.com"/>
         <span className="text-red-500 text-sm mt-0 mb-4">{errors.email?.message}</span>
-
-        <label className='uppercase text-[#49A078] text-md'>Date of Birth</label>
-        <div className="relative">
-          <Controller
-            name="dateOfBirth"
-            control={control}
-            defaultValue={new Date(1990, 12, 1)} // Set the default value to null or a specific date
-            render={({ field }) => (
-              <DatePicker
-                selected={field.value}
-                onChange={(date: Date) => field.onChange(date)}
-                className='mb-1 mt-1 p-3 outline-1 outline-[#263228] outline rounded-sm pr-5 focus:outline-[#49A078] focus:outline-2'
-              />
-            )}
-          />
-          <span
-          className="cursor-pointer absolute right-2 top-4 text-[#263228]">
-              {/* Font Awesome Eye Icon */}
-              <i className="far fa-calendar"></i>
-            </span>
-        </div>
-        <span className="text-red-500 text-sm mt-0 mb-4">{errors.dateOfBirth?.message}</span>
 
         <label className='uppercase text-[#49A078] text-md'>Password</label>
         <div className="relative">
@@ -88,7 +98,7 @@ const RegisterForm = () => {
       <div className="flex items-center justify-center p-4">
         {/* Google OAuth */}
         {/* You may need to replace this with the appropriate library */}
-        <h1>LOREM IPSUM</h1>
+        
 
         {/* Apple OAuth */}
         {/* Add Apple OAuth button here */}
