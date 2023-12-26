@@ -1,5 +1,5 @@
 export const LINKS = {
-  'REGISTER': '/register',
   'HOMEPAGE': '/',
-  'LOGIN': '/login'
+  'LOGIN': '/login',
+  'ACCOUNT': '/account/'
 };

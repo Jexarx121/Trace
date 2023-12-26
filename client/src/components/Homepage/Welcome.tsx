@@ -5,8 +5,8 @@ import { LINKS } from "../constants";
 const Welcome = () => {
   const navigate = useNavigate();
 
-  const goToRegister = () => {
-    navigate(LINKS.REGISTER);
+  const goToLogin = () => {
+    navigate(LINKS.LOGIN);
   }
 
   return (
@@ -21,7 +21,7 @@ const Welcome = () => {
           </p>
           <div className="flex flex-col md:flex-row items-center md:items-start text-white py-2">
             <button className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:mr-2"
-              onClick={goToRegister}>
+              onClick={goToLogin}>
               Try Now
             </button>
             <a className="px-8 mt-2 cursor-pointer text-center md:text-left" href="#">
