@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
+import { useNavigate } from "react-router-dom";
+import { LINKS } from "../constants";
 
 type NavbarItemProps = {
   title: string,
@@ -12,7 +14,12 @@ const NavbarItem = ({title, classprops} : NavbarItemProps) => (
 )
 
 const Navbar = () => {
-  const [toggleMenu, setToggleMenu] = useState(false)
+  const navigate = useNavigate();
+  const [toggleMenu, setToggleMenu] = useState(false);
+
+  const goToLogin = () => {
+    navigate(LINKS.LOGIN);
+  };
 
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
@@ -24,8 +31,8 @@ const Navbar = () => {
           {["Services", "About", "Resources"].map((item, index) => (
             <NavbarItem key={item + index} title={item} classprops="px-3 hover:underline hover:underline-offset-4" />
           ))}
-          <li className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold">
-            Sign Up
+          <li className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold" onClick={goToLogin}>
+            Login
           </li>
         </ul>
         <div className="flex relative ml-auto md:hidden">
@@ -43,8 +50,8 @@ const Navbar = () => {
               {["Services", "About", "Resources"].map((item, index) => (
                 <NavbarItem key={item + index} title={item} classprops="text-xl pb-5"/>
               ))}
-              <li className="mx-4 text-xl cursor-pointer font-bold text-[#49A078]">
-                Sign Up
+              <li className="mx-4 text-xl cursor-pointer font-bold text-[#49A078]" onClick={goToLogin}>
+                Login
               </li>
             </ul>
           )}
