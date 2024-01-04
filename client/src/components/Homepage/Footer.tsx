@@ -1,12 +1,25 @@
+import { useNavigate } from "react-router-dom";
+import { LINKS } from "../constants";
+
 const Footer = () => {
+  const navigate = useNavigate();
+  
+  const goToHomepage = () => {
+    navigate(LINKS.HOMEPAGE);
+  };
+
+  const goToAccount = () => {
+    navigate(LINKS.ACCOUNT);
+  };
+  
   return (
     <div className="bg-[#216869]">
       <div className="w-full md:w-[70vw] mx-auto text-white">
         <div className="flex flex-col md:flex-row justify-between">
-          <h1 className="font-bold p-5 cursor-pointer">Trace</h1>
-          <a className="p-5 cursor-pointer">Services</a>
+          <h1 className="font-bold p-5 cursor-pointer" onClick={goToHomepage}>Trace</h1>
           <a className="p-5 cursor-pointer">About</a>
-          <a className="p-5 cursor-pointer">Resources</a>
+          <a className="p-5 cursor-pointer">Dashboard</a>
+          <a className="p-5 cursor-pointer" onClick={goToAccount}>Profile</a>
         </div>
         <div className="border-t-2 border-gray-400 flex flex-col md:flex-row justify-start">
           <h1 className="font-bold p-5">&#169; 2023 Trace</h1> 

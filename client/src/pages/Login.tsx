@@ -25,7 +25,7 @@ const Login = () => {
   }, []);
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT);
+    navigate(LINKS.ACCOUNT, {state: { session }});
   }
 
   if (!session) {
