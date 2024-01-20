@@ -17,7 +17,7 @@ const AccountProfile = () => {
 
   const goToEditAccountPage = () => {
     navigate(LINKS.EDIT_ACCOUNT, { state: { session, fullName, age, passedAvatarUrl, bio }});
-  }
+  };
 
   async function downloadImage(path : string) {
     try {
@@ -31,7 +31,7 @@ const AccountProfile = () => {
     } catch (error) {
       console.log('Error downloading image: ', error);
     }
-  }
+  };
 
   useEffect(() => {
     let ignore = false;

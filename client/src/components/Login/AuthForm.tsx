@@ -49,8 +49,8 @@ const AuthForm = () => {
                   defaultButtonBackgroundHover: '#b7c8b9',
                   inputBorder: '#263228',
                   dividerBackground: '#444444',
-                  inputBorderFocus: '#49A078',
-                  inputBorderHover: '#49A078',
+                  inputBorderFocus: "#0000FF",
+                  inputBorderHover: '#263228',
                   anchorTextColor: '#49A078',
                   anchorTextHoverColor: '#49A078'
                 },

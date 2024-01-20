@@ -7,6 +7,7 @@ import { profileSchema } from ".";
 import { supabase } from "../../supabase/supabaseClient";
 import { capitalize } from "../../helpers/functions";
 import { LINKS } from "../constants";
+import { truncateText } from "../../helpers/functions";
 
 type ProfileSchema = z.infer<typeof profileSchema>;
 
@@ -56,7 +57,18 @@ const EditAccountForm = () => {
       alert(error);
       return "";
     } 
-  }
+  };
+
+  async function updatePosts(authId : any, newName: string) {
+    const { error } = await supabase
+      .from('posts')
+      .update({ created_by: newName})
+      .eq('id', authId);
+
+    if (error) {
+      alert(error.message);
+    };
+  };
 
   async function updateProfile(data : any) {
     setLoading(false);
@@ -82,21 +94,23 @@ const EditAccountForm = () => {
       age: data.age,
       bio: data.bio,
       updated_at: new Date()
-    }
+    };
 
     const { error } = await supabase.from('profiles').upsert(updates);
 
     if (error) {
-      alert(error.message)
-    }
+      alert(error.message);
+    };
+
+    updatePosts(user.id, fullname);
 
     setLoading(true);
     goToAccount();
-  }
+  };
 
   const onSubmit: SubmitHandler<ProfileSchema> = (data) => {
     updateProfile(data);
-  }
+  };
   
   return (
     <div>
@@ -109,7 +123,7 @@ const EditAccountForm = () => {
               className="w-full px-3 py-2 border-2 rounded-md mb-2 md:mb-0 border-[#1f2421]" 
               {...register("profileImage")}/>
             {errors.profileImage && (
-              <p className="text-xs text-red-500 mt-2"> {errors.profileImage?.message?.toString()}</p> 
+              <p className="text-sm text-red-500 mt-2"> {errors.profileImage?.message?.toString()}</p> 
             )}
           </div>
 
@@ -122,17 +136,17 @@ const EditAccountForm = () => {
                   className="w-full px-3 py-2 border-2 rounded-md mb-2 md:mb-0 border-[#1f2421]" 
                   {...register("firstName")}/>
                 {errors.firstName && (
-                  <p className="text-xs text-red-500 mt-2"> {errors.firstName?.message}</p> 
+                  <p className="text-sm text-red-500 mt-2"> {errors.firstName?.message}</p> 
                 )}
               </div>
               
-              <div className="w-full md:w-1/2 lg:w-1/2 pl-2">
+              <div className="w-full md:w-1/2 lg:w-1/2 md:pl-2">
                 <label htmlFor="surname" className="block mb-1">Surname</label>
                 <input type="text" id="surname" placeholder="Smith" 
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]" defaultValue={surname}
                   {...register("surname")}/>
                 {errors.surname && (
-                  <p className="text-xs text-red-500 mt-2"> {errors.surname?.message}</p> 
+                  <p className="text-sm text-red-500 mt-2"> {errors.surname?.message}</p> 
                 )}
               </div>
             </div>
@@ -146,7 +160,7 @@ const EditAccountForm = () => {
               defaultValue={age}
               {...register("age")}/>
             {errors.age && (
-              <p className="text-xs text-red-500 mt-2"> {errors.age?.message}</p> 
+              <p className="text-sm text-red-500 mt-2"> {errors.age?.message}</p> 
             )}
           </div>
 
@@ -161,14 +175,21 @@ const EditAccountForm = () => {
               defaultValue={bio}
               {...register("bio")} />
             {errors.bio && (
-              <p className="text-xs text-red-500 mt-2"> {errors.bio?.message}</p> 
+              <p className="text-sm text-red-500 mt-2"> {errors.bio?.message}</p> 
             )}
           </div>
         </div>
 
         {/* Update Profile Button */}
-        <button type="submit" className="w-full md:w-auto mt-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center text-white">
-          {loading ? 'Update Profile' : 'Updating...'}
+        <button type="submit" 
+          className="w-full md:w-auto mt-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center text-white md:mr-4">
+          {loading ? 'Update' : 'Updating...'}
+        </button>
+
+        <button 
+          className="w-full md:w-auto mt-4 px-8 bg-red-600 py-2 rounded-md cursor-pointer font-bold text-center text-white"
+          onClick={goToAccount}>
+          Cancel
         </button>
       </form>
     </div>

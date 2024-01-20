@@ -1,11 +1,11 @@
 import { Navbar } from "../components/Homepage";
-import { Posts } from "../components/Dashboard";
+import { DashboardInfo } from "../components/Dashboard";
 
 const Dashboard = () => {
   return (
     <div>
       <Navbar/>
-      <Posts/>
+      <DashboardInfo/>
     </div>
   )
 }
