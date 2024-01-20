@@ -139,6 +139,10 @@ const DashboardInfo = () => {
 
     // refresh the page
     navigate(0);
+  };
+
+  const showPost = () => {
+    console.log('Hi');
   }
 
   const onSubmit: SubmitHandler<PostSchema> = (data) => {
@@ -235,7 +239,8 @@ const DashboardInfo = () => {
         <h1 className="text-4xl font-bold mt-3">Available Work</h1>
 
         {/* Posts */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
+          onClick={showPost}>
           {postData.map((post) => (
             <div className="my-2 rounded-lg overflow-hidden shadow-2xl shadow-slate-500 bg-white hover:shadow-slate-700 cursor-pointer" key={post.post_id}>
               <div className="p-4 flex items-center">
