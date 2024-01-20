@@ -17,7 +17,7 @@ const DashboardInfo = () => {
   const session = location.state?.session;
 
   const [postData, setPostData] = useState<Post[]>([]);
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = () => {
@@ -40,23 +40,6 @@ const DashboardInfo = () => {
     navigate(LINKS.LOGIN);
   };
 
-  async function getProfileImage(authID : string) {
-    let imageUrl;
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select("avatar_url")
-      .eq("id", authID)
-      .single();
-
-    if (error) {
-      console.warn(error);
-    };
-
-    imageUrl = await downloadImage(data?.avatar_url);
-    return imageUrl;
-  }
-
   async function downloadImage(path : string) {
     try {
       const { data, error } = await supabase.storage.from('avatars').download(path);
@@ -68,6 +51,33 @@ const DashboardInfo = () => {
     } catch (error) {
       console.log('Error downloading image: ', error);
     };   
+  };
+
+  async function getProfileImage(authID: string) {
+    if (avatarUrlList[authID]) {
+      // If the image URL is already in the state, return it.
+      return avatarUrlList[authID];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', authID)
+        .single();
+
+      if (error) {
+        console.warn(error);
+        return '';
+      }
+
+      const imageUrl = await downloadImage(data?.avatar_url);
+
+      return imageUrl;
+    } catch (error) {
+      console.log('Error fetching profile image: ', error);
+      return '';
+    }
   };
 
   async function getPosts() {
@@ -89,7 +99,16 @@ const DashboardInfo = () => {
     };
 
     getPosts();
-  }, []);
+
+    // Fetch profile images for each post
+    postData.forEach(async (post) => {
+      const imageUrl = await getProfileImage(post.id);
+      setAvatarUrlList((prevImages : Record<string, string>) => ({
+        ...prevImages,
+        [post.id]: imageUrl || '',
+      }));
+    });
+  }, [session, postData]); // Add postData as a dependency
 
   async function createPost(postData: any) {
     const { user } = session;
@@ -218,9 +237,9 @@ const DashboardInfo = () => {
         {/* Posts */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {postData.map((post) => (
-            <div className="my-2 rounded-lg overflow-hidden shadow-2xl bg-white" key={post.post_id}>
+            <div className="my-2 rounded-lg overflow-hidden shadow-2xl shadow-slate-500 bg-white hover:shadow-slate-700 cursor-pointer" key={post.post_id}>
               <div className="p-4 flex items-center">
-                <img className="w-20 h-20 object-cover rounded-full mr-4" src={getProfileImage(post.id)}/>
+                <img className="w-20 h-20 object-cover rounded-full mr-4" src={avatarUrlList[post.id]}/>
                 <div>
                   <h2 className="text-2xl text-[#2c6048]">{truncateText(post.title, 40)}</h2>
                   <p className="text-lg text-[#1f2421]">{truncateText(post.description, 50)}</p>
