@@ -16,9 +16,13 @@ const DashboardInfo = () => {
   const location = useLocation();
   const session = location.state?.session;
 
+  const [loading, setLoading] = useState(true);
   const [postData, setPostData] = useState<Post[]>([]);
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -27,6 +31,20 @@ const DashboardInfo = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const showPost = (post : Post) => {
+    setSelectedPost(post);
+    setModalVisible(true);
+  };
+
+  const closePost = () => {
+    setSelectedPost(null);
+    setModalVisible(false);
+  };
+
+  const goToDashboard = () => {
+    navigate(LINKS.DASHBOARD, {state: {session}});
+  }
 
   const {
     register,
@@ -141,9 +159,39 @@ const DashboardInfo = () => {
     navigate(0);
   };
 
-  const showPost = () => {
-    console.log('Hi');
-  }
+  async function updatePost(postID : number) {
+    console.log(postID);
+  };
+
+  async function deletePost(postID : number) {
+    console.log(postID);
+    setLoading(false);
+
+    const { error } = await supabase
+      .from('posts')
+      .delete()
+      .eq('post_id', postID);
+
+    if (error) {
+      alert(error.message);
+    };
+    
+    setLoading(true);
+    closeDeletePostModal();
+    goToDashboard();
+  };
+
+  const editPost = (post: Post) => {
+
+  };
+
+  const openDeletePostModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const closeDeletePostModal = () => {
+    setIsDeleteModalOpen(false);
+  };
 
   const onSubmit: SubmitHandler<PostSchema> = (data) => {
     createPost(data);
@@ -154,7 +202,7 @@ const DashboardInfo = () => {
       <div>
         <h1 className="text-4xl font-bold mt-3">Accepted Work</h1>
         <button type="submit" 
-          className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mt-4 text-white"
+          className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mt-4 text-white hover:bg-[#3e7d5a] transition duration-300"
           onClick={openModal}>
           Create Post
         </button>
@@ -162,7 +210,9 @@ const DashboardInfo = () => {
         {isModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
-
+            <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeModal}>
+              &times;
+            </span>
             <h1 className="text-3xl my-2">Create a Post</h1>
             
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full space-y-4">
@@ -194,7 +244,7 @@ const DashboardInfo = () => {
               </div>
               
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">Post Description</label>
                 <textarea
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
                   id="description"
@@ -222,10 +272,10 @@ const DashboardInfo = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
-                <button onClick={closeModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md">
+                <button onClick={closeModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
                   Cancel
                 </button>
-                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md">
+                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
                   Create
                 </button>
               </div>
@@ -239,20 +289,93 @@ const DashboardInfo = () => {
         <h1 className="text-4xl font-bold mt-3">Available Work</h1>
 
         {/* Posts */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-          onClick={showPost}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {postData.map((post) => (
-            <div className="my-2 rounded-lg overflow-hidden shadow-2xl shadow-slate-500 bg-white hover:shadow-slate-700 cursor-pointer" key={post.post_id}>
-              <div className="p-4 flex items-center">
+            <div className="my-2 rounded-lg overflow-hidden shadow-2xl shadow-slate-500 bg-white hover:shadow-slate-700 cursor-pointer" 
+              key={post.post_id}>
+              <div className="p-4 flex items-center" onClick={() => showPost(post)} >
                 <img className="w-20 h-20 object-cover rounded-full mr-4" src={avatarUrlList[post.id]}/>
                 <div>
-                  <h2 className="text-2xl text-[#2c6048]">{truncateText(post.title, 40)}</h2>
+                  <h2 className="text-2xl text-[#2c6048]">{truncateText(post.title, 30)}</h2>
                   <p className="text-lg text-[#1f2421]">{truncateText(post.description, 50)}</p>
                   <p className="text-sm text-gray-500">{post.created_by} | {post.date_created.toLocaleString()}</p>
+
+                  {/* Only render these icons if the posts are the users */}
+                  {post.id === session.user.id && (
+                    <div>
+                      <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          editPost(post)}}></i>
+                      <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          openDeletePostModal()}}></i>
+                    </div>
+                  )}
                 </div>
+
+                {isDeleteModalOpen && (
+                  <div onClick={(e) => {
+                    e.stopPropagation()}}
+                    className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+                      <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
+                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
+                        <button type="submit" 
+                          className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            closeDeletePostModal()}}>
+                          Cancel
+                        </button>
+                        <button
+                          className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            deletePost(post.post_id)}}>
+                          {loading ? 'Delete' : 'Deleting...'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ))}
+
+          {isModalVisible && selectedPost && (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+                <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closePost}>
+                  &times;
+                </span>
+                <h2 className="text-4xl text-[#2c6048] font-semibold mb-4">{selectedPost.title}</h2>
+                <p className="text-lg text-[#1f2421] mb-4">{selectedPost.description}</p>
+
+                <div className="flex items-center mb-4">
+                  <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
+                  <p className="text-[#2c6048] font-semibold">{selectedPost.contact}</p>
+                </div>
+
+                <div className="flex items-center mb-4">
+                  <i className="fa-regular fa-user text-gray-500 mr-2"></i>
+                  <p className="text-md text-gray-500">{selectedPost.created_by} | {selectedPost.date_created.toLocaleString()}</p>
+                </div>
+
+                
+                {/* Modal buttons */}
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
+                  <button onClick={closePost} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                    Cancel
+                  </button>
+                  <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
+                    Request
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
