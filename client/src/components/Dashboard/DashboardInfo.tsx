@@ -233,7 +233,7 @@ const DashboardInfo = () => {
 
               <div>
                 <label htmlFor="types" className="block text-sm font-medium text-gray-700">Type of Work</label>
-                <select id="types" className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421] cursor-pointer"
+                <select id="types" className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421] bg-white cursor-pointer"
                   {...register("type")}>
                   <option value="short">Short</option>
                   <option value="long">Long</option>
