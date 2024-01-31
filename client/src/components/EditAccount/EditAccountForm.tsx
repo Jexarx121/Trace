@@ -7,7 +7,6 @@ import { profileSchema } from ".";
 import { supabase } from "../../supabase/supabaseClient";
 import { capitalize } from "../../helpers/functions";
 import { LINKS } from "../constants";
-import { truncateText } from "../../helpers/functions";
 
 type ProfileSchema = z.infer<typeof profileSchema>;
 
@@ -16,12 +15,17 @@ const EditAccountForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { session, fullName, age, bio, passedAvatarUrl } = location.state || {};
-  let listOfNames = fullName.split(' ');
-  let firstName = listOfNames[0];
-  let surname = "";
+  let firstName;
+  let surname;
+  let listOfNames;
+  if (fullName !== null) {
+    listOfNames = fullName.split(' ');
+    firstName = listOfNames[0];
+    surname = "";
 
-  for (let i=1; i < listOfNames.length; i++) {
-    surname += capitalize(listOfNames[i]) + " ";
+    for (let i=1; i < listOfNames.length; i++) {
+      surname += capitalize(listOfNames[i]) + " ";
+    }
   }
 
   const goToAccount = () => {

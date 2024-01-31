@@ -42,10 +42,6 @@ const DashboardInfo = () => {
     setModalVisible(false);
   };
 
-  const goToDashboard = () => {
-    navigate(LINKS.DASHBOARD, {state: {session}});
-  }
-
   const {
     register,
     handleSubmit,
@@ -164,21 +160,26 @@ const DashboardInfo = () => {
   };
 
   async function deletePost(postID : number) {
-    console.log(postID);
     setLoading(false);
 
-    const { error } = await supabase
+    try {
+      const { error } = await supabase
       .from('posts')
       .delete()
       .eq('post_id', postID);
 
-    if (error) {
-      alert(error.message);
-    };
+      if (error) {
+        alert(error.message);
+      };
+    } catch (error) {
+      console.log(error, error);
+    }
     
     setLoading(true);
     closeDeletePostModal();
-    goToDashboard();
+
+    // refresh the page
+    // navigate(0);
   };
 
   const editPost = (post: Post) => {
@@ -322,15 +323,13 @@ const DashboardInfo = () => {
                     <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
                       <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
-                        <button type="submit" 
-                          className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
+                        <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
                           onClick={(e) => {
                             e.stopPropagation()
                             closeDeletePostModal()}}>
                           Cancel
                         </button>
-                        <button
-                          className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300"
+                        <button className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300"
                           onClick={(e) => {
                             e.stopPropagation()
                             deletePost(post.post_id)}}>
