@@ -179,7 +179,7 @@ const DashboardInfo = () => {
     closeDeletePostModal();
 
     // refresh the page
-    // navigate(0);
+    navigate(0);
   };
 
   const editPost = (post: Post) => {
@@ -199,9 +199,9 @@ const DashboardInfo = () => {
   };
 
   return (
-    <div className="w-[70vw] m-auto pt-12">
+    <div className="w-[70vw] m-auto mt-12 mb-12">
       <div>
-        <h1 className="text-4xl font-bold mt-3">Accepted Work</h1>
+        <h1 className="text-4xl font-bold">Accepted Work</h1>
         <button type="submit" 
           className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mt-4 text-white hover:bg-[#3e7d5a] transition duration-300"
           onClick={openModal}>
