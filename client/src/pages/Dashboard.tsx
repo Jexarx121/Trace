@@ -1,11 +1,12 @@
-import { Navbar } from "../components/Homepage";
-import { Posts } from "../components/Dashboard";
+import { Footer, Navbar } from "../components/Homepage";
+import { DashboardInfo } from "../components/Dashboard";
 
 const Dashboard = () => {
   return (
     <div>
       <Navbar/>
-      <Posts/>
+      <DashboardInfo/>
+      <Footer/>
     </div>
   )
 }

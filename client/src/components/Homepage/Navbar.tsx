@@ -26,16 +26,20 @@ const Navbar = () => {
   }, []);
 
   const goToLogin = () => {
-    navigate(LINKS.LOGIN);
+    navigate(LINKS.LOGIN, {state: {session}});
   };
 
   const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE);
+    navigate(LINKS.HOMEPAGE, {state: { session }});
   };
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT);
+    navigate(LINKS.ACCOUNT, {state: { session }});
   };
+
+  const goToDashboard = () => {
+    navigate(LINKS.DASHBOARD, {state: { session }});
+  }
 
   const handleLogout = () => {
     supabase.auth.signOut();
@@ -53,7 +57,7 @@ const Navbar = () => {
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
             About
           </li>
-          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
+          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToDashboard}>
             Dashboard
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToAccount}>
@@ -85,7 +89,7 @@ const Navbar = () => {
               <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
                 About
               </li>
-              <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
+              <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToDashboard}>
                 Dashboard
               </li>
               <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToAccount}>

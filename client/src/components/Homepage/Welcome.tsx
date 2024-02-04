@@ -24,9 +24,6 @@ const Welcome = () => {
               onClick={goToLogin}>
               Try Now
             </button>
-            <a className="px-8 mt-2 cursor-pointer text-center md:text-left" href="#">
-              Learn More →
-            </a>
           </div>
         </div>
         <div className="md:w-1/2 flex justify-center items-center mt-5 md:mt-0">
