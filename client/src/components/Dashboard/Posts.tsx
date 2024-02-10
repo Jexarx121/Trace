@@ -10,4 +10,5 @@ export interface Post {
   description: string,
   contact: string,
   assigned_to: string,
+  status: string
 };
