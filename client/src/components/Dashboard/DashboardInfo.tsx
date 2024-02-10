@@ -11,7 +11,7 @@ import { truncateText } from "../../helpers/functions";
 
 type PostSchema = z.infer<typeof postSchema>;
 
-const DashboardInfo = () => {
+const DashboardInfo = () => { 
   const navigate = useNavigate();
   const location = useLocation();
   const session = location.state?.session;
@@ -24,6 +24,8 @@ const DashboardInfo = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [confirmRequest, setConfirmRequest] = useState(false);
+  const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -32,6 +34,16 @@ const DashboardInfo = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const showAcceptedPost = (post : Post) => {
+    setSelectedPost(post);
+    setIsRequestModalOpen(true);
+  };
+
+  const closeAcceptedPost = () => {
+    setSelectedPost(null);
+    setIsRequestModalOpen(false);
+  }
 
   const openUpdateModal = () => {
     setIsUpdateModalOpen(true);
@@ -49,6 +61,7 @@ const DashboardInfo = () => {
   const closePost = () => {
     setSelectedPost(null);
     setModalVisible(false);
+    setConfirmRequest(false);
   };
 
   const {
@@ -233,29 +246,79 @@ const DashboardInfo = () => {
   };
 
   async function requestPost() {
-    setLoading(false);
-    const { user } = session;
+    if (confirmRequest) {
+      const { user } = session;
 
-    const updates = {
-      assigned_to: user.id,
-      status: "pending"
-    };
+      // get user's name from id and put it into profile
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
 
-    try {
-      const { error } = await supabase
-        .from('posts')
-        .update(updates)
-        .eq('post_id', selectedPost?.post_id);
+      const updates = {
+        assigned_to_name: data[0].full_name,
+        assigned_to: user.id,
+        status: "accepted"
+      };
 
-      if (error) {
-        alert(error.message);
-      }
-    } catch (error) {
-      alert(error);
-    };
+      try {
+        const { error } = await supabase
+          .from('posts')
+          .update(updates)
+          .eq('post_id', selectedPost?.post_id);
 
-    setLoading(true);
-  }
+        if (error) {
+          alert(error.message);
+        }
+      } catch (error) {
+        alert(error);
+      };
+      setConfirmRequest(false);
+      closePost();
+
+      // put in flash alert to indicate post has been requested
+
+      // refresh page
+      navigate(0);
+    } else {
+      setConfirmRequest(true);
+    }
+  };
+
+  async function cancelAcceptedRequest() {
+    if (confirmRequest) {
+      const updates = {
+        assigned_to_name: null,
+        assigned_to: null,
+        status: "free"
+      };
+
+      try {
+        const { error } = await supabase
+          .from('posts')
+          .update(updates)
+          .eq('post_id', selectedPost?.post_id);
+
+        if (error) {
+          alert(error.message);
+        };
+      } catch (error) {
+        alert(error);
+      };
+
+      setConfirmRequest(false);
+      closeAcceptedPost();
+
+      // refresh page
+      navigate(0);
+    } else {
+      setConfirmRequest(true);
+    }
+  };
+
+  async function finishPost() {
+    console.log("test");
+  };
 
   const openDeletePostModal = () => {
     setIsDeleteModalOpen(true);
@@ -268,20 +331,21 @@ const DashboardInfo = () => {
   return (
     <div className="w-[70vw] m-auto mt-12 mb-12">
 
-      {/* Pending Posts */}
-      <div>
+      {/* Accepted Posts */}
+      <div className="mt-12">
         <div className="flex flex-row">
-          <h1 className="text-4xl font-bold mb-4">Work Accepted | Pending</h1>
+          <h1 className="text-4xl font-bold mb-4">Accepted Work</h1>
           <button type="submit" 
-            className="ml-auto mr-5 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mb-4 text-white hover:bg-[#3e7d5a] transition duration-300"
+            className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mb-4 text-white hover:bg-[#3e7d5a] transition duration-300"
             onClick={openModal}>
-            <i className="fa-regular fa-square-plus mr-2"></i>Create Post
+            <i className="fa-regular fa-square-plus mr-2"/>Create Post
           </button>
         </div>
+        
         {postData.map((post) => (
-          post.status !== "free" && (
+          post.status === "accepted" && (
             <div className="my-6 rounded-xl shadow-2xl border-2 border-[#2c6048] bg-white hover:shadow-slate-500 cursor-pointer" 
-              key={post.post_id}  onClick={() => showPost(post)}>
+              key={post.post_id}  onClick={() => showAcceptedPost(post)}>
               <div className="flex md:flex-row flex-col">
                 <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
                 <div>
@@ -314,6 +378,66 @@ const DashboardInfo = () => {
           )
         ))}
       </div>
+
+      {isRequestModalOpen && selectedPost && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+            <div className="flex flex-row">
+              <h2 className="text-4xl text-[#2c6048] font-semibold mb-4">{selectedPost.title}</h2>
+              <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeAcceptedPost}>
+                &times;
+              </span>
+            </div>
+            
+            <p className="text-lg text-[#1f2421] mb-4">{selectedPost.description}</p>
+
+            <div className="flex items-center mb-4">
+              <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
+              <p className="text-[#2c6048] font-semibold">{selectedPost.contact}</p>
+            </div>
+
+            <div className="flex items-center mb-4">
+              <i className="fa-regular fa-user text-gray-600 mr-2"></i>
+              <p className="text-md font-bold text-gray-600">{selectedPost.created_by} | {selectedPost.date_created.toLocaleString()}</p>
+            </div>
+
+            <div className="mb-4">
+              <a className="text-md">Assigned To: <b>{selectedPost.assigned_to_name}</b></a>
+            </div>
+
+            {selectedPost.id !== session.user.id && (
+              <h2 className="text-lg mb-4 font-bold text-red-500">
+                {confirmRequest ? "Are you sure you want to cancel this work? You won't receive the full amount of credits." : "" }</h2>
+            )}
+
+            {selectedPost.id === session.user.id && (
+              <h2 className="text-lg mb-4 font-bold text-red-500">
+              {confirmRequest ? "Are you sure you want to cancel this work? The volunteer won't receive the full amount of credits." : "" }</h2>
+            )}
+            
+            {/* Modal buttons */}
+            <div className={`flex ${selectedPost.id === session.user.id ? 'flex-row' : 'flex-col'} space-y-2 sm:space-y-0 sm:space-x-2 mt-auto`}>
+              {selectedPost.id !== session.user.id && (
+                <button onClick={cancelAcceptedRequest}
+                  className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                  Cancel Work
+                </button>
+              )}
+              {selectedPost.id === session.user.id && (
+                <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+                  <button onClick={cancelAcceptedRequest}
+                    className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                    Cancel Work
+                  </button>
+                  <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
+                    Finish Work
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Free posts */}
       <div className="mt-12">
@@ -400,6 +524,9 @@ const DashboardInfo = () => {
                 <i className="fa-regular fa-user text-gray-600 mr-2"></i>
                 <p className="text-md font-bold text-gray-600">{selectedPost.created_by} | {selectedPost.date_created.toLocaleString()}</p>
               </div>
+
+              <h2 className="text-lg mb-4 font-bold text-red-500">
+                {confirmRequest ? "Please make sure to contact the creator of this post first to sort out any details before requesting!" : "" }</h2>
               
               {/* Modal buttons */}
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
@@ -407,7 +534,7 @@ const DashboardInfo = () => {
                   Cancel
                 </button>
                 <button onClick={requestPost} className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
-                  Request
+                  {confirmRequest ? "Confirm" : "Request"}
                 </button>
               </div>
             </div>

@@ -66,7 +66,7 @@ const EditAccountForm = () => {
   async function updatePosts(authId : any, newName: string) {
     const { error } = await supabase
       .from('posts')
-      .update({ created_by: newName})
+      .update({created_by: newName, assigned_to_name: newName})
       .eq('id', authId);
 
     if (error) {
