@@ -64,11 +64,11 @@ const Navbar = () => {
             Profile
           </li>
           {!session ? (
-            <li className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold" onClick={goToLogin}>
+            <li className="ml-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold" onClick={goToLogin}>
               Login
             </li>
           ) : (
-            <button className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:mr-2"
+            <button className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:ml-4"
               onClick={handleLogout}>
               Sign Out
             </button>
