@@ -12,9 +12,12 @@ type ProfileSchema = z.infer<typeof profileSchema>;
 
 const EditAccountForm = () => {
   const [loading, setLoading] = useState(true);
+  const [descriptionLength, setDescriptionLength] = useState(0);
+
   const navigate = useNavigate();
   const location = useLocation();
   const { session, fullName, age, bio, passedAvatarUrl } = location.state || {};
+
   let firstName;
   let surname;
   let listOfNames;
@@ -25,12 +28,12 @@ const EditAccountForm = () => {
 
     for (let i=1; i < listOfNames.length; i++) {
       surname += capitalize(listOfNames[i]) + " ";
-    }
-  }
+    };
+  };
 
   const goToAccount = () => {
     navigate(LINKS.ACCOUNT, {state: { session }});
-  }
+  };
 
   const {
     register,
@@ -40,6 +43,10 @@ const EditAccountForm = () => {
     resolver: zodResolver(profileSchema),
   });
   
+  const handleDescriptionChange = (event : any) => {
+    const descriptionValue = event.target.value;
+    setDescriptionLength(descriptionValue.length);
+  };
 
   async function uploadAvatar(profileImage : any): Promise<string> {
     try {
@@ -177,7 +184,9 @@ const EditAccountForm = () => {
               className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
               rows={8}
               defaultValue={bio}
-              {...register("bio")} />
+              {...register("bio")} 
+              onChange={handleDescriptionChange} />
+            <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 1000 characters</p>
             {errors.bio && (
               <p className="text-sm text-red-500 mt-2"> {errors.bio?.message}</p> 
             )}

@@ -28,6 +28,7 @@ const DashboardInfo = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [confirmRequest, setConfirmRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+  const [descriptionLength, setDescriptionLength] = useState(0);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -92,6 +93,11 @@ const DashboardInfo = () => {
 
   const goToLogin = () => {
     navigate(LINKS.LOGIN);
+  };
+
+  const handleDescriptionChange = (event : any) => {
+    const descriptionValue = event.target.value;
+    setDescriptionLength(descriptionValue.length);
   };
 
   async function downloadImage(path : string) {
@@ -536,8 +542,10 @@ const DashboardInfo = () => {
               </span>
             </div>
             
-            <p className="text-lg text-[#1f2421] mb-4">{selectedPost.description}</p>
-
+            <div className="">
+              <p className="text-lg text-[#1f2421] mb-4 whitespace-pre-wrap">{selectedPost.description}</p>
+            </div>
+           
             <div className="flex items-center mb-4">
               <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
               <p className="text-[#2c6048] font-semibold">{selectedPost.contact}</p>
@@ -622,7 +630,9 @@ const DashboardInfo = () => {
                   placeholder="Enter a suitable description for the task."
                   rows={10}
                   {...register("description")}
+                  onChange={handleDescriptionChange}
                 />
+                <p className="text-sm text-gray-500 text-right">{descriptionLength} / 500</p>
                 {errors.description && (
                   <p className="text-sm text-red-500 mt-2"> {errors.description?.message}</p> 
                 )}
@@ -704,7 +714,9 @@ const DashboardInfo = () => {
                   rows={10}
                   {...registerUpdate("description")}
                   defaultValue={selectedPost?.description}
+                  onChange={handleDescriptionChange}
                 />
+                <p className="text-sm text-gray-500 text-right">{descriptionLength} / 500</p>
                 {errorsUpdate.description && (
                   <p className="text-sm text-red-500 mt-2"> {errorsUpdate.description?.message}</p> 
                 )}

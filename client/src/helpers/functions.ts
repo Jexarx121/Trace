@@ -12,21 +12,3 @@ export const truncateText = (text : string, maxLength : number) => {
   return text;
 };
 
-async function getUserFromId(userId: any) {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select()
-      .eq('id', userId)
-    
-    if (error) {
-      alert(error);
-    }
-
-    return data;
-
-  } catch (error) {
-    alert(error);
-    return "No user found";
-  }
-};
