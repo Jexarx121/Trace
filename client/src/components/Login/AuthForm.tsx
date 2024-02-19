@@ -10,6 +10,11 @@ const AuthForm = () => {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
 
+  const handleUserCreation = (event: any) => {
+    // Logic to handle new user creation
+    console.log('New user created:', event.user);
+  };
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -23,6 +28,20 @@ const AuthForm = () => {
 
     return () => subscription.unsubscribe()
   }, []);
+
+  useEffect(() => {
+    // Attach the onAuthStateChange callback
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'INITIAL_SESSION') {
+        handleUserCreation(event);
+      }
+    });
+
+    // Cleanup the listener on component unmount
+    return () => {
+      data.subscription?.unsubscribe();
+    };
+  }, []); 
 
   const goToAccount = () => {
     navigate(LINKS.ACCOUNT, {state: { session }});
