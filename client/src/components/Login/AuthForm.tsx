@@ -5,10 +5,25 @@ import { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 import { LINKS } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { authSchema } from ".";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+type AuthSchema = z.infer<typeof authSchema>;
 
 const AuthForm = () => {
   const navigate = useNavigate();
   const [session, setSession] = useState<Session | null>(null);
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
+  } = useForm<AuthSchema>({
+    resolver: zodResolver(authSchema),
+  });
 
   const handleUserCreation = (event: any) => {
     // Logic to handle new user creation
