@@ -341,7 +341,8 @@ const DashboardInfo = () => {
             <i className="fa-regular fa-square-plus mr-2"/>Create Post
           </button>
         </div>
-        
+
+        {/* Only shows accepted posts */}
         {postData.map((post) => (
           post.status === "accepted" && (
             <div className="my-6 rounded-xl shadow-2xl border-2 border-[#2c6048] bg-white hover:shadow-slate-500 cursor-pointer" 

@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { decrypt } from "../../client/src/helpers/functions"
+import Security from "../helpers/functions";
 
 const {
   loadFixture,
@@ -10,13 +10,14 @@ const { expect } = require("chai");
 describe("NodeManager Contract", function () {
 
   async function deployNodeFixture() {
+    const security = new Security();
     const [owner, addr1, addr2] = await ethers.getSigners();
 
     const traceCredit = await ethers.deployContract("Credit");
     await traceCredit.waitForDeployment();
 
-    const trustedForwarder = decrypt("dce3dbc62fd48a368cc3d864f80d4cf23a094e9a1929596d1d8b369c2c0c01525aaebb365a784f958a8a8e122b45b60e26047f9f17f113b66e7c01fe1428df36f02f24003c1da7305234407fbebb8d5d"); 
-    const nodeManager = await ethers.deployContract("NodeManager", [traceCredit.address, trustedForwarder]);
+    const trustedForwarder = security.decrypt(""); 
+    const nodeManager = await ethers.deployContract("NodeManager", [traceCredit, trustedForwarder]);
     await nodeManager.waitForDeployment();
 
     // creates the variables to be used in different tests to avoid duplication

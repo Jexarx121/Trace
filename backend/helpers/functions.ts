@@ -1,17 +1,5 @@
 import crypto from 'crypto-browserify';
 
-export const capitalize = (str: string = "", lowerRest = true): string =>
-  str.slice(0, 1).toUpperCase() +
-  (lowerRest ? str.slice(1).toLowerCase() : str.slice(1));
-
-export const truncateText = (text : string, maxLength : number) => {
-  if (text.length > maxLength) {
-    return `${text.slice(0, maxLength)}...`;
-  };
-
-  return text;
-};
-
 // Code from https://dev.to/vapourisation/east-encryption-in-typescript-3948
 
 function splitEncryptedText( encryptedText: string ) {
@@ -26,19 +14,19 @@ export default class Security {
   encoding: BufferEncoding = 'hex';
 
   // process.env.CRYPTO_KEY should be a 32 BYTE key
-  key: string = "Fd1WYDCW+QrRvKIkFZT1UPSGEP7cA0NGWzJlaMlWHhQ=";
+  key: string = process.env.CRYPTO_KEY!;
 
   encrypt( plaintext: string ) {
     try {
       const iv = crypto.randomBytes( 16 );
-      const cipher = crypto.createCipheriv('aes-256-cbc', this.key, iv);
+      const cipher = crypto.createCipheriv( 'aes-256-cbc', this.key, iv );
 
       const encrypted = Buffer.concat( [
         cipher.update(
-          plaintext, 'utf-8'
+            plaintext, 'utf-8'
         ),
         cipher.final(),
-      ] );
+      ]);
 
       return iv.toString( this.encoding ) + encrypted.toString( this.encoding );
     } catch (e) {

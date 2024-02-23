@@ -195,7 +195,7 @@ const EditAccountForm = () => {
 
         {/* Update Profile Button */}
         <button type="submit" 
-          className="w-full md:w-auto mt-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center text-white md:mr-4">
+          className="w-full md:w-auto mt-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center text-white md:mr-4 hover:bg-[#3e7d5a] transition duration-300">
           {loading ? 'Update' : 'Updating...'}
         </button>
 
