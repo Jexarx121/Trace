@@ -16,7 +16,7 @@ describe("NodeManager Contract", function () {
     const traceCredit = await ethers.deployContract("Credit");
     await traceCredit.waitForDeployment();
 
-    const trustedForwarder = security.decrypt(""); 
+    const trustedForwarder = security.decrypt(process.env.ADMIN_ACCOUNT!); 
     const nodeManager = await ethers.deployContract("NodeManager", [traceCredit, trustedForwarder]);
     await nodeManager.waitForDeployment();
 
