@@ -19,6 +19,7 @@ describe("Credit contract", function() {
 
   it("Should set the right owner", async function () {
     const { traceCredit, owner } = await loadFixture(deployCreditFixture);
+    
     expect(await traceCredit.owner()).to.equal(owner.address);
   })
 

@@ -6,6 +6,7 @@ const {
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 
 const { expect } = require("chai");
+const { vars } = require("hardhat/config");
 
 describe("NodeManager Contract", function () {
 
@@ -16,9 +17,14 @@ describe("NodeManager Contract", function () {
     const traceCredit = await ethers.deployContract("Credit");
     await traceCredit.waitForDeployment();
 
-    const trustedForwarder = security.decrypt(process.env.ADMIN_ACCOUNT!); 
-    const nodeManager = await ethers.deployContract("NodeManager", [traceCredit, trustedForwarder]);
+    // environment vars set with https://hardhat.org/hardhat-runner/docs/guides/configuration-variables
+    const ADMIN_ENCRYPTED_ADDRESS = vars.get("ADMIN_ENCRYPTED_ADDRESS");
+    const trustedForwarder = security.decrypt(ADMIN_ENCRYPTED_ADDRESS); 
+
+    const traceCreditAddress = await traceCredit.getAddress();
+    const nodeManager = await ethers.deployContract("NodeManager", [traceCredit.target, trustedForwarder]);
     await nodeManager.waitForDeployment();
+    console.log("NodeManager contract deplopyed to: ", nodeManager.target);
 
     // creates the variables to be used in different tests to avoid duplication
     return { nodeManager, owner, addr1, addr2 };

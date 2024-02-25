@@ -1,11 +1,12 @@
 import crypto from 'crypto-browserify';
+const { vars } = require("hardhat/config");
 
 // Code from https://dev.to/vapourisation/east-encryption-in-typescript-3948
 
 function splitEncryptedText(encryptedText: string) {
   return {
-    ivString: encryptedText.slice( 0, 32 ),
-    encryptedDataString: encryptedText.slice( 32 ),
+    ivString: encryptedText.slice(0, 32),
+    encryptedDataString: encryptedText.slice(32),
   }
 }
 
@@ -13,8 +14,7 @@ function splitEncryptedText(encryptedText: string) {
 export default class Security {
   encoding: BufferEncoding = 'hex';
 
-  // process.env.CRYPTO_KEY should be a 32 BYTE key
-  key: string = process.env.CRYPTO_KEY!;
+  key: string = vars.get("CRYPTO_KEY");
 
   encrypt(plaintext: string) {
     try {

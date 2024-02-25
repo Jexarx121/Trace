@@ -2,6 +2,7 @@
 pragma solidity ^0.8.9;
 
 import "./Credit.sol";
+import "hardhat/console.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
 contract NodeManager is ERC2771Context {
@@ -18,6 +19,7 @@ contract NodeManager is ERC2771Context {
   uint256 public nodesCount;
 
   constructor(address creditTokenAddress, address trustedForwarder) ERC2771Context(trustedForwarder) {
+    console.log("HERE");
     creditToken = Credit(creditTokenAddress);
   }
 
