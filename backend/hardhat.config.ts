@@ -1,5 +1,8 @@
+import 'dotenv/config';
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomicfoundation/hardhat-ethers";
+import "@openzeppelin/hardhat-upgrades";
 
 require("@nomicfoundation/hardhat-toolbox");
 
@@ -14,6 +17,16 @@ const config: HardhatUserConfig = {
         settings: {},
       },
     ],
+  },
+  defender: {
+    apiKey: process.env.TEST_ENV_API_KEY as string,
+    apiSecret: process.env.TEST_ENV_API_SECRET_KEY as string
+  },
+  networks: {
+    sepolia: {
+      url: "https://ethereum-sepolia-rpc.publicnode.com",
+      chainId: 11155111
+    }
   }
 };
 

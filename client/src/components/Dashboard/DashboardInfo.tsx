@@ -7,7 +7,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { Post } from "./Posts";
-import { truncateText } from "../../helpers/functions";
+import { truncateText }from "../../helpers/functions";
+import Security from "../../helpers/functions";
 
 type PostSchema = z.infer<typeof postSchema>;
 
@@ -15,6 +16,7 @@ const DashboardInfo = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const session = location.state?.session;
+  const security = new Security();
 
   const [loading, setLoading] = useState(true);
   const [postData, setPostData] = useState<Post[]>([]);
@@ -320,6 +322,21 @@ const DashboardInfo = () => {
     console.log("test");
   };
 
+  async function getKey(userId : string) {
+    const { data } = await supabase
+      .from("wallets")
+      .select("ethereum_private_address")
+      .eq("id", userId)
+
+    const privateKey = security.decrypt(data[0].ethereum_private_address);
+    console.log(privateKey);
+  };
+
+  const clickButtonGetKey = () => {
+    console.log(session.user.id);
+    getKey(session.user.id);
+  }
+
   const openDeletePostModal = () => {
     setIsDeleteModalOpen(true);
   };
@@ -339,6 +356,11 @@ const DashboardInfo = () => {
             className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mb-4 text-white hover:bg-[#3e7d5a] transition duration-300"
             onClick={openModal}>
             <i className="fa-regular fa-square-plus mr-2"/>Create Post
+          </button>
+          <button type="submit" 
+            className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mb-4 text-white hover:bg-[#3e7d5a] transition duration-300"
+            onClick={clickButtonGetKey}>
+            <i className="fa-regular fa-square-plus mr-2"/>Get Key
           </button>
         </div>
 

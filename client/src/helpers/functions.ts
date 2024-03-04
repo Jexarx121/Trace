@@ -13,7 +13,6 @@ export const truncateText = (text : string, maxLength : number) => {
 };
 
 // Code from https://dev.to/vapourisation/east-encryption-in-typescript-3948
-
 function splitEncryptedText(encryptedText: string) {
   return {
     ivString: encryptedText.slice(0, 32),
@@ -25,8 +24,7 @@ function splitEncryptedText(encryptedText: string) {
 export default class Security {
   encoding: BufferEncoding = 'hex';
 
-  // process.env.CRYPTO_KEY should be a 32 BYTE key
-  key: string = process.env.CRYPTO_KEY!;
+  key: string = import.meta.env.VITE_CRYPTO_KEY;
 
   encrypt(plaintext: string) {
     try {

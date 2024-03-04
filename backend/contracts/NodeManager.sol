@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.9;
 
-import "./Credit.sol";
+import "./TraceCredit.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 
@@ -13,19 +13,18 @@ contract NodeManager is ERC2771Context {
     uint256 postId;
   }
 
-  Credit public creditToken;
+  TraceCredit public traceCredit;
 
   mapping(uint256 => Node) public nodes;
   uint256 public nodesCount;
 
   constructor(address creditTokenAddress, address trustedForwarder) ERC2771Context(trustedForwarder) {
-    console.log("HERE");
-    creditToken = Credit(creditTokenAddress);
+    traceCredit = TraceCredit(creditTokenAddress);
   }
 
   function createNode(address receiver, uint256 amount, uint256 postId) external {
     // Use the _msgSender() from ERC2771Context to get the actual sender of the meta transaction
-    creditToken.transferFrom(_msgSender(), receiver, amount);
+    traceCredit.transferFrom(_msgSender(), receiver, amount);
 
     // Add to the chain
     Node storage newNode = nodes[nodesCount];
