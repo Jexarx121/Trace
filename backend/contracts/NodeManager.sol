@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 import "./TraceCredit.sol";
 import "hardhat/console.sol";
 import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
 
 contract NodeManager is ERC2771Context {
   struct Node {
@@ -18,7 +19,7 @@ contract NodeManager is ERC2771Context {
   mapping(uint256 => Node) public nodes;
   uint256 public nodesCount;
 
-  constructor(address creditTokenAddress, address trustedForwarder) ERC2771Context(trustedForwarder) {
+  constructor(address creditTokenAddress, ERC2771Forwarder forwarder) ERC2771Context(address(forwarder)) {
     traceCredit = TraceCredit(creditTokenAddress);
   }
 

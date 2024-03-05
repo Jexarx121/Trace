@@ -6,7 +6,6 @@ const {
 } = require("@nomicfoundation/hardhat-toolbox/network-helpers");
 
 const { expect } = require("chai");
-const { vars } = require("hardhat/config");
 
 describe("NodeManager Contract", function () {
 
@@ -17,10 +16,12 @@ describe("NodeManager Contract", function () {
     const traceCredit = await ethers.deployContract("TraceCredit", [initialSupply]);
     await traceCredit.waitForDeployment();
 
-    const relayerAddress = process.env.RELAYER_ADDRESS;
-    const traceCreditAddress = await traceCredit.getAddress()
+    const forwarderFactory = await ethers.getContractFactory("ERC2771Forwarder");
+    const forwarder = await forwarderFactory.deploy('ERC2771Forwarder');
+    const forwarderAddress = await forwarder.getAddress();
 
-    const nodeManager = await ethers.deployContract("NodeManager", [traceCreditAddress, relayerAddress]);
+    const traceCreditAddress = await traceCredit.getAddress()
+    const nodeManager = await ethers.deployContract("NodeManager", [traceCreditAddress, forwarderAddress]);
     await nodeManager.waitForDeployment();
 
     // creates the variables to be used in different tests to avoid duplication

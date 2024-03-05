@@ -1,3 +1,5 @@
 {
-  "nodeManager": "0x9ab7F343d657f7CBD53eFe3936913B59896d25A8"
+  "nodeManager": "0x94581d3bb2093cB6d2A1e44bDf1dB78A70236C12",
+  "forwarder": "0x549d92da35452726a2dD67591504a4B9585De0c2",
+  "traceCredit": "0x8a2D729eDabe29c526EADe99408d2Bbfc540994C"
 }

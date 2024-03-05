@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { Post } from "./Posts";
 import { truncateText }from "../../helpers/functions";
+import { ethers } from "ethers";
 import Security from "../../helpers/functions";
 
 type PostSchema = z.infer<typeof postSchema>;
@@ -28,6 +29,9 @@ const DashboardInfo = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [confirmRequest, setConfirmRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+
+  const provider = new ethers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
+  const wallet = new ethers.Wallet("0x57685c4fcad8575c70b8b58ee74ce3b4afbacd437e1e6bb4c0b9b2d2bb992d92", provider)
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -332,9 +336,21 @@ const DashboardInfo = () => {
     console.log(privateKey);
   };
 
+  async function testBlock() {
+    provider.getBlockNumber().then((blocknumber) => {
+      console.log("Block number: ", blocknumber);
+    })
+    .catch(console.error);
+
+    provider.getBalance('0x9ab7F343d657f7CBD53eFe3936913B59896d25A8').then((balance) => {
+      console.log("Balance : ", balance);
+    })
+    .catch(console.error);
+  }
+
   const clickButtonGetKey = () => {
-    console.log(session.user.id);
-    getKey(session.user.id);
+    // getKey(session.user.id);
+    testBlock();
   }
 
   const openDeletePostModal = () => {

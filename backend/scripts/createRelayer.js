@@ -2,6 +2,8 @@ require('dotenv').config();
 const { RelayClient } = require('@openzeppelin/defender-relay-client');
 const { appendFileSync, writeFileSync} = require('fs');
 
+// This function creates a relayer for the deploy script to get the address of.
+// Stores the details in relay.json
 async function run() {
   const API_KEY = process.env.DEFENDER_API_KEY;
   const API_SECRET = process.env.DEFENDER_API_SECRET_KEY;
