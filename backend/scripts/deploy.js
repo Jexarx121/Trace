@@ -27,6 +27,7 @@ async function main() {
   await forwarder.waitForDeployment();
   const forwarderAddress = await forwarder.getAddress();
 
+  // NodeManager contract deployment
   const nodeManagerFactory = await ethers.getContractFactory("NodeManager", { signer: relaySigner });
   const nodeManager = await defender.deployContract(nodeManagerFactory, [traceCreditAddress, forwarderAddress]);
   await nodeManager.waitForDeployment();

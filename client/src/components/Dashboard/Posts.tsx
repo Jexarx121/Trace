@@ -11,5 +11,16 @@ export interface Post {
   contact: string,
   assigned_to: string,
   assigned_to_name: string,
-  status: string
+  status: string,
+  rating: number
 };
+
+export type PostTypes = {
+  short: number,
+  long: number;
+}
+
+export const postTypes : PostTypes = {
+  "short": 5,
+  "long" : 10
+}

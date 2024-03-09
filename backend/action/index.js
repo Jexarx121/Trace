@@ -5,9 +5,11 @@ const FORWARDER_ABI = frequire('../src/forwarder').forwarderABI;
 const FORWARDER_ADDRESS= require('../deploy.json').forwarder;
 
 // Tutorial from https://docs.openzeppelin.com/defender/v2/guide/meta-tx
-async function relay(forwarder, relay, signature) {
-  // Potentially add roles in this for OpenZeppelin's whitelist
-  // Users can have roles and only validate their request based on roles
+
+async function relay(forwarder, request, signature, whitelist) {
+  // Users can have roles and only validate their request based on roles in whitelist
+  const accepts = !whitelist || whitelist.includes(request.to);
+  if (!accepts) throw new Error(`Rejected requrest to ${request.to}`);
 
   const valid = await forwarder.verify(request, signature);
   if (!valid) throw new Error('Invalid request.');

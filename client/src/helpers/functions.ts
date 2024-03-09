@@ -45,10 +45,7 @@ export default class Security {
   };
 
   decrypt(cipherText: string) {
-    const {
-      encryptedDataString,
-      ivString,
-    } = splitEncryptedText(cipherText);
+    const { encryptedDataString, ivString } = splitEncryptedText(cipherText);
 
     try {
       const iv = Buffer.from(ivString, this.encoding);

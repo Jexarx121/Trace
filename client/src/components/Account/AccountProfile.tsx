@@ -37,7 +37,6 @@ const AccountProfile = () => {
 
   // Called when users register for the first time to create a wallet for each
   async function createAndStoreWallet(userId : string) {
-    // const key = import.meta.env.VITE_CRYPTO_KEY;
     const security = new Security();
     const wallet = ethers.Wallet.createRandom();
     const ethereumAddress = wallet.address;
