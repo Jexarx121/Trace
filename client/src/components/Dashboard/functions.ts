@@ -45,7 +45,7 @@ export const calculateCredit = (data: { time: string; amountPeople: string; rati
   const numberOfPeople = parseInt(data.amountPeople);
   const creditFromPostType = postTypes[postType];
 
-  const credit = (creditFromPostType + numberOfHours) * (numberOfPeople + 1);
+  const credit : number = (creditFromPostType + numberOfHours) * (numberOfPeople + 1);
   console.log("Credit: ", credit);
   return credit;
 };

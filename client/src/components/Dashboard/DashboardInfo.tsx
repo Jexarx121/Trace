@@ -12,6 +12,7 @@ import { ethers } from "ethers";
 import { EthContext } from "../../eth/context";
 import { downloadImage, calculateCredit, getPrivateKey, getPublicKey } from "./functions";
 import { createNewNode } from "../../eth/createNode";
+import { createInstance } from "../../eth/nodeManager";
 
 type PostSchema = z.infer<typeof postSchema>;
 type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
@@ -350,15 +351,17 @@ const DashboardInfo = () => {
   };
 
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
+    console.log(nodeManager);
     const privateKey = await getPrivateKey(session.user.id);
     const wallet = new ethers.Wallet(privateKey);
     const signer = wallet.connect(provider);
+    const newNodeManager = createInstance(signer);
 
     const receiver = await getPublicKey(selectedPost?.assigned_to!);
     const creditAmount = calculateCredit(data, postType);
     const postId = selectedPost?.post_id;
 
-    const response = await createNewNode(nodeManager, provider, signer, receiver, creditAmount, postId);
+    const response = await createNewNode(newNodeManager, provider, signer, receiver, creditAmount, postId);
     console.log(response);
     
     setConfirmRequest(false);

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { createInstance } from "./forwarder";
-import { signMetaTransactionRequest } from "../../../backend/src/signer";
+import { signMetaTransactionRequest } from '../../../backend/src/signer.js';
 
 // Helper function to create data for createNode function call (assuming function arguments)
 // function getCreateNodeData(receiver, amount, postId) {
@@ -28,13 +28,19 @@ async function sendMetaTransaction(nodeManager, provider, signer, receiver, cred
   if (!URL) {
     console.error("Missing url");
   };
+  console.log("HERE 2");
 
   const forwarder = createInstance(provider);
+  console.log("HERE 3");
   const from = await signer.getAddress();
+  console.log("HERE 4");
   const data = nodeManager.interface.encodeFunctionData('createNode', [receiver, creditAmount, postId]);
+  console.log("HERE 5");
   const to = await nodeManager.getAddress();
+  console.log("HERE 6");
 
   const request = await signMetaTransactionRequest(signer.provider, forwarder, { to, from, data });
+  console.log("HERE 10");
 
   return fetch(URL, {
     method: 'POST',

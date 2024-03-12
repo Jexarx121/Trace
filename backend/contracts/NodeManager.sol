@@ -24,12 +24,13 @@ contract NodeManager is ERC2771Context {
   }
 
   function createNode(address receiver, uint256 amount, uint256 postId) external {
-    // Use the _msgSender() from ERC2771Context to get the actual sender of the meta transaction
-    traceCredit.transferFrom(_msgSender(), receiver, amount);
+    // Approve transfer of tokens from traceCredit to this contract
+    traceCredit.approve(address(this), amount);
+    traceCredit.transferFrom(address(this), receiver, amount);
 
     // Add to the chain
     Node storage newNode = nodes[nodesCount];
-    newNode.sender = _msgSender();
+    newNode.sender = _msgSender(); // supporting meta transactions
     newNode.receiver = receiver;
     newNode.amount = amount;
     newNode.postId = postId;

@@ -1,7 +1,7 @@
 const { Defender } = require('@openzeppelin/defender-sdk');
 const { ethers } = require('hardhat');
 
-const FORWARDER_ABI = frequire('../src/forwarder').forwarderABI;
+const FORWARDER_ABI = require('../src/forwarder').forwarderABI;
 const FORWARDER_ADDRESS= require('../deploy.json').forwarder;
 
 // Tutorial from https://docs.openzeppelin.com/defender/v2/guide/meta-tx

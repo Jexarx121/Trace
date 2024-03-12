@@ -28,15 +28,13 @@ describe("NodeManager Contract", function () {
     return { nodeManager, owner, addr1, addr2, traceCredit };
   }
 
-  it("Should create a node and transfer tokens", async function () {
+  it("Should create a node and transfer tokens from traceCredit contract to addr2", async function () {
     const { nodeManager, addr1, addr2, traceCredit } = await loadFixture(deployNodeFixture);
     const nodeManagerAddress = await nodeManager.getAddress();
 
-    await traceCredit.transfer(addr1.address, 100);
+    await traceCredit.transfer(addr1.address, 10);
     await traceCredit.transfer(nodeManagerAddress, 3000);
 
-    // Approve the nodeManager contract to spend tokens on behalf of addr1
-    await traceCredit.connect(addr1).approve(nodeManagerAddress, 50);
     await nodeManager.connect(addr1).createNode(addr2.address, 50, 1);
 
     const [sender, receiver, amount, postId] = await nodeManager.getNodeDetails(0);

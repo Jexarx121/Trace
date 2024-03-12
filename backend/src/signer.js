@@ -1,4 +1,4 @@
-const ethSigUtil = require('eth-sig-util');
+import { ethers } from 'ethers';
 
 const EIP712 = [
   { name: 'name', type: 'string' },
@@ -35,31 +35,33 @@ const getTransactionTypeData = (chainId, verifyingContract) => {
 async function signTypedData(signer, data) {
   if (typeof(signer) === 'string') {
     const privateKey = Buffer.from(signer.replace(/^0x/, ''), 'hex');
-    return ethSigUtil.signTypedMessage(privateKey, { data });
+    return signer._signTypedData(privateKey, { data });
   };
 
   // Can potentially add other inputs for different EIP712 inputs
 };
 
 async function buildRequest(forwarder, input) {
-  const nonce = await forwarder.getNonce(input.from).then(nonce => nonce.toString());
+  const nonce = (await forwarder.nonces(input.from)).toString();
+  // const nonce = await forwarder.getNonce(input.from).then(nonce => nonce.toString());
   return { value: 0, gas: 1e6, nonce, ...input };
 };
 
 async function buildTypedData(forwarder, request) {
-  const chainId = await forwarder.provider.getNetwork().then(n => n.chainId);
+  const forwarderProvider = await forwarder.provider;
+  console.log(forwarder);
+  const chainId = await forwarderProvider.getNetwork().then(n => n.chainId);
   const forwarderAddress = await forwarder.getAddress();
   const typeData = getTransactionTypeData(chainId, forwarderAddress);
   return { ...typeData, message: request };
 };
 
-async function signMetaTransactionRequest(signer, forwarder, input) {
+export async function signMetaTransactionRequest(signer, forwarder, input) {
   const request = await buildRequest(forwarder, input);
+  console.log("HERE 7");
   const toSign = await buildTypedData(forwarder, request);
-  const signature = await signTypedData(signer, input.from, toSign);
+  console.log("HERE 8");
+  const signature = await signTypedData(signer, toSign);
+  console.log("HERE 9");
   return { signature, request };
-}
-
-module.exports = {
-  signMetaTransactionRequest
-}
+};
