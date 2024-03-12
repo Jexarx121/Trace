@@ -13,6 +13,7 @@ import { EthContext } from "../../eth/context";
 import { downloadImage, calculateCredit, getPrivateKey, getPublicKey } from "./functions";
 import { createNewNode } from "../../eth/createNode";
 import { createInstance } from "../../eth/nodeManager";
+import { createInstance as createTraceInstance } from "../../eth/traceCredit";
 
 type PostSchema = z.infer<typeof postSchema>;
 type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
@@ -356,6 +357,7 @@ const DashboardInfo = () => {
     const wallet = new ethers.Wallet(privateKey);
     const signer = wallet.connect(provider);
     const newNodeManager = createInstance(signer);
+    const traceCredit = createTraceInstance(provider);
 
     const receiver = await getPublicKey(selectedPost?.assigned_to!);
     const creditAmount = calculateCredit(data, postType);
@@ -363,6 +365,11 @@ const DashboardInfo = () => {
 
     const response = await createNewNode(newNodeManager, provider, signer, receiver, creditAmount, postId);
     console.log(response);
+    const balance = await traceCredit.balanceOf(receiver);
+    console.log(balance);
+    const nodeDetails = await newNodeManager.nodesCount;
+    console.log(nodeDetails);
+
     
     setConfirmRequest(false);
     // setFinishPostModal(false);

@@ -39,7 +39,7 @@ async function sendMetaTransaction(nodeManager, provider, signer, receiver, cred
   const to = await nodeManager.getAddress();
   console.log("HERE 6");
 
-  const request = await signMetaTransactionRequest(signer.provider, forwarder, { to, from, data });
+  const request = await signMetaTransactionRequest(signer.provider, forwarder, { to, from, data }, provider);
   console.log("HERE 10");
 
   return fetch(URL, {
@@ -47,6 +47,7 @@ async function sendMetaTransaction(nodeManager, provider, signer, receiver, cred
     body: JSON.stringify(request),
     headers: { 'Content-Type' : 'application/json' }
   });
+
 };
 
 export async function createNewNode(nodeManager, provider, signer, receiver, creditAmount, postId) {

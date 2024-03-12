@@ -10,7 +10,7 @@ async function main() {
 
   const { actionId } = await client.action.create({
     name: "Relayer Meta Transactions",
-    encodedZippedCode: await client.action.getEncodedZippedCodeFromFolder('./action'),
+    encodedZippedCode: await client.action.getEncodedZippedCodeFromFolder('./build/action'),
     relayerId: relayerId,
     trigger: {
       type: 'webhook'

@@ -4,8 +4,6 @@ import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-ethers";
 import "@openzeppelin/hardhat-upgrades";
 
-require("@nomicfoundation/hardhat-toolbox");
-
 const config: HardhatUserConfig = {
   solidity: {
     compilers: [

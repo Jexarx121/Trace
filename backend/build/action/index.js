@@ -1,5 +1,7 @@
+'use strict';
+
 const { Defender } = require('@openzeppelin/defender-sdk');
-const { ethers } = require('hardhat');
+const { ethers } = require('ethers');
 
 const FORWARDER_ABI = require('../src/forwarder').forwarderABI;
 const FORWARDER_ADDRESS= require('../deploy.json').forwarder;
@@ -16,8 +18,7 @@ async function relay(forwarder, request, signature, whitelist) {
 
   const gasLimit = (parseInt(request.gas) + 50000).toString();
   return await forwarder.execute(request, signature, { gasLimit });
-};
-
+}
 async function handler(event) {
   // Parse webhook payload
   if (!event.request || !event.request.body) throw new Error(`Missing payload`);
@@ -37,8 +38,7 @@ async function handler(event) {
   const tx = await relay(forwarder, request, signature);
   console.log(`Sent meta-tx: ${tx.hash}`);
   return { txHash: tx.hash };
-};
-
+}
 module.exports = {
   handler,
   relay
