@@ -14,13 +14,13 @@
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@openzeppelin/contracts-upgradeable": "^5.0.2",
     "@openzeppelin/hardhat-upgrades": "^3.0.4",
-    "dotenv": "^16.4.5",
-    "hardhat": "^2.19.5",
-    "rollup": "^4.13.0",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^15.2.3",
-    "builtin-modules": "^3.2.0"
+    "builtin-modules": "^3.2.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.19.5",
+    "rollup": "^4.13.0"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.8.0",
@@ -31,7 +31,7 @@
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "eth-sig-util": "^3.0.1",
-    "ethers": "^6.11.1",
+    "ethers": "^5.7.2",
     "stream-browserify": "^3.0.0"
   }
 }

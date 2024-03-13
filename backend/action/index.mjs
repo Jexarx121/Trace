@@ -1,15 +1,14 @@
 const { Defender } = require('@openzeppelin/defender-sdk');
 const { ethers } = require('ethers');
 
-const FORWARDER_ABI = require('../src/forwarder').forwarderABI;
+const { forwarderABI } = require('../src/forwarder');
 const FORWARDER_ADDRESS= require('../deploy.json').forwarder;
 
 // Tutorial from https://docs.openzeppelin.com/defender/v2/guide/meta-tx
 
-async function relay(forwarder, request, signature, whitelist) {
+async function relay(forwarder, request, signature) {
   // Users can have roles and only validate their request based on roles in whitelist
-  const accepts = !whitelist || whitelist.includes(request.to);
-  if (!accepts) throw new Error(`Rejected requrest to ${request.to}`);
+  // Future thing to do 
 
   const valid = await forwarder.verify(request, signature);
   if (!valid) throw new Error('Invalid request.');
@@ -31,7 +30,7 @@ async function handler(event) {
 
   const provider = client.relaySigner.getProvider();
   const signer = client.relaySigner.getSigner(provider, { speed: 'fast' });
-  const forwarder = new ethers.Contract(FORWARDER_ADDRESS, FORWARDER_ABI, signer);
+  const forwarder = new ethers.Contract(FORWARDER_ADDRESS, forwarderABI, signer);
 
   // Relay transaction!
   const tx = await relay(forwarder, request, signature);
@@ -43,3 +42,10 @@ module.exports = {
   handler,
   relay
 };
+
+if (require.main === module) {
+  const { RELAYER_API_KEY: RELAYER_KEY, RELAYER_API_SECRET: RELAYER_SECRET } = process.env;
+  handler({ RELAYER_KEY, RELAYER_SECRET })
+    .then(() => process.exit(0))
+    .catch(error => { console.error(error); process.exit(1); });
+}

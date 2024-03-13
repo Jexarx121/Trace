@@ -19,7 +19,6 @@ const forwardRequest = [
 const getTransactionTypeData = (chainId, verifyingContract) => {
   return {
     types: {
-      EIP712,
       forwardRequest,
     },
     domain: {
@@ -32,10 +31,11 @@ const getTransactionTypeData = (chainId, verifyingContract) => {
   };
 };
 
-async function signTypedData(signer, data) {
-  if (typeof(signer) === 'string') {
-    const privateKey = Buffer.from(signer.replace(/^0x/, ''), 'hex');
-    return signer._signTypedData(privateKey, { data });
+async function signTypedDataFunction(signer, data) {
+  if (typeof(signer.address) === 'string') {
+    const privateKey = Buffer.from(signer.address.replace(/^0x/, ''), 'hex');
+    const signature = await signer.signTypedData(data.domain, data.types, data.value);
+    return signature;
   };
 
   // Can potentially add other inputs for different EIP712 inputs
@@ -50,15 +50,12 @@ async function buildTypedData(forwarder, request, provider) {
   const chainId = await provider.getNetwork().then(n => n.chainId);
   const forwarderAddress = await forwarder.getAddress();
   const typeData = getTransactionTypeData(chainId, forwarderAddress);
-  return { ...typeData, message: request };
+  return { ...typeData, value: request };
 };
 
 export async function signMetaTransactionRequest(signer, forwarder, input, provider) {
   const request = await buildRequest(forwarder, input);
-  console.log("HERE 7");
   const toSign = await buildTypedData(forwarder, request, provider);
-  console.log("HERE 8");
-  const signature = await signTypedData(signer, toSign);
-  console.log("HERE 9");
+  const signature = await signTypedDataFunction(signer, toSign);
   return { signature, request };
 };

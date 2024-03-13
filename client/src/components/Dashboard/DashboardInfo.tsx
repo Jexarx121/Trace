@@ -352,10 +352,12 @@ const DashboardInfo = () => {
   };
 
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
-    console.log(nodeManager);
+    setLoading(false);
     const privateKey = await getPrivateKey(session.user.id);
-    const wallet = new ethers.Wallet(privateKey);
+    const wallet = new ethers.Wallet(privateKey, provider);
     const signer = wallet.connect(provider);
+    console.log("Signer: ", signer);
+
     const newNodeManager = createInstance(signer);
     const traceCredit = createTraceInstance(provider);
 
@@ -370,8 +372,8 @@ const DashboardInfo = () => {
     const nodeDetails = await newNodeManager.nodesCount;
     console.log(nodeDetails);
 
-    
     setConfirmRequest(false);
+    setLoading(true);
     // setFinishPostModal(false);
   };
 
@@ -581,8 +583,10 @@ const DashboardInfo = () => {
                 <button onClick={closeFinishModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
                   Cancel
                 </button>
-                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
-                  Create
+                {/* HELP, make all buttons disabled when clicked once using loading */}
+                <button type="submit" className={`w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300 ${loading ? 'cursor-pointer' : 'cursor-wait'}`}
+                  disabled={!loading}>
+                  {loading ? 'Create' : 'Creating...'}
                 </button>
               </div>
             </form>
