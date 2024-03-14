@@ -456,7 +456,7 @@ const DashboardInfo = () => {
       {/* Post Modal for accepted posts */}
       {isRequestModalOpen && selectedPost && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
             <div className="flex flex-row">
               <h2 className="text-4xl text-[#2c6048] font-semibold mb-4">{selectedPost.title}</h2>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeAcceptedPost}>
@@ -503,11 +503,11 @@ const DashboardInfo = () => {
               {selectedPost.id === session.user.id && (
                 <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                   <button onClick={cancelAcceptedRequest}
-                    className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                    className="w-full sm:w-[50%] cancel-button">
                     Cancel Work
                   </button>
                   <button onClick={openFinishModal}
-                    className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
+                    className="w-full sm:w-[50%] confirm-button">
                     Finish Work
                   </button>
                 </div>
@@ -520,7 +520,7 @@ const DashboardInfo = () => {
       {/* Modal for finishing the post */}
       {finishPostModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Complete Work</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeFinishModal}>
@@ -580,11 +580,12 @@ const DashboardInfo = () => {
               </h2>
 
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
-                <button onClick={closeFinishModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                <button onClick={closeFinishModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 mr-4">
                   Cancel
                 </button>
                 {/* HELP, make all buttons disabled when clicked once using loading */}
-                <button type="submit" className={`w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300 ${loading ? 'cursor-pointer' : 'cursor-wait'}`}
+                <button type="submit" 
+                  className={`w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300 ml-4 ${loading ? 'cursor-pointer' : 'cursor-wait'}`}
                   disabled={!loading}>
                   {loading ? 'Create' : 'Creating...'}
                 </button>
@@ -633,7 +634,7 @@ const DashboardInfo = () => {
                   <div onClick={(e) => {
                     e.stopPropagation()}}
                     className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+                    <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
                       <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
                         <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
@@ -657,10 +658,10 @@ const DashboardInfo = () => {
           )
         ))}
 
-        {/* Modal for showing currently clicked post */}
+        {/* Modal for showing currently clicked free post */}
         {isModalVisible && selectedPost && (
           <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+            <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
               <div className="flex flex-row">
                 <h2 className="text-4xl text-[#2c6048] font-semibold mb-4">{selectedPost.title}</h2>
                 <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closePost}>
@@ -687,22 +688,22 @@ const DashboardInfo = () => {
               
               {/* Modal buttons */}
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
-                <button onClick={closePost} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                <button onClick={closePost} className="w-full sm:w-[50%] cancel-button">
                   Cancel
                 </button>
-                <button onClick={requestPost} className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
+                <button onClick={requestPost} className="w-full sm:w-[50%] confirm-button">
                   {confirmRequest ? "Confirm" : "Request"}
                 </button>
               </div>
             </div>
           </div>
         )}
-      </div>
+      </div> 
 
       {/* Form Modal for creating posts */}
       {isModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Create Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeModal}>
@@ -767,10 +768,10 @@ const DashboardInfo = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
-                <button onClick={closeModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                <button onClick={closeModal} className="w-full sm:w-[50%] cancel-button">
                   Cancel
                 </button>
-                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
+                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] confirm-button">
                   Create
                 </button>
               </div>
@@ -782,7 +783,7 @@ const DashboardInfo = () => {
       {/* Form for updating the post */}
       {isUpdateModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] xl:w-[30%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Update Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeUpdateModal}>
@@ -850,10 +851,10 @@ const DashboardInfo = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
-                <button onClick={closeUpdateModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                <button onClick={closeUpdateModal} className="w-full sm:w-[50%] cancel-button">
                   Cancel
                 </button>
-                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300">
+                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] confirm-button">
                   Update
                 </button>
               </div>

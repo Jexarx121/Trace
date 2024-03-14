@@ -43,6 +43,32 @@ h1, h2 {
   }
 }
 
+.confirm-button {
+  background-color: rgb(73 160 120);
+  color: white;
+  padding: 0.5rem 0px;
+  border-radius: 0.375rem;
+  transition: 300ms;
+  margin-left: 1rem;
+}
+
+.confirm-button:hover {
+  background-color: #3e7d5a;
+}
+
+.cancel-button {
+  background-color: rgb(220 38 38);
+  color: white;
+  padding: 0.5rem 0px;
+  border-radius: 0.375rem;
+  transition: 300ms;
+  margin-right: 1rem;
+}
+
+.cancel-button:hover {
+  background-color: rgb(185 28 28);
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
