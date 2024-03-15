@@ -1,31 +1,17 @@
 import { supabase } from "../../supabase/supabaseClient";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { Session } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { LINKS } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { SessionContext } from "../Context/SessionContext";
 
 const AuthForm = () => {
   const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    })
-
-    return () => subscription.unsubscribe()
-  }, []);
+  const { session } = useContext(SessionContext);
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: { session }});
+    navigate(LINKS.ACCOUNT);
   }
 
   const goToHomepage = () => {

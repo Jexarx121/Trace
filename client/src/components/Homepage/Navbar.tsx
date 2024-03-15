@@ -1,44 +1,30 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { supabase } from "../../supabase/supabaseClient";
-import { Session } from "@supabase/supabase-js";
+import { SessionContext } from "../Context/SessionContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [toggleMenu, setToggleMenu] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    })
-
-    return () => subscription.unsubscribe()
-  }, []);
-
+  const { session } = useContext(SessionContext);
+  
   const goToLogin = () => {
-    navigate(LINKS.LOGIN, {state: {session}});
+    navigate(LINKS.LOGIN);
   };
 
   const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE, {state: { session }});
+    navigate(LINKS.HOMEPAGE);
   };
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: { session }});
+    navigate(LINKS.ACCOUNT);
   };
 
   const goToDashboard = () => {
-    navigate(LINKS.DASHBOARD, {state: { session }});
+    navigate(LINKS.DASHBOARD);
   }
 
   const handleLogout = () => {

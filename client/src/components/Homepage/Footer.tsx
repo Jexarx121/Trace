@@ -1,37 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
-import { useEffect, useState } from "react";
-import { supabase } from "../../supabase/supabaseClient";
-import { Session } from "@supabase/supabase-js";
+import { useContext } from "react";
+import { SessionContext } from "../Context/SessionContext";
 
 const Footer = () => {
   const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    })
-
-    return () => subscription.unsubscribe()
-  }, []);
+  const { session } = useContext(SessionContext);
   
   const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE, {state: {session}});
+    navigate(LINKS.HOMEPAGE);
   };
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: {session}});
+    navigate(LINKS.ACCOUNT);
   };
 
   const goToDashboard = () => {
-    navigate(LINKS.DASHBOARD, {state: {session}});
+    navigate(LINKS.DASHBOARD);
   };
   
   return (

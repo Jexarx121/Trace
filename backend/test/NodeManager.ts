@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { ethers } from "hardhat";
+import { signMetaTransactionRequest } from '../src/signer.js';
 
 const {
   loadFixture,
@@ -10,7 +11,7 @@ const { expect } = require("chai");
 describe("NodeManager Contract", function () {
 
   async function deployNodeFixture() {
-    const [owner, addr1, addr2] = await ethers.getSigners();
+    const accounts = await ethers.getSigners();
 
     const initialSupply = 10000;
     const traceCredit = await ethers.deployContract("TraceCredit", [initialSupply]);
@@ -25,12 +26,14 @@ describe("NodeManager Contract", function () {
     await nodeManager.waitForDeployment();
 
     // creates the variables to be used in different tests to avoid duplication
-    return { nodeManager, owner, addr1, addr2, traceCredit };
+    return { nodeManager, accounts, traceCredit, forwarder };
   }
 
   it("Should create a node and transfer tokens from traceCredit contract to addr2", async function () {
-    const { nodeManager, addr1, addr2, traceCredit } = await loadFixture(deployNodeFixture);
+    const { nodeManager, accounts, traceCredit } = await loadFixture(deployNodeFixture);
     const nodeManagerAddress = await nodeManager.getAddress();
+    const addr1 = accounts[1];
+    const addr2 = accounts[2];
 
     await traceCredit.transfer(addr1.address, 10);
     await traceCredit.transfer(nodeManagerAddress, 3000);
@@ -42,5 +45,24 @@ describe("NodeManager Contract", function () {
     expect(receiver).to.equal(addr2);
     expect(amount).to.equal(50);
     expect(postId).to.equal(1);
+  });
+
+  it("Should create a node through a meta-tx", async function () {
+    const { nodeManager, accounts, forwarder, traceCredit } = await loadFixture(deployNodeFixture);
+    const signer = accounts[2];
+    const relayer = accounts[3];
+    const receiver = accounts[4];
+
+    await forwarder.connect(relayer);
+    
+    const { request, signature } = await signMetaTransactionRequest(signer, forwarder, {
+      from : signer.address,
+      to: nodeManager.address,
+      data: nodeManager.interface.encodeFunctionData('createNode', [receiver, 12, 2])
+      }, signer.provider
+    );
+
+    await forwarder.execute(request, signature).then(tx => tx.wait());
+    expect(await traceCredit.balanceOf(receiver).to.equal(12));
   });
 });

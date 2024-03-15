@@ -12,6 +12,7 @@ const forwardRequest = [
   { name: 'to', type: 'address'},
   { name: 'value', type: 'uint256'},
   { name: 'gas', type: 'uint256'},
+  { name: 'deadline', type: 'uint48'},
   { name: 'nonce', type: 'uint256'},
   { name: 'data', type: 'bytes'}
 ];
@@ -34,7 +35,7 @@ const getTransactionTypeData = (chainId, verifyingContract) => {
 async function signTypedDataFunction(signer, data) {
   if (typeof(signer.address) === 'string') {
     const privateKey = Buffer.from(signer.address.replace(/^0x/, ''), 'hex');
-    const signature = await signer.signTypedData(data.domain, data.types, data.value);
+    const signature = await signer.signTypedData(data.domain, data.types, data.message);
     return signature;
   };
 
@@ -42,15 +43,16 @@ async function signTypedDataFunction(signer, data) {
 };
 
 async function buildRequest(forwarder, input) {
-  const nonce = (await forwarder.nonces(input.from)).toString();
-  return { value: 0, gas: 1e6, nonce, ...input };
+  const nonce = parseInt((await forwarder.nonces(input.from)).toString());
+  const deadline = Math.floor(Date.now() / 1000) + 3600;
+  return { value: 0, gas: 1e6, deadline, nonce, ...input };
 };
 
 async function buildTypedData(forwarder, request, provider) {
   const chainId = await provider.getNetwork().then(n => n.chainId);
   const forwarderAddress = await forwarder.getAddress();
   const typeData = getTransactionTypeData(chainId, forwarderAddress);
-  return { ...typeData, value: request };
+  return { ...typeData, message: request };
 };
 
 export async function signMetaTransactionRequest(signer, forwarder, input, provider) {

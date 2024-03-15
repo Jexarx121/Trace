@@ -1,15 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../supabase/supabaseClient";
 import { LINKS } from "../constants";
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
 import { ethers } from "ethers";
+import { SessionContext } from "../Context/SessionContext";
 import Security from "../../helpers/functions";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
-  const location = useLocation()
-  const session = location.state?.session;
+  const { session } = useContext(SessionContext);
   
   const [fullName, setFullName] = useState(null);
   const [age, setAge] = useState(null);

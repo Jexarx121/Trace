@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import { profileSchema } from ".";
 import { supabase } from "../../supabase/supabaseClient";
 import { capitalize } from "../../helpers/functions";
 import { LINKS } from "../constants";
+import { SessionContext } from "../Context/SessionContext";
 
 type ProfileSchema = z.infer<typeof profileSchema>;
 
@@ -16,7 +17,8 @@ const EditAccountForm = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { session, fullName, age, bio, passedAvatarUrl } = location.state || {};
+  const { fullName, age, bio, passedAvatarUrl } = location.state || {};
+  const { session } = useContext(SessionContext);
 
   let firstName;
   let surname;
@@ -32,7 +34,7 @@ const EditAccountForm = () => {
   };
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: { session }});
+    navigate(LINKS.ACCOUNT);
   };
 
   const {

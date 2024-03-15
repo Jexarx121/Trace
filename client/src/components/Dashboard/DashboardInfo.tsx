@@ -4,12 +4,13 @@ import { postSchema, finishedPostSchema } from ".";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { Post } from "./Posts";
 import { truncateText, capitalize }from "../../helpers/functions";
 import { ethers } from "ethers";
 import { EthContext } from "../../eth/context";
+import { SessionContext } from "../Context/SessionContext";
 import { downloadImage, calculateCredit, getPrivateKey, getPublicKey } from "./functions";
 import { createNewNode } from "../../eth/createNode";
 import { createInstance } from "../../eth/nodeManager";
@@ -20,8 +21,7 @@ type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
 
 const DashboardInfo = () => { 
   const navigate = useNavigate();
-  const location = useLocation();
-  const session = location.state?.session;
+  const { session } = useContext(SessionContext);
   const { provider, nodeManager } = useContext(EthContext);
 
   const [loading, setLoading] = useState(true);
@@ -353,7 +353,7 @@ const DashboardInfo = () => {
 
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
     setLoading(false);
-    const privateKey = await getPrivateKey(session.user.id);
+    const privateKey = await getPrivateKey(session?.user.id);
     const wallet = new ethers.Wallet(privateKey, provider);
     const signer = wallet.connect(provider);
     console.log("Signer: ", signer);
@@ -417,7 +417,7 @@ const DashboardInfo = () => {
 
         {/* Only shows accepted posts */}
         {postData.map((post) => (
-          post.status === "accepted" && (post.id === session.user.id || post.assigned_to === session.user.id) && (
+          post.status === "accepted" && (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
             <div className="my-6 rounded-xl shadow-2xl border-2 border-[#2c6048] bg-white hover:shadow-slate-500 cursor-pointer" 
               key={post.post_id}  onClick={() => showAcceptedPost(post)}>
               <div className="flex md:flex-row flex-col">
@@ -480,19 +480,19 @@ const DashboardInfo = () => {
               <a className="text-md">Assigned To: <b>{selectedPost.assigned_to_name}</b></a>
             </div>
 
-            {selectedPost.id !== session.user.id && (
+            {selectedPost.id !== session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
                 {confirmRequest ? "Are you sure you want to cancel this work? You won't receive the full amount of credits." : "" }</h2>
             )}
 
-            {selectedPost.id === session.user.id && (
+            {selectedPost.id === session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
               {confirmRequest ? "Are you sure you want to cancel this work? The volunteer won't receive the full amount of credits." : "" }</h2>
             )}
             
             {/* Modal buttons */}
-            <div className={`flex ${selectedPost.id === session.user.id ? 'flex-row' : 'flex-col'} space-y-2 sm:space-y-0 sm:space-x-2 mt-auto`}>
-              {selectedPost.id !== session.user.id && (
+            <div className={`flex ${selectedPost.id === session?.user.id ? 'flex-row' : 'flex-col'} space-y-2 sm:space-y-0 sm:space-x-2 mt-auto`}>
+              {selectedPost.id !== session?.user.id && (
                 <button onClick={cancelAcceptedRequest}
                   className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
                   Cancel Work
@@ -500,7 +500,7 @@ const DashboardInfo = () => {
               )}
 
               {/* Only creator of post can finish it */}
-              {selectedPost.id === session.user.id && (
+              {selectedPost.id === session?.user.id && (
                 <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                   <button onClick={cancelAcceptedRequest}
                     className="w-full sm:w-[50%] cancel-button">
@@ -614,7 +614,7 @@ const DashboardInfo = () => {
                   <p className="text-lg text-[#1f2421]">{truncateText(post.description, 150)}</p>
                   
                   {/* Only render these icons if the posts are the users */}
-                  {post.id === session.user.id && (
+                  {post.id === session?.user.id && (
                     <div>
                       <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
                         onClick={(e) => {
