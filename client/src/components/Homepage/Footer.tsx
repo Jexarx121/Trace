@@ -1,13 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { Link } from "react-router-dom";
+import { UserIdContext } from "../Context/UserIdContext";
+import { useContext } from "react";
 
 const Footer = () => {
-  const navigate = useNavigate();
-  
-  const goToAccount = () => {
-    navigate(LINKS.ACCOUNT);
-  };
+  const { userId } = useContext(UserIdContext);
 
   return (
     <div className="bg-[#216869] pt-1">
@@ -18,7 +15,7 @@ const Footer = () => {
           </h1>
           <a className="p-5 cursor-pointer">About</a>
           <Link to={LINKS.DASHBOARD} className="p-5 cursor-pointer">Dashboard</Link>
-          <a className="p-5 cursor-pointer" onClick={goToAccount}>Profile</a>
+          <Link className="p-5 cursor-pointer" to={`/account/${userId}`}>Profile</Link>
         </div>
         <div className="border-t-2 border-gray-400 flex flex-col md:flex-row justify-start">
           <h1 className="font-bold p-5">&#169; 2024 Trace</h1> 

@@ -33,9 +33,9 @@ const About = () => {
   };
 
   return (
-    <div className="bg-[#FFFFFF]">
+    <div className="bg-[#FFFFFF] ">
       <div className="w-full md:w-[70vw] mx-auto flex flex-col lg:flex-row mt-20">
-        <div className="lg:w-1/2 sm:p-5 md:p-0">
+        <div className="lg:w-1/2 sm:p-5 md:p-0 px-4">
           <h1 className="font-bold mb-4 mt-4 uppercase text-[#1f2421]">About</h1>
           <div>
             {aboutTitles.map((item, index) => (

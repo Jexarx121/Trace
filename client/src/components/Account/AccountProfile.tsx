@@ -8,7 +8,7 @@ import Security from "../../helpers/functions";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { user_id } = useParams();
   const { session } = useContext(SessionContext);
   
   const [fullName, setFullName] = useState(null);

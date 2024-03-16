@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { useNavigate } from "react-router-dom";
@@ -6,15 +6,13 @@ import { LINKS } from "../constants";
 import { supabase } from "../../supabase/supabaseClient";
 import { SessionContext } from "../Context/SessionContext";
 import { Link } from "react-router-dom";
+import { UserIdContext } from "../Context/UserIdContext";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [toggleMenu, setToggleMenu] = useState(false);
   const { session } = useContext(SessionContext);
-
-  const goToAccount = () => {
-    navigate(LINKS.ACCOUNT);
-  };
+  const { userId } = useContext(UserIdContext);
 
   const handleLogout = () => {
     supabase.auth.signOut();
@@ -34,8 +32,8 @@ const Navbar = () => {
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
             <Link to={LINKS.DASHBOARD}>Dashboard</Link>
           </li>
-          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToAccount}>
-            Profile
+          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
+            <Link to={`/account/${userId}`}>Profile</Link>
           </li>
           {!session ? (
             <li>
@@ -68,8 +66,8 @@ const Navbar = () => {
               <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
                 <Link to={LINKS.DASHBOARD}>Dashboard</Link>
               </li>
-              <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToAccount}>
-                Profile
+              <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
+                <Link to={`/account/${userId}`}>Profile</Link>
               </li>
               {!session ? (
                 <li >
