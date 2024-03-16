@@ -15,6 +15,7 @@ import { downloadImage, calculateCredit, getPrivateKey, getPublicKey } from "./f
 import { createNewNode } from "../../eth/createNode";
 import { createInstance } from "../../eth/nodeManager";
 import { createInstance as createTraceInstance } from "../../eth/traceCredit";
+import toast from "react-hot-toast";
 
 type PostSchema = z.infer<typeof postSchema>;
 type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
@@ -222,10 +223,8 @@ const DashboardInfo = () => {
       alert(error.message)
     };
 
-    // flash notification
-
-    // refresh the page
-    navigate(0);
+    toast.success('Post has been created.');
+    closeModal();
   };
 
   async function updatePost(data : any) {
@@ -252,9 +251,9 @@ const DashboardInfo = () => {
       alert(error);
     };
 
-    // flash notification
     setLoading(false);
-    navigate(0);
+    toast.success('Post has been updated.');
+    closeUpdateModal();
   };
 
   async function deletePost() {
@@ -274,10 +273,8 @@ const DashboardInfo = () => {
     }
 
     setLoading(true);
+    toast.success('Post has been deleted.');
     closeDeletePostModal();
-
-    // refresh the page
-    navigate(0);
   };
 
   async function requestPost() {

@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "./supabase/supabaseClient";
 import { Session } from "@supabase/supabase-js";
 import { UserIdContext } from "./components/Context/UserIdContext";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const provider = createProvider();
@@ -63,6 +64,16 @@ const App = () => {
             </EthContext.Provider>
           }/>
         </Routes>
+        <Toaster toastOptions={{
+          success: {
+            style: {
+              background: '#263228',
+              color: 'white',
+              fontSize: '16px',
+              fontFamily: 'Outfit'
+            }
+          }
+        }}/>
       </UserIdContext.Provider>
     </SessionContext.Provider>
   );

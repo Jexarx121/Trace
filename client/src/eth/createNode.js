@@ -14,16 +14,13 @@ async function sendMetaTransaction(nodeManager, provider, signer, receiver, cred
   const to = await nodeManager.getAddress();
 
   const request = await signMetaTransactionRequest(signer, forwarder, { to, from, data }, provider);
-  console.log(request.request);
-  console.log("Signature: ", request.signature.length);
-  const sig = ethers.Signature.from(request.signature);
-  const finalSignature = ethers.concat([sig.r, sig.s, sig.v]);
+  console.log(request);
 
-  // return fetch(URL, {
-  //   method: 'POST',
-  //   body: JSON.stringify(request),
-  //   headers: { 'Content-Type' : 'application/json' }
-  // });
+  return fetch(URL, {
+    method: 'POST',
+    body: JSON.stringify(request),
+    headers: { 'Content-Type' : 'application/json' }
+  });
 
 };
 

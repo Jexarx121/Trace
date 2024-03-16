@@ -5,6 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import { ethers } from "ethers";
 import { SessionContext } from "../Context/SessionContext";
 import Security from "../../helpers/functions";
+import { Link } from "react-router-dom";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
@@ -16,9 +17,10 @@ const AccountProfile = () => {
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState(null);
   const [passedAvatarUrl, setPassedAvatarUrl] = useState("");
+  const [ userId, setUserId ] = useState(0);
 
   const goToEditAccountPage = () => {
-    navigate(LINKS.EDIT_ACCOUNT, { state: { session, fullName, age, passedAvatarUrl, bio }});
+    navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
   };
 
   async function downloadImage(path : string) {
@@ -36,20 +38,14 @@ const AccountProfile = () => {
   };
 
   // Called when users register for the first time to create a wallet for each
-  async function createAndStoreWallet(userId : string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select("id")
-      .eq('user_id', userId)
-      .single();
-
+  async function createAndStoreWallet() {
     const security = new Security();
     const wallet = ethers.Wallet.createRandom();
     const ethereumAddress = wallet.address;
     const ethereumPrivateAddress = security.encrypt(wallet.privateKey);
 
     const details = {
-      id: data?.id,
+      id: session?.user.id,
       ethereum_address: ethereumAddress,
       ethereum_private_address: ethereumPrivateAddress
     };
@@ -63,6 +59,19 @@ const AccountProfile = () => {
     };
   };
 
+  async function getUserId() {
+    const { data } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('id', session?.user.id)
+      .single();
+    
+    if (data && data.user_id) {
+      setUserId(data.user_id);
+      navigate(`/account/${userId}`)
+    }
+  }
+
   useEffect(() => {
     let ignore = false;
     // Go back to auth page if not login
@@ -70,16 +79,20 @@ const AccountProfile = () => {
       navigate(LINKS.LOGIN);
     };
 
+    if (user_id === ":user_id" || user_id === '0') {
+      getUserId();
+    }
+
     async function getProfile() {
       const { data, error } = await supabase
         .from('profiles')
         .select("full_name, avatar_url, age, bio")
-        .eq('id', session?.user.id)
+        .eq('user_id', user_id)
         .single();
 
       // if data from database is null, user is newly joined
       if (data?.full_name === null) {
-        createAndStoreWallet(userId);
+        createAndStoreWallet();
         goToEditAccountPage();
       };
 
@@ -102,7 +115,7 @@ const AccountProfile = () => {
   });
 
   const checkWallet = () => {
-    createAndStoreWallet(session.user.id);
+    createAndStoreWallet();
   }
 
   return (
@@ -112,7 +125,7 @@ const AccountProfile = () => {
           {/* Account Profile Div */}
           <div className="w-full mb-4 sm:flex-col">
             <div className="flex flex-col md:flex-row items-start">
-              <img className="w-48 h-48 rounded-full mb-4 md:mr-4 md:mb-0" src={avatarUrl} alt="Profile Picture" />
+              <img className="w-48 h-48 rounded-full mb-4 md:mr-4 md:mb-10 " src={avatarUrl} alt="Profile Picture" />
               <div>
                 <h1 className="text-3xl font-bold text-[#1f2421]">{fullName}</h1>
                 <h2 className="text-md text-gray-600">{age}</h2>
@@ -121,10 +134,11 @@ const AccountProfile = () => {
                 </p>
               </div>
             </div>
-            <button className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mt-8 text-white hover:bg-[#3e7d5a] transition duration-300"
-              onClick={goToEditAccountPage}>
+            {/* Pass state variables to editProfile */}
+            <Link className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-lg text-white hover:bg-[#3e7d5a] transition duration-300"
+              to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
               Edit Profile
-            </button>
+            </Link>
           </div>
         </div>
 
