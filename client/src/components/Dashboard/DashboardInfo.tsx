@@ -23,6 +23,7 @@ type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
 const DashboardInfo = () => { 
   const navigate = useNavigate();
   const { session } = useContext(SessionContext);
+  sessionStorage.setItem("session", session);
   const { provider, nodeManager } = useContext(EthContext);
 
   const [loading, setLoading] = useState(true);
@@ -134,10 +135,6 @@ const DashboardInfo = () => {
     }
   }
 
-  const goToLogin = () => {
-    navigate(LINKS.LOGIN);
-  };
-
   async function getProfileImage(authID: string) {
     if (avatarUrlList[authID]) {
       // If the image URL is already in the state, return it.
@@ -180,9 +177,14 @@ const DashboardInfo = () => {
   useEffect(() => {
     // User can only view posts if logged in
     if (!session) {
-      goToLogin();
+      const storedSession = sessionStorage.getItem("session");
+      // Stored session since context variable doesn't persist after page refresh
+      if (!storedSession) {
+        navigate(LINKS.LOGIN);
+        return;
+      }
     };
-
+    
     getPosts();
 
     // Fetch profile images for each post
@@ -193,7 +195,7 @@ const DashboardInfo = () => {
         [post.id]: imageUrl || '',
       }));
     });
-  }, [session, postData]); // Add postData as a dependency
+  }, [session, postData, navigate]);
 
   async function createPost(postData: any) {
     const { user } = session;
@@ -308,10 +310,8 @@ const DashboardInfo = () => {
       setConfirmRequest(false);
       closePost();
 
-      // put in flash alert to indicate post has been requested
+      toast.success('Post has been requested.') 
 
-      // refresh page
-      navigate(0);
     } else {
       setConfirmRequest(true);
     }
@@ -339,10 +339,8 @@ const DashboardInfo = () => {
       };
 
       setConfirmRequest(false);
+      toast.success("Post has been unassigned.")
       closeAcceptedPost();
-
-      // refresh page
-      navigate(0);
     } else {
       setConfirmRequest(true);
     }

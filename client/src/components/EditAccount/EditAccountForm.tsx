@@ -8,6 +8,7 @@ import { supabase } from "../../supabase/supabaseClient";
 import { capitalize } from "../../helpers/functions";
 import { LINKS } from "../constants";
 import { SessionContext } from "../Context/SessionContext";
+import toast from "react-hot-toast";
 
 type ProfileSchema = z.infer<typeof profileSchema>;
 
@@ -116,7 +117,7 @@ const EditAccountForm = () => {
     };
 
     updatePosts(user.id, fullname);
-
+    toast.success("Your account has been updated.")
     setLoading(true);
     goToAccount();
   };

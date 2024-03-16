@@ -7,6 +7,7 @@ import { supabase } from "../../supabase/supabaseClient";
 import { SessionContext } from "../Context/SessionContext";
 import { Link } from "react-router-dom";
 import { UserIdContext } from "../Context/UserIdContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const Navbar = () => {
   const { userId } = useContext(UserIdContext);
 
   const handleLogout = () => {
+    toast.success("You have been logged out.")
     supabase.auth.signOut();
     navigate(LINKS.HOMEPAGE);
   };
