@@ -5,27 +5,16 @@ import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { supabase } from "../../supabase/supabaseClient";
 import { SessionContext } from "../Context/SessionContext";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [toggleMenu, setToggleMenu] = useState(false);
   const { session } = useContext(SessionContext);
-  
-  const goToLogin = () => {
-    navigate(LINKS.LOGIN);
-  };
-
-  const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE);
-  };
 
   const goToAccount = () => {
     navigate(LINKS.ACCOUNT);
   };
-
-  const goToDashboard = () => {
-    navigate(LINKS.DASHBOARD);
-  }
 
   const handleLogout = () => {
     supabase.auth.signOut();
@@ -35,23 +24,23 @@ const Navbar = () => {
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
       <div className="w-[70vw] m-auto flex items-center">
-        <h1 className="text-white font-bold text-2xl cursor-pointer"
-          onClick={goToHomepage}>
-          Trace
+        <h1 className="text-white font-bold text-2xl cursor-pointer">
+          <Link to={LINKS.HOMEPAGE}>Trace</Link>
         </h1>
         <ul className='md:flex hidden flex-row list-none items-center px-4 ml-auto text-white flex-initial'>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
             About
           </li>
-          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToDashboard}>
-            Dashboard
+          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
+            <Link to={LINKS.DASHBOARD}>Dashboard</Link>
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToAccount}>
             Profile
           </li>
           {!session ? (
-            <li className="ml-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold hover:bg-[#3e7d5a] transition duration-300" onClick={goToLogin}>
-              Login
+            <li>
+              <Link className="ml-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold hover:bg-[#3e7d5a] transition duration-300" 
+                to={LINKS.LOGIN}>Login</Link>
             </li>
           ) : (
             // add flash alert for this
@@ -76,24 +65,25 @@ const Navbar = () => {
               <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
                 About
               </li>
-              <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToDashboard}>
-                Dashboard
+              <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
+                <Link to={LINKS.DASHBOARD}>Dashboard</Link>
               </li>
               <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToAccount}>
                 Profile
               </li>
               {!session ? (
-                <li className="px-4 cursor-pointer font-bold text-xl hover:bg-[#3e7d5a] transition duration-300" onClick={goToLogin}>
-                  Login
+                <li >
+                  <Link className="px-4 cursor-pointer font-bold text-xl" 
+                    to={LINKS.LOGIN}>Login</Link>
                 </li>
               ) : (
-                <button className="px-4 cursor-pointer font-bold md:text-left md:mr-2 hover:bg-[#3e7d5a] transition duration-300"
+                <button className="px-4 cursor-pointer font-bold text-xl text-left md:mr-2"
                   onClick={handleLogout}>
                   Sign Out
                 </button>
               )}
-                </ul>
-              )}
+            </ul>
+          )}
         </div> 
       </div>
     </nav>

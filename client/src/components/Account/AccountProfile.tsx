@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../supabase/supabaseClient";
 import { LINKS } from "../constants";
 import { useState, useEffect, useContext } from "react";
@@ -8,6 +8,7 @@ import Security from "../../helpers/functions";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const { session } = useContext(SessionContext);
   
   const [fullName, setFullName] = useState(null);
@@ -36,13 +37,19 @@ const AccountProfile = () => {
 
   // Called when users register for the first time to create a wallet for each
   async function createAndStoreWallet(userId : string) {
+    const { data } = await supabase
+      .from('profiles')
+      .select("id")
+      .eq('user_id', userId)
+      .single();
+
     const security = new Security();
     const wallet = ethers.Wallet.createRandom();
     const ethereumAddress = wallet.address;
     const ethereumPrivateAddress = security.encrypt(wallet.privateKey);
 
     const details = {
-      id: userId,
+      id: data?.id,
       ethereum_address: ethereumAddress,
       ethereum_private_address: ethereumPrivateAddress
     };
@@ -72,7 +79,7 @@ const AccountProfile = () => {
 
       // if data from database is null, user is newly joined
       if (data?.full_name === null) {
-        createAndStoreWallet(session.user.id);
+        createAndStoreWallet(userId);
         goToEditAccountPage();
       };
 

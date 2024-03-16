@@ -4,8 +4,8 @@ import { AccountProfile } from "../components/Account";
 const Account = () => {
   return (
     <div>
-      <Navbar />
-      <AccountProfile />
+      <Navbar/>
+      <AccountProfile/>
     </div>
   );
 };
