@@ -136,14 +136,17 @@ const AccountProfile = () => {
             <img className="sm:h-48 sm:w-48 sm:-translate-y-24 h-36 w-36 -translate-y-20 m-4 mr-6 border-white border-8 rounded-full" src={avatarUrl}/>
             <div>
               <h1 className="sm:text-4xl text-xl font-bold text-[#1f2421] mt-4">{fullName}</h1>
-              <p className="sm:text-md text-sm text-gray-600 mt-2">{age}</p>
+              <p className="sm:text-lg text-md text-gray-600 mt-2">{age}</p>
             </div>
+
+            {/* Only render if this is the user's profile */}
             <div className="ml-auto"> 
               <Link className="m-4 bg-[#49A078] rounded-md font-bold text-lg text-white hover:bg-[#3e7d5a] transition duration-300"
                 to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
                 <HiOutlinePencilSquare className="sm:text-3xl text-2xl text-[#49A078] mr-10"/>
               </Link>
             </div>
+
           </div>
           {/* Bio */}
           <div className="mb-10">

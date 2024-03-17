@@ -16,6 +16,7 @@ import { createNewNode } from "../../eth/createNode";
 import { createInstance } from "../../eth/nodeManager";
 import { createInstance as createTraceInstance } from "../../eth/traceCredit";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 type PostSchema = z.infer<typeof postSchema>;
 type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
@@ -37,6 +38,7 @@ const DashboardInfo = () => {
   const [confirmRequest, setConfirmRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [finishPostModal, setFinishPostModal] = useState(false);
+  const [userId, setUserId] = useState(0);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -174,30 +176,18 @@ const DashboardInfo = () => {
     setPostData(data as Post[]);
   };
 
-  useEffect(() => {
-    // User can only view posts if logged in
-    if (!session) {
-      const storedSession = JSON.parse(sessionStorage.getItem("session"));
-      // Stored session since context variable doesn't persist after page refresh
-      if (!storedSession && !toastShown) {
-        toast.error("Login required.");
-        toastShown = true;
-        navigate(LINKS.LOGIN);
-        return;
-      }
-    };
-    
-    getPosts();
+  async function _getUserIdFromId(postUserId : string) {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('user_id')
+      .eq('id', postUserId)
 
-    // Fetch profile images for each post
-    postData.forEach(async (post) => {
-      const imageUrl = await getProfileImage(post.id);
-      setAvatarUrlList((prevImages : Record<string, string>) => ({
-        ...prevImages,
-        [post.id]: imageUrl || '',
-      }));
-    });
-  }, [session, postData, navigate]);
+    if (error) {
+      console.warn(error);
+    }
+
+    return data[0].user_id;
+  }
 
   async function createPost(postData: any) {
     const { user } = session;
@@ -348,6 +338,11 @@ const DashboardInfo = () => {
     }
   };
 
+  const getUserIdFromId = async (postUserId: string) => {
+    const userId = await _getUserIdFromId(postUserId);
+    return userId;
+  }
+
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
     setLoading(false);
     const privateKey = await getPrivateKey(session?.user.id);
@@ -397,6 +392,39 @@ const DashboardInfo = () => {
   const closeDeletePostModal = () => {
     setIsDeleteModalOpen(false);
   };
+  
+  useEffect(() => {
+    // User can only view posts if logged in
+    if (!session) {
+      const storedSession = JSON.parse(sessionStorage.getItem("session"));
+      // Stored session since context variable doesn't persist after page refresh
+      if (!storedSession && !toastShown) {
+        toast.error("Login required.");
+        toastShown = true;
+        navigate(LINKS.LOGIN);
+        return;
+      }
+    };
+    
+    getPosts();
+
+    // Fetch profile images for each post
+    postData.forEach(async (post) => {
+      const imageUrl = await getProfileImage(post.id);
+      setAvatarUrlList((prevImages : Record<string, string>) => ({
+        ...prevImages,
+        [post.id]: imageUrl || '',
+      }));
+    });
+
+    // get url links for each post creator
+    const fetchUserId = async () => {
+      const userId = await getUserIdFromId(selectedPost?.id);
+      setUserId(userId);
+    };
+
+    fetchUserId();
+  }, [session, postData, navigate, selectedPost]);
 
   return (
     <div className="w-[70vw] m-auto mt-12 mb-12">
@@ -453,24 +481,25 @@ const DashboardInfo = () => {
       {/* Post Modal for accepted posts */}
       {isRequestModalOpen && selectedPost && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
             <div className="flex flex-row">
-              <h2 className="text-4xl text-[#2c6048] font-semibold mb-4">{selectedPost.title}</h2>
+              <div>
+                <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
+                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
+              </div>
+              
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeAcceptedPost}>
                 &times;
               </span>
             </div>
             
             <p className="text-lg text-[#1f2421] mb-4 break-words">{selectedPost.description}</p>
-
+            
             <div className="flex items-center mb-4">
               <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
-              <p className="text-[#2c6048] font-semibold">{selectedPost.contact}</p>
-            </div>
-
-            <div className="flex items-center mb-4">
-              <i className="fa-regular fa-user text-gray-600 mr-2"></i>
-              <p className="text-md font-bold text-gray-600">{selectedPost.created_by} | {capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | </p>
+              <p className="text-[#2c6048] font-semibold mr-2">{selectedPost.contact} |</p>
+              <i className="fa-solid fa-user text-[#2c6048] mr-2"></i>
+              <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
             </div>
 
             <div className="mb-4">
@@ -517,7 +546,7 @@ const DashboardInfo = () => {
       {/* Modal for finishing the post */}
       {finishPostModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-[50%] md:h-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Complete Work</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeFinishModal}>
@@ -631,7 +660,7 @@ const DashboardInfo = () => {
                   <div onClick={(e) => {
                     e.stopPropagation()}}
                     className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
+                    <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
                       <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
                       <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
                         <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
@@ -658,9 +687,12 @@ const DashboardInfo = () => {
         {/* Modal for showing currently clicked free post */}
         {isModalVisible && selectedPost && (
           <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
+            <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
               <div className="flex flex-row">
-                <h2 className="text-4xl text-[#2c6048] font-semibold mb-4">{selectedPost.title}</h2>
+                <div>
+                  <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
+                  <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
+                </div>
                 <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closePost}>
                   &times;
                 </span>
@@ -670,12 +702,9 @@ const DashboardInfo = () => {
 
               <div className="flex items-center mb-4">
                 <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
-                <p className="text-[#2c6048] font-semibold">{selectedPost.contact}</p>
-              </div>
-
-              <div className="flex items-center mb-4">
-                <i className="fa-regular fa-user text-gray-600 mr-2"></i>
-                <p className="text-md font-bold text-gray-600">{selectedPost.created_by} | {selectedPost.date_created.toLocaleString()}</p>
+                <p className="text-[#2c6048] font-semibold mr-2">{selectedPost.contact} |</p>
+                <i className="fa-solid fa-user text-[#2c6048] mr-2"></i>
+                <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
               </div>
 
               <h2 className="text-lg mb-4 font-bold text-red-500">
@@ -700,7 +729,7 @@ const DashboardInfo = () => {
       {/* Form Modal for creating posts */}
       {isModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Create Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeModal}>
@@ -780,7 +809,7 @@ const DashboardInfo = () => {
       {/* Form for updating the post */}
       {isUpdateModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-full md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Update Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeUpdateModal}>
