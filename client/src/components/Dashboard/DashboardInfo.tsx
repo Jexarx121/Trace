@@ -22,9 +22,9 @@ type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
 
 const DashboardInfo = () => { 
   const navigate = useNavigate();
-  const { session } = useContext(SessionContext);
-  sessionStorage.setItem("session", session);
+  const { session } = useContext(SessionContext);;
   const { provider, nodeManager } = useContext(EthContext);
+  let toastShown = false;
 
   const [loading, setLoading] = useState(true);
   const [postData, setPostData] = useState<Post[]>([]);
@@ -177,9 +177,11 @@ const DashboardInfo = () => {
   useEffect(() => {
     // User can only view posts if logged in
     if (!session) {
-      const storedSession = sessionStorage.getItem("session");
+      const storedSession = JSON.parse(sessionStorage.getItem("session"));
       // Stored session since context variable doesn't persist after page refresh
-      if (!storedSession) {
+      if (!storedSession && !toastShown) {
+        toast.error("Login required.");
+        toastShown = true;
         navigate(LINKS.LOGIN);
         return;
       }

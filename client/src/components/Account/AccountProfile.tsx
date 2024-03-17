@@ -6,11 +6,13 @@ import { ethers } from "ethers";
 import { SessionContext } from "../Context/SessionContext";
 import Security from "../../helpers/functions";
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
   const { user_id } = useParams();
   const { session } = useContext(SessionContext);
+  let toastShown = false;
   
   const [fullName, setFullName] = useState(null);
   const [age, setAge] = useState(null);
@@ -74,9 +76,17 @@ const AccountProfile = () => {
 
   useEffect(() => {
     let ignore = false;
+
     // Go back to auth page if not login
     if (!session) {
-      navigate(LINKS.LOGIN);
+      const storedSession = JSON.parse(sessionStorage.getItem("session"));
+      // Stored session since context variable doesn't persist after page refresh
+      if (!storedSession && !toastShown) {
+        toast.error("Login required.");
+        toastShown = true;
+        navigate(LINKS.LOGIN);
+        return;
+      }
     };
 
     if (user_id === ":user_id" || user_id === '0') {

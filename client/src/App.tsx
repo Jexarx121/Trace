@@ -16,17 +16,19 @@ const App = () => {
   const nodeManager = createInstance(provider);
   const ethContext = { nodeManager, provider };
   const [ userId, setUserId ] = useState<number>(0);
-  const [session, setSession] = useState<Session | null>(null);
+  const [ session, setSession ] = useState<Session | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      sessionStorage.setItem("session", JSON.stringify(session));
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      sessionStorage.setItem("session", JSON.stringify(session));
     })
 
     return () => subscription.unsubscribe()
@@ -71,6 +73,14 @@ const App = () => {
               color: 'white',
               fontSize: '16px',
               fontFamily: 'Outfit'
+            }
+          },
+          error: {
+            style: {
+              background: '#dc2626',
+              color: 'white',
+              fontSize: '16px',
+              fontFamily: 'Outfit',
             }
           }
         }}/>

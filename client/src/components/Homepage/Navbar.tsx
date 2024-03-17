@@ -11,14 +11,15 @@ import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [toggleMenu, setToggleMenu] = useState(false);
+  const [ toggleMenu, setToggleMenu ] = useState(false);
   const { session } = useContext(SessionContext);
   const { userId } = useContext(UserIdContext);
 
   const handleLogout = () => {
-    toast.success("You have been logged out.")
+    toast.success("You have been logged out.");
     supabase.auth.signOut();
     navigate(LINKS.HOMEPAGE);
+    sessionStorage.clear();
   };
 
   return (
