@@ -1,5 +1,4 @@
 import { useState, useContext } from "react";
-import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 import { MdMenu } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
