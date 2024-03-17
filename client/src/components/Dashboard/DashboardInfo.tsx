@@ -290,7 +290,7 @@ const DashboardInfo = () => {
         .eq("id", user.id)
 
       const updates = {
-        assigned_to_name: data[0].full_name,
+        assigned_to_name: data?.[0]?.full_name,
         assigned_to: user.id,
         status: "accepted"
       };

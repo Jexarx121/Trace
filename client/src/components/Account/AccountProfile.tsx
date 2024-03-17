@@ -80,6 +80,8 @@ const AccountProfile = () => {
     };
 
     if (user_id === ":user_id" || user_id === '0') {
+      console.log("USER_ID : ", user_id)
+      console.log("HERE CHANGED USER_ID HERE");
       getUserId();
     }
 
