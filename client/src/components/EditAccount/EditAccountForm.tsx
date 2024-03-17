@@ -185,11 +185,11 @@ const EditAccountForm = () => {
               id="bio"
               placeholder="Feel free to enter stuff about yourself, previous work experience and why you joined!"
               className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
-              rows={8}
+              rows={15}
               defaultValue={bio}
               {...register("bio")} 
               onChange={handleDescriptionChange} />
-            <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 1000 characters</p>
+            <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 2000 characters</p>
             {errors.bio && (
               <p className="text-sm text-red-500 mt-2"> {errors.bio?.message}</p> 
             )}
