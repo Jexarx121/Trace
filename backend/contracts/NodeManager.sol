@@ -25,8 +25,7 @@ contract NodeManager is ERC2771Context {
 
   function createNode(address receiver, uint256 amount, uint256 postId) external {
     // Approve transfer of tokens from traceCredit to this contract
-    traceCredit.approve(address(this), amount);
-    traceCredit.transferFrom(address(this), receiver, amount);
+    traceCredit.transfer(receiver, amount);
 
     // Add to the chain
     Node storage newNode = nodes[nodesCount];

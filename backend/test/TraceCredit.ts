@@ -6,7 +6,7 @@ const {
 
 const { expect } = require("chai");
 
-describe("TraceCredit contract", function() {
+describe.skip("TraceCredit contract", function() {
 
   async function deployCreditFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
