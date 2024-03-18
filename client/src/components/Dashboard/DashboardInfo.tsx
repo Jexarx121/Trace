@@ -177,16 +177,14 @@ const DashboardInfo = () => {
   };
 
   async function _getUserIdFromId(postUserId : string) {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('profiles')
       .select('user_id')
       .eq('id', postUserId)
 
-    if (error) {
-      console.warn(error);
+    if (data) {
+      return data[0].user_id;
     }
-
-    return data[0].user_id;
   }
 
   async function createPost(postData: any) {
@@ -418,12 +416,14 @@ const DashboardInfo = () => {
     });
 
     // get url links for each post creator
-    const fetchUserId = async () => {
-      const userId = await getUserIdFromId(selectedPost?.id);
-      setUserId(userId);
-    };
-
-    fetchUserId();
+    if (selectedPost !== null) {
+      const fetchUserId = async () => {
+        const userId = await getUserIdFromId(selectedPost.id);
+        setUserId(userId);
+      };
+  
+      fetchUserId();
+    }
   }, [session, postData, navigate, selectedPost]);
 
   return (
