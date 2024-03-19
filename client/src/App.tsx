@@ -9,12 +9,10 @@ import { supabase } from "./supabase/supabaseClient";
 import { Session } from "@supabase/supabase-js";
 import { UserIdContext } from "./components/Context/UserIdContext";
 import { Toaster } from "react-hot-toast";
-import { createInstance } from "./eth/nodeManager";
 
 const App = () => {
   const provider = createProvider();
-  const nodeManager = createInstance(provider);
-  const ethContext = { nodeManager };
+  const ethContext = { provider };
   const [ userId, setUserId ] = useState<number>(0);
   const [ session, setSession ] = useState<Session | null>(null);
 
@@ -55,17 +53,15 @@ const App = () => {
   return (
     <SessionContext.Provider value={{ session }}>
       <UserIdContext.Provider value={{ userId }}>
-        <Routes>
-          <Route path={LINKS.HOMEPAGE} element={<Homepage/>}/>
-          <Route path={LINKS.ACCOUNT} element={<Account/>}/>
-          <Route path={LINKS.EDIT_ACCOUNT} element={<EditAccount/>}/>
-          <Route path={LINKS.LOGIN} element={<Login/>}/>
-          <Route path={LINKS.DASHBOARD} element={
-            <EthContext.Provider value={ethContext}>
-              <Dashboard/>
-            </EthContext.Provider>
-          }/>
-        </Routes>
+        <EthContext.Provider value={ethContext}>
+          <Routes>
+            <Route path={LINKS.HOMEPAGE} element={<Homepage/>}/>
+            <Route path={LINKS.ACCOUNT} element={<Account/>}/>
+            <Route path={LINKS.EDIT_ACCOUNT} element={<EditAccount/>}/>
+            <Route path={LINKS.LOGIN} element={<Login/>}/>
+            <Route path={LINKS.DASHBOARD} element={<Dashboard/>}/>
+          </Routes>
+        </EthContext.Provider>
         <Toaster toastOptions={{
           success: {
             style: {
