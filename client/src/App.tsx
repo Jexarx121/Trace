@@ -14,7 +14,7 @@ import { Toaster } from "react-hot-toast";
 const App = () => {
   const provider = createProvider();
   const nodeManager = createInstance(provider);
-  const ethContext = { nodeManager, provider };
+  const ethContext = { provider, nodeManager };
   const [ userId, setUserId ] = useState<number>(0);
   const [ session, setSession ] = useState<Session | null>(null);
 

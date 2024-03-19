@@ -344,6 +344,7 @@ const DashboardInfo = () => {
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
     setLoading(false);
     const privateKey = await getPrivateKey(session?.user.id);
+    console.log(privateKey);
     const wallet = new ethers.Wallet(privateKey, provider);
     const signer = wallet.connect(provider);
     console.log("Signer: ", signer);
@@ -355,12 +356,12 @@ const DashboardInfo = () => {
     const creditAmount = calculateCredit(data, postType);
     const postId = selectedPost?.post_id;
 
-    const response = await createNewNode(newNodeManager, provider, signer, receiver, creditAmount, postId);
-    console.log(response);
-    const balance = await traceCredit.balanceOf(receiver);
-    console.log(balance);
-    const nodeDetails = await newNodeManager.nodesCount;
-    console.log(nodeDetails);
+    // const response = await createNewNode(newNodeManager, provider, signer, receiver, creditAmount, postId);
+    // console.log(response);
+    // const balance = await traceCredit.balanceOf(receiver);
+    // console.log(balance);
+    // const nodeDetails = await newNodeManager.nodesCount;
+    // console.log(nodeDetails);
 
     setConfirmRequest(false);
     setLoading(true);

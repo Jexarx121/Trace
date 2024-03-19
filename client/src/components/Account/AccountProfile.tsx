@@ -8,11 +8,14 @@ import Security from "../../helpers/functions";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { HiOutlinePencilSquare } from "react-icons/hi2";
+import { createInstance } from "../../eth/traceCredit";
+import { EthContext } from "../../eth/context";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
   const { user_id } = useParams();
   const { session } = useContext(SessionContext);
+  // const { provider, nodeManager } = useContext(EthContext);
   let toastShown = false;
   const backgroundGradient = "../images/background_gradient.jpg";
   
@@ -22,10 +25,6 @@ const AccountProfile = () => {
   const [ bio, setBio ] = useState(null);
   const [ passedAvatarUrl, setPassedAvatarUrl ] = useState("");
   const [ userId, setUserId ] = useState(0);
-
-  const goToEditAccountPage = () => {
-    navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
-  };
 
   async function downloadImage(path : string) {
     try {
@@ -62,6 +61,20 @@ const AccountProfile = () => {
       throw error;
     };
   };
+
+  async function fundWalletTokens() {
+    const privateKey = "0x8528a64c98bbc9e8fbf2f714db810fb81f99c8af63c1c6d78c82fd2576ccaca7";
+    const MAIN_RPC_ENDPOINT= 'https://ethereum-sepolia-rpc.publicnode.com';
+    const provider = new ethers.JsonRpcProvider(MAIN_RPC_ENDPOINT);
+    
+    const wallet = new ethers.Wallet(privateKey);
+    const signer = wallet.connect(provider);
+    
+    const contract = createInstance(signer);
+    const tx = await contract.transfer(signer.address, 100, {gasLimit: 100000});
+
+    console.log(tx);
+  }
 
   async function getUserId() {
     const { data } = await supabase
@@ -105,7 +118,7 @@ const AccountProfile = () => {
       // if data from database is null, user is newly joined
       if (data?.full_name === null) {
         createAndStoreWallet();
-        goToEditAccountPage();
+        // goToEditAccountPage();
       };
 
       if (error) {
@@ -123,7 +136,7 @@ const AccountProfile = () => {
   });
 
   const checkWallet = () => {
-    createAndStoreWallet();
+    fundWalletTokens();
   }
 
   return (
@@ -158,7 +171,7 @@ const AccountProfile = () => {
             {/* Insert work here */}
             <button className="px-8 mx-3 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mt-8 text-white hover:bg-[#3e7d5a] transition duration-300"
               onClick={checkWallet}>
-              Create Wallet
+              Fund Wallet
             </button>
           </div>
         </div>

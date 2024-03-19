@@ -21,22 +21,22 @@ async function main() {
   await traceCredit.waitForDeployment();
   const traceCreditAddress = await traceCredit.getAddress();
 
-  // Trusted forwarder deployment
-  const forwarderFactory = await ethers.getContractFactory("ERC2771Forwarder", { signer : relaySigner});
-  const forwarder = await defender.deployContract(forwarderFactory, ["ERC2771Forwarder"]);
-  await forwarder.waitForDeployment();
-  const forwarderAddress = await forwarder.getAddress();
+  // // Trusted forwarder deployment
+  // const forwarderFactory = await ethers.getContractFactory("ERC2771Forwarder", { signer : relaySigner});
+  // const forwarder = await defender.deployContract(forwarderFactory, ["ERC2771Forwarder"]);
+  // await forwarder.waitForDeployment();
+  // const forwarderAddress = await forwarder.getAddress();
 
-  // NodeManager contract deployment
-  const nodeManagerFactory = await ethers.getContractFactory("NodeManager", { signer: relaySigner });
-  const nodeManager = await defender.deployContract(nodeManagerFactory, [traceCreditAddress, forwarderAddress]);
-  await nodeManager.waitForDeployment();
-  const nodeManagerAddress = await nodeManager.getAddress();
+  // // NodeManager contract deployment
+  // const nodeManagerFactory = await ethers.getContractFactory("NodeManager", { signer: relaySigner });
+  // const nodeManager = await defender.deployContract(nodeManagerFactory, [traceCreditAddress, forwarderAddress]);
+  // await nodeManager.waitForDeployment();
+  // const nodeManagerAddress = await nodeManager.getAddress();
 
   // check if thing is deployed first 
   writeFileSync('deploy.json', JSON.stringify({
-    nodeManager: nodeManagerAddress,
-    forwarder: forwarderAddress,
+    // nodeManager: nodeManagerAddress,
+    // forwarder: forwarderAddress,
     traceCredit: traceCreditAddress
   }, null, 2));
 

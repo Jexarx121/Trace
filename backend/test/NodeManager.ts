@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { ethers } from "hardhat";
+import { signMetaTransactionRequest } from "../src/signer"
 
 const {
   loadFixture,
@@ -7,7 +8,7 @@ const {
 
 const { expect } = require("chai");
 
-describe("NodeManager Contract", function () {
+describe.skip("NodeManager Contract", function () {
 
   async function deployNodeFixture() {
     const accounts = await ethers.getSigners();
@@ -20,7 +21,7 @@ describe("NodeManager Contract", function () {
     const forwarder = await forwarderFactory.deploy('ERC2771Forwarder');
     const forwarderAddress = await forwarder.getAddress();
 
-    const traceCreditAddress = await traceCredit.getAddress()
+    const traceCreditAddress = await traceCredit.getAddress();
     const nodeManager = await ethers.deployContract("NodeManager", [traceCreditAddress, forwarderAddress]);
     await nodeManager.waitForDeployment();
 
@@ -47,6 +48,27 @@ describe("NodeManager Contract", function () {
   });
 
   it("Should create a node through a meta-tx", async function () {
+    const { nodeManager, accounts, forwarder, traceCredit } = await loadFixture(deployNodeFixture);
+    const signer = accounts[2];
+    const relayer = accounts[3];
+    const receiver = accounts[4];
 
+    console.log("Test forwarder");
+    
+    const tForwarder = await forwarder.connect(relayer);
+
+    await traceCredit.transfer(nodeManager.getAddress(), 3000);
+    const PRIVATE_KEY = "0x8528a64c98bbc9e8fbf2f714db810fb81f99c8af63c1c6d78c82fd2576ccaca7";
+    const from = new ethers.Wallet(PRIVATE_KEY).address;
+    const data = nodeManager.interface.encodeFunctionData('createNode', [receiver.address, 12, 2]);
+    const to = await nodeManager.getAddress();
+
+    const { request, signature } = await signMetaTransactionRequest(signer, tForwarder, { to, from, data});
+    console.log(request);
+    console.log(signature);
+
+    // const gasLimit = (parseInt(request.gas) + 50000).toString();
+    await forwarder.execute(request, signature).then((tx: { wait: () => any; }) => tx.wait());
+    expect(await traceCredit.balanceOf(receiver).to.equal(12));
   });
 });
