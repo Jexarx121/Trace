@@ -454,7 +454,7 @@ const DashboardInfo = () => {
                 </div>
               </div>  
               <div className="p-4 flex items-center" >
-                <div className="break-words">
+                <div className="overflow-hidden">
                   <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
                   
                   {/* Only render these icons if the posts are the users */}
@@ -663,7 +663,7 @@ const DashboardInfo = () => {
                     className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
                       <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
-                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
+                      <div className="flex flex-row w-full sm:space-x-2 mt-auto space-x-2">
                         <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
                           onClick={(e) => {
                             e.stopPropagation();
@@ -714,7 +714,7 @@ const DashboardInfo = () => {
               </h2>
               
               {/* Modal buttons */}
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto">
+              <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                 <button onClick={closePost} className="w-full sm:w-[50%] cancel-button">
                   Cancel
                 </button>
@@ -794,7 +794,7 @@ const DashboardInfo = () => {
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
+              <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                 <button onClick={closeModal} className="w-full sm:w-[50%] cancel-button">
                   Cancel
                 </button>
@@ -838,7 +838,7 @@ const DashboardInfo = () => {
               <div>
                 <label htmlFor="types" className="block text-sm font-medium text-gray-700">Type of Work</label>
                 <select id="types" className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421] bg-white cursor-pointer"
-                  {...registerUpdate("type")}>
+                  {...registerUpdate("type")} defaultValue={selectedPost?.type}>
                   <option value="short">Short</option>
                   <option value="long">Long</option>
                 </select>
@@ -877,7 +877,7 @@ const DashboardInfo = () => {
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
+              <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                 <button onClick={closeUpdateModal} className="w-full sm:w-[50%] cancel-button">
                   Cancel
                 </button>

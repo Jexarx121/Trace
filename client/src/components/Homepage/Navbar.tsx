@@ -22,6 +22,12 @@ const Navbar = () => {
     sessionStorage.clear();
   };
 
+  const handleLinkClick = () => {
+    // Force a page refresh after the navigation
+    navigate(`/account/${userId}`);
+    window.location.reload();
+  }
+
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
       <div className="w-[70vw] m-auto flex items-center">
@@ -36,7 +42,7 @@ const Navbar = () => {
             <Link to={LINKS.DASHBOARD}>Dashboard</Link>
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
-            <Link to={`/account/${userId}`}>Profile</Link>
+            <Link to={`/account/${userId}`} onClick={handleLinkClick}>Profile</Link>
           </li>
           {!session ? (
             <li>

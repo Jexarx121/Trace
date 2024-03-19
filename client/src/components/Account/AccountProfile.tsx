@@ -92,7 +92,7 @@ const AccountProfile = () => {
     
     if (data && data.user_id) {
       setUserId(data.user_id);
-      navigate(`/account/${userId}`)
+      navigate(`/account/${userId}`);
     }
   }
 
@@ -163,7 +163,7 @@ const AccountProfile = () => {
       getBalance();
     };
 
-  }, [sessionId, creditAmount, provider]);
+  });
 
   async function checkFunds(receiverAddress) {
     const contract = createInstance(provider);
