@@ -16,6 +16,7 @@ const AccountProfile = () => {
   const { user_id } = useParams();
   const { session } = useContext(SessionContext);
   // const { provider, nodeManager } = useContext(EthContext);
+  const RELAYER_ADDRESS = "0xC5A764aD1c5114ef1eA088f0c518B445e78D9590";
   let toastShown = false;
   const backgroundGradient = "../images/background_gradient.jpg";
   
@@ -63,7 +64,7 @@ const AccountProfile = () => {
   };
 
   async function fundWalletTokens() {
-    const privateKey = "0x8528a64c98bbc9e8fbf2f714db810fb81f99c8af63c1c6d78c82fd2576ccaca7";
+    const privateKey = import.meta.env.VITE_PRIVATE_KEY;
     const MAIN_RPC_ENDPOINT= 'https://ethereum-sepolia-rpc.publicnode.com';
     const provider = new ethers.JsonRpcProvider(MAIN_RPC_ENDPOINT);
     
@@ -71,8 +72,7 @@ const AccountProfile = () => {
     const signer = wallet.connect(provider);
     
     const contract = createInstance(signer);
-    const tx = await contract.transfer(signer.address, 100, {gasLimit: 100000});
-
+    const tx = await contract.balanceOf(signer.address);
     console.log(tx);
   }
 

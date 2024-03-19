@@ -4,17 +4,17 @@ import { LINKS } from "./components/constants";
 import { EthContext } from "./eth/context";
 import { SessionContext } from "./components/Context/SessionContext";
 import { createProvider } from "./eth/provider";
-import { createInstance } from "./eth/forwarder";
 import { useEffect, useState } from "react";
 import { supabase } from "./supabase/supabaseClient";
 import { Session } from "@supabase/supabase-js";
 import { UserIdContext } from "./components/Context/UserIdContext";
 import { Toaster } from "react-hot-toast";
+import { createInstance } from "./eth/nodeManager";
 
 const App = () => {
   const provider = createProvider();
   const nodeManager = createInstance(provider);
-  const ethContext = { provider, nodeManager };
+  const ethContext = { nodeManager };
   const [ userId, setUserId ] = useState<number>(0);
   const [ session, setSession ] = useState<Session | null>(null);
 
