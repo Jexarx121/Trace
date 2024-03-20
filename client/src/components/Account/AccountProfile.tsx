@@ -233,6 +233,7 @@ const AccountProfile = () => {
           <div className="mb-10">
             <h1 className="text-xl text-[#1f2421] font-bold p-4 border-b-black border-b-2 sm:mx-0 mx-3">About Me</h1>
             <p className="sm:text-lg text-md text-[#1f2421] p-4 sm:mx-0 mx-3" style={{ whiteSpace: "pre-wrap"}}>{bio}</p>
+            {/* Add button here that can only be triggered every 24 hours */}
           </div>
           <div>
             <h1 className="text-xl text-[#1f2421] font-bold p-4 border-b-black border-b-2 sm:mx-0 mx-3">Latest Work</h1>

@@ -463,6 +463,9 @@ const DashboardInfo = () => {
   return (
     <div className="w-[70vw] m-auto mt-12 mb-12">
       
+      <h1 className="text-xl text-[#1f2421] font-bold p-4 border-b-black border-b-2 sm:mx-0 mx-3">Dashboard</h1>
+      {/* Add in steps to use */}
+
       {/* Only shows completed posts */}
       {viewCompletePosts && (
         <div className="mt-12">
@@ -479,7 +482,7 @@ const DashboardInfo = () => {
                     <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
                   </div>
                 </div>  
-                <div className="p-4 flex items-center" >
+                <div className="p-4 flex items-center">
                   <div className="overflow-hidden">
                     <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
                   </div>
