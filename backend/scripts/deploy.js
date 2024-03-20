@@ -30,7 +30,7 @@ async function main() {
   // check if thing is deployed first 
   writeFileSync('deploy.json', JSON.stringify({
     nodeManager: nodeManagerAddress,
-    traceCredit: traceCreditAddress
+    // traceCredit: traceCreditAddress
   }, null, 2));
 
   console.log('Contract deployed');

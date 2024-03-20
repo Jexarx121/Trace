@@ -11,6 +11,7 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { createInstance } from "../../eth/traceCredit";
 import { EthContext } from "../../eth/context";
 import { FaEthereum } from "react-icons/fa";
+import { getPrivateKey } from "../Dashboard/functions";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
@@ -26,7 +27,7 @@ const AccountProfile = () => {
   const [ bio, setBio ] = useState(null);
   const [ passedAvatarUrl, setPassedAvatarUrl ] = useState("");
   const [ userId, setUserId ] = useState(0);
-  const [ creditAmount, setCreditAmount ] = useState(0);
+  const [ creditAmount, setCreditAmount ] = useState(-1);
   const [ sessionId, setSessionId ] = useState("");
 
   const goToEditAccountPage = () => {
@@ -159,22 +160,46 @@ const AccountProfile = () => {
     }
 
     getProfile();
-    if (creditAmount === 0) {
+    if (creditAmount === -1) {
       getBalance();
     };
 
   });
 
-  async function checkFunds(receiverAddress) {
+  async function checkFunds(receiverAddress : string) {
     const contract = createInstance(provider);
     const balance = await contract.balanceOf(receiverAddress);
     console.log(parseInt(balance.toString()) / 10**18 );
-  }
+  };
+  
+  // async function testTransferFrom(receiverAddress : string) {
+  //   const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
+    
+  //   const adminWallet = new ethers.Wallet(adminPrivateKey);
+  //   const adminSigner = adminWallet.connect(provider?.provider);
+
+  //   const receiver = "0x96420BB9e68F41c35146Fe23B23b90dd8A7FC606";
+
+
+  //   const receiverPrivateKey = await getPrivateKey(session?.user.id);
+  //   const receiverWallet = new ethers.Wallet(receiverPrivateKey);
+  //   console.log(receiverWallet.address)
+
+  //   const baseAmount = 100n * (10n ** 18n); // 100 credits to start off with
+
+  //   const contract = createInstance(adminSigner);
+  //   const approveTx = await contract.approve(receiverWallet, baseAmount, {gasLimit: 100000});
+  //   console.log(approveTx);
+  //   const tx = await contract.transferFrom(receiverWallet.address, adminSigner.address, baseAmount, {gasLimit: 100000})
+  //   console.log(tx);
+  // }
 
   const checkWallet = () => {
-    const walletAddress = "0xFC2eD5748641f6bA982c5C0Bbf8a4c848167a4bD"
+    const walletAddress = "0x96420BB9e68F41c35146Fe23B23b90dd8A7FC606"
     // fundWalletTokens(walletAddress);
     checkFunds(walletAddress);
+    // testTransferFrom(walletAddress);
+    // createAndStoreWallet();
   }
 
   return (
@@ -226,40 +251,5 @@ const AccountProfile = () => {
 // default icon
 {/* <a href="https://www.flaticon.com/free-icons/user" title="user icons">User icons created by Becris - Flaticon</a> */}
 
-{/* <div className="relative">
-<img className="absolute top-0 left-0 w-full h-56" src={backgroundGradient} alt="Background gradient for profile" />
-{/* Profile Image 
-// <div className="absolute transform w-48 h-48 rounded-full overflow-hidden">
-//   <img className="w-full h-full object-cover" src={avatarUrl} alt="Profile Picture" />
-// </div>
-// </div>
-
-// <div className="container mx-auto p-4">
-// <div className="flex flex-wrap items-center">
-//   <div className="flex flex-col md:flex-row items-start">
-//     {/* Text Content */}
-//     <div>
-//       <h1 className="text-3xl font-bold text-[#1f2421]">{fullName}</h1>
-//       <h2 className="text-md text-gray-600">{age}</h2>
-//       <p className="lg:text-xl text-lg mt-2 text-gray-700">
-//         {bio}
-//       </p>
-//     </div>
-//   </div>
-// </div>
-
-// {/* Edit Profile */}
-// <Link className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-lg text-white hover:bg-[#3e7d5a] transition duration-300"
-//   to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
-//   Edit Profile
-// </Link>
-
-// {/* Experience Section */}
-// <div className="w-full mt-4">
-//   <h1 className="text-3xl font-bold text-[#1f2421]">Previous Experience</h1>
-//   {/* Add your work experience content here */}
-
-// </div>
-// </div> */}
 
 export default AccountProfile;

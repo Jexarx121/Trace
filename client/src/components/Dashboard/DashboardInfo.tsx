@@ -12,7 +12,6 @@ import { ethers } from "ethers";
 import { EthContext } from "../../eth/context";
 import { SessionContext } from "../Context/SessionContext";
 import { downloadImage, calculateCredit, getPrivateKey, getPublicKey } from "./functions";
-import { createNewNode } from "../../eth/createNode";
 import { createInstance } from "../../eth/nodeManager";
 import { createInstance as createTraceInstance } from "../../eth/traceCredit";
 import toast from "react-hot-toast";
@@ -24,7 +23,7 @@ type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
 const DashboardInfo = () => { 
   const navigate = useNavigate();
   const { session } = useContext(SessionContext);;
-  const { provider, nodeManager } = useContext(EthContext);
+  const provider = useContext(EthContext);
   let toastShown = false;
 
   const [loading, setLoading] = useState(true);
@@ -343,46 +342,60 @@ const DashboardInfo = () => {
 
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
     setLoading(false);
-    const privateKey = await getPrivateKey(session?.user.id);
-    console.log(privateKey);
-    const wallet = new ethers.Wallet(privateKey, provider);
-    const signer = wallet.connect(provider);
+    const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
+    const adminWallet = new ethers.Wallet(adminPrivateKey);
+    const signer = adminWallet.connect(provider?.provider);
     console.log("Signer: ", signer);
 
-    const newNodeManager = createInstance(signer);
-    const traceCredit = createTraceInstance(provider);
+    const nodeManagerContract = createInstance(signer);
+    const traceCreditContract = createTraceInstance(signer);
 
-    const receiver = await getPublicKey(selectedPost?.assigned_to!);
-    const creditAmount = calculateCredit(data, postType);
+    const senderAddress = await getPublicKey(selectedPost?.id);
+    console.log(senderAddress)
+    const receiverAddress = await getPublicKey(selectedPost?.assigned_to!);
+    console.log("Receiver: ", receiverAddress);
+    const creditAmountNode = calculateCredit(data, postType);
+    const creditAmountTrace = BigInt(creditAmountNode) * (10n ** 18n);
     const postId = selectedPost?.post_id;
 
-    // const response = await createNewNode(newNodeManager, provider, signer, receiver, creditAmount, postId);
-    // console.log(response);
-    // const balance = await traceCredit.balanceOf(receiver);
-    // console.log(balance);
-    // const nodeDetails = await newNodeManager.nodesCount;
-    // console.log(nodeDetails);
+    const creditTransaction = await traceCreditContract.transfer(receiverAddress, creditAmountTrace)
+    await creditTransaction.wait();
+    console.log(creditTransaction);
+    const nodeTransaction = await nodeManagerContract.createNode(postId, senderAddress, receiverAddress, creditAmountNode, data.time, data.amountPeople);
+    console.log(nodeTransaction);
+    
+    // update post in database
+    const updates = {
+      date_finished: new Date(),
+      rating: data.rating,
+      status: "completed"
+    };
+
+    const { error } = await supabase
+      .from('posts')
+      .update(updates)
+      .eq('post_id', selectedPost?.post_id);
+
+    if (error) {
+      alert(error.message);
+    };
 
     setConfirmRequest(false);
     setLoading(true);
-    // setFinishPostModal(false);
+    toast.success(`Post ${selectedPost?.post_id} has been completed! Your funds will shortly arrive.`);
+    setFinishPostModal(false);
   };
 
-  // async function testBlock() {
-  //   const code = await provider.getCode(deploy.nodeManager);
-  //   // console.log(code);
+  async function testBlock(blockNumber : number) {
+    const nodeManagerContract = createInstance(provider);
+    const nodeDetails = await nodeManagerContract.getNodeDetails(blockNumber);
+    console.log(nodeDetails);
+  }
 
-  //   const walletAddress = "0xDE9cDAfcF43a772268347D9E1d94bE1E4886cE68";
-  //   const wallet = await provider.getBalance(walletAddress);
-  //   // console.log(wallet.toString());
-
-  //   // making a signer 
-  //   const walletSigner = new ethers.Wallet("0x57685c4fcad8575c70b8b58ee74ce3b4afbacd437e1e6bb4c0b9b2d2bb992d92", provider);
-  //   console.log(walletSigner);
-  //   // Check if signer has functions like check address
-
-  //   // need to connect a signer to a contract to execute the contracts
-  // }
+  const findBlock = () => {
+    const blockNumber = 20;
+    testBlock(blockNumber);
+  }
 
   const openDeletePostModal = () => {
     setIsDeleteModalOpen(true);
@@ -439,6 +452,10 @@ const DashboardInfo = () => {
             onClick={openModal}>
             <i className="fa-regular fa-square-plus mr-2"/>Create Post
           </button>
+          <button className="ml-auto px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center mb-4 text-white hover:bg-[#3e7d5a] transition duration-300"
+            onClick={findBlock}>
+              Find block
+          </button>
         </div>
 
         {/* Only shows accepted posts */}
@@ -486,7 +503,7 @@ const DashboardInfo = () => {
             <div className="flex flex-row">
               <div>
                 <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
-                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
+                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
               </div>
               
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeAcceptedPost}>
@@ -692,7 +709,7 @@ const DashboardInfo = () => {
               <div className="flex flex-row">
                 <div>
                   <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
-                  <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
+                  <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
                 </div>
                 <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closePost}>
                   &times;
