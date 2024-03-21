@@ -11,7 +11,7 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { createInstance } from "../../eth/traceCredit";
 import { EthContext } from "../../eth/context";
 import { FaEthereum } from "react-icons/fa";
-import { getPrivateKey, getPublicKey } from "../Dashboard/functions";
+import { getPublicKey } from "../Dashboard/functions";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const AccountProfile = () => {
   const [ userId, setUserId ] = useState(0);
   const [ creditAmount, setCreditAmount ] = useState(-1);
   const [ sessionId, setSessionId ] = useState("");
-  const [ actualAccount, setActualAccount ] = useState("");
+  const [ actualAccount, setActualAccount ] = useState(false);
 
   const goToEditAccountPage = () => {
     navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
@@ -112,7 +112,23 @@ const AccountProfile = () => {
       const balance = await contract.balanceOf(data.ethereum_address);
       setCreditAmount(parseInt(balance.toString()) / DECIMALS);
     }
-  }
+  };
+
+  const checkIfAccountIsCurrentUser = async () => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("user_id")
+      .eq("id", session?.user.id)
+      .single();
+
+    if (data) {
+      if (data.user_id != user_id) {
+        setActualAccount(false);
+      } else {
+        setActualAccount(true);
+      }
+    };
+  };
 
   useEffect(() => {
     // Go back to auth page if not login
@@ -164,6 +180,7 @@ const AccountProfile = () => {
       getBalance();
     };
 
+    checkIfAccountIsCurrentUser();
   });
 
   async function checkFunds(receiverAddress : string) {
@@ -177,30 +194,8 @@ const AccountProfile = () => {
     const receiverAddress = await getPublicKey(session?.user.id);
     fundWalletTokens(receiverAddress, creditAmount);
     toast.success("Your credit amount will be updated soon.")
-  }
+  };
   
-  // async function testTransferFrom(receiverAddress : string) {
-  //   const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
-    
-  //   const adminWallet = new ethers.Wallet(adminPrivateKey);
-  //   const adminSigner = adminWallet.connect(provider?.provider);
-
-  //   const receiver = "0x96420BB9e68F41c35146Fe23B23b90dd8A7FC606";
-
-
-  //   const receiverPrivateKey = await getPrivateKey(session?.user.id);
-  //   const receiverWallet = new ethers.Wallet(receiverPrivateKey);
-  //   console.log(receiverWallet.address)
-
-  //   const baseAmount = 100n * (10n ** 18n); // 100 credits to start off with
-
-  //   const contract = createInstance(adminSigner);
-  //   const approveTx = await contract.approve(receiverWallet, baseAmount, {gasLimit: 100000});
-  //   console.log(approveTx);
-  //   const tx = await contract.transferFrom(receiverWallet.address, adminSigner.address, baseAmount, {gasLimit: 100000})
-  //   console.log(tx);
-  // }
-
   const checkWallet = () => {
     const walletAddress = "0x96420BB9e68F41c35146Fe23B23b90dd8A7FC606"
     // fundWalletTokens(walletAddress);
@@ -224,24 +219,24 @@ const AccountProfile = () => {
                 <p className="sm:text-lg text-md font-bold text-[#49A078] mt-2 ml-2">{creditAmount}</p>
                 <FaEthereum className="sm:text-lg text-md text-[#49A078] mt-3 ml-1"/>
               </div>
-              
             </div>
 
             {/* Only render if this is the user's profile */}
-            <div className="ml-auto flex flex-col"> 
-              <Link className="m-4 rounded-md font-bold text-lg text-white"
-                to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
-                <HiOutlinePencilSquare className="sm:text-3xl text-2xl text-[#49A078] mr-10"/>
-              </Link>
-              <button type="submit" 
-                className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
-                onClick={getFreeFunds}>
-                Get Funds
-              </button>
-            </div>
-            
-
+            {actualAccount && (
+              <div className="ml-auto flex flex-col"> 
+                <Link className="m-4 rounded-md font-bold text-lg text-white"
+                  to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
+                  <HiOutlinePencilSquare className="sm:text-3xl text-2xl text-[#49A078] mr-10"/>
+                </Link>
+                <button type="submit" 
+                  className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
+                  onClick={getFreeFunds}>
+                  Get Funds
+                </button>
+              </div>
+            )}
           </div>
+
           {/* Bio */}
           <div className="mb-10">
             <h1 className="text-xl text-[#1f2421] font-bold p-4 border-b-black border-b-2 sm:mx-0 mx-3">About Me</h1>

@@ -19,8 +19,7 @@
     "@rollup/plugin-node-resolve": "^15.2.3",
     "builtin-modules": "^3.2.0",
     "dotenv": "^16.4.5",
-    "hardhat": "^2.19.5",
-    "rollup": "^4.13.0"
+    "hardhat": "^2.19.5"
   },
   "dependencies": {
     "@chainlink/contracts": "^0.8.0",
