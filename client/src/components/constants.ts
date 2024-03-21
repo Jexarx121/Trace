@@ -5,3 +5,5 @@ export const LINKS = {
   'EDIT_ACCOUNT': '/edit_account/:user_id',
   'DASHBOARD': '/dashboard'
 };
+
+export const DECIMALS = 10 ** 18;

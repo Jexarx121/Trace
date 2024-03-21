@@ -5,13 +5,13 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { LINKS } from "../constants";
+import { DECIMALS, LINKS } from "../constants";
 import { Post } from "./Posts";
 import { truncateText, capitalize }from "../../helpers/functions";
 import { ethers } from "ethers";
 import { EthContext } from "../../eth/context";
 import { SessionContext } from "../Context/SessionContext";
-import { downloadImage, calculateCredit, getPublicKey } from "./functions";
+import { downloadImage, calculateCredit, getPublicKey, getPrivateKey } from "./functions";
 import { createInstance } from "../../eth/nodeManager";
 import { createInstance as createTraceInstance } from "../../eth/traceCredit";
 import toast from "react-hot-toast";
@@ -26,7 +26,7 @@ const DashboardInfo = () => {
   const provider = useContext(EthContext);
   let toastShown = false;
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [postData, setPostData] = useState<Post[]>([]);
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,6 +40,7 @@ const DashboardInfo = () => {
   const [viewCompletePosts, setViewCompletePosts] = useState(false);
   const [completePostModal, setCompletePostModal] = useState(false);
   const [userId, setUserId] = useState(0);
+  const [createPostCreditAmount, setCreatePostCreditAmount] = useState(0);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -65,6 +66,9 @@ const DashboardInfo = () => {
 
   const closeModal = () => {
     resetCreate();
+    setConfirmRequest(false);
+    setCreatePostCreditAmount(0);
+    setLoading(false);
     setIsModalOpen(false);
   };
 
@@ -141,7 +145,17 @@ const DashboardInfo = () => {
   });
 
   const onSubmit: SubmitHandler<PostSchema> = (data) => {
-    createPost(data);
+    if (confirmRequest) {
+      setLoading(false);
+      createPostTokensFromUser(createPostCreditAmount, data);
+    } else {
+      if (data.type === "short") {
+        setCreatePostCreditAmount(5);
+      } else {
+        setCreatePostCreditAmount(10)
+      }
+      setConfirmRequest(true);
+    }
   };
 
   const onSubmitUpdate: SubmitHandler<PostSchema> = (data) => {
@@ -234,7 +248,9 @@ const DashboardInfo = () => {
       alert(error.message)
     };
 
+    setLoading(false);
     toast.success('Post has been created.');
+    setConfirmRequest(false);
     closeModal();
   };
 
@@ -268,7 +284,7 @@ const DashboardInfo = () => {
   };
 
   async function deletePost() {
-    setLoading(false);
+    setLoading(true);
 
     try {
       const { error } = await supabase
@@ -283,7 +299,7 @@ const DashboardInfo = () => {
       alert(error);
     }
 
-    setLoading(true);
+    setLoading(false);
     toast.success('Post has been deleted.');
     closeDeletePostModal();
   };
@@ -361,7 +377,7 @@ const DashboardInfo = () => {
   }
 
   async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
-    setLoading(false);
+    setLoading(true);
     const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     const adminWallet = new ethers.Wallet(adminPrivateKey);
     const signer = adminWallet.connect(provider?.provider);
@@ -401,7 +417,7 @@ const DashboardInfo = () => {
     };
 
     setConfirmRequest(false);
-    setLoading(true);
+    setLoading(false);
     toast.success(`Post ${selectedPost?.post_id} has been completed! Your funds will shortly arrive.`);
     setFinishPostModal(false);
   };
@@ -424,6 +440,45 @@ const DashboardInfo = () => {
   const closeDeletePostModal = () => {
     setIsDeleteModalOpen(false);
   };
+
+  const createPostTokensFromUser = async (creditAmount : number, data : any) => {
+    const PRIVATE_KEY = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
+    const adminWallet = new ethers.Wallet(PRIVATE_KEY);
+    const adminSigner = adminWallet.connect(provider?.provider);
+
+    const receiverKey = await getPrivateKey(session?.user.id);
+    const receiverWallet = new ethers.Wallet(receiverKey);
+    const receiverSigner = receiverWallet.connect(provider?.provider);
+
+    const baseAmount = BigInt(creditAmount) * (10n ** 18n);
+    const contract = createTraceInstance(receiverSigner);
+
+    // Check if credit balance of user is enough first
+    const balanceInBigInt = await contract.balanceOf(receiverWallet.address);
+    const balanceInNumber = parseInt(balanceInBigInt.toString()) / DECIMALS;
+    
+    if (balanceInNumber < creditAmount) {
+      // Call closeModal here to close create post modal
+      closeModal();
+      toast.error(`You need ${creditAmount} credits to make this post.`);
+      setLoading(false);
+      return;
+    }
+
+    // If balance is enough, transfer some funds from admin wallet to receiver wallet for transaction
+    const transactionEth = await adminSigner.sendTransaction({
+      to: receiverWallet.address,
+      value: ethers.parseEther("0.01")
+    });
+
+    await transactionEth.wait();
+    console.log(transactionEth);  
+
+    const transaction = await contract.transfer(adminWallet.address, baseAmount);
+    console.log(transaction);
+
+    createPost(data);
+  }
   
   useEffect(() => {
     // User can only view posts if logged in
@@ -462,9 +517,6 @@ const DashboardInfo = () => {
 
   return (
     <div className="w-[70vw] m-auto mt-12 mb-12">
-      
-      <h1 className="text-xl text-[#1f2421] font-bold p-4 border-b-black border-b-2 sm:mx-0 mx-3">Dashboard</h1>
-      {/* Add in steps to use */}
 
       {/* Only shows completed posts */}
       {viewCompletePosts && (
@@ -550,7 +602,7 @@ const DashboardInfo = () => {
               <i className="fa-regular fa-square-plus mr-2"/>Create Post
             </button>
             {/* <button className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
-              onClick={findBlock}>
+              onClick={testTransferFromAnotherWallet}>
                 Find block
             </button> */}
           </div>
@@ -727,9 +779,9 @@ const DashboardInfo = () => {
                 </button>
                 {/* HELP, make all buttons disabled when clicked once using loading */}
                 <button type="submit" 
-                  className={`w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300 ml-4 ${loading ? 'cursor-pointer' : 'cursor-wait'}`}
-                  disabled={!loading}>
-                  {loading ? 'Create' : 'Creating...'}
+                  className={`w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300 ml-4 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
+                  disabled={loading}>
+                  {loading ? 'Completing...' : 'Complete'}
                 </button>
               </div>
             </form>
@@ -780,16 +832,18 @@ const DashboardInfo = () => {
                       <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
                       <div className="flex flex-row w-full sm:space-x-2 mt-auto space-x-2">
                         <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
+                          disabled={loading}
                           onClick={(e) => {
                             e.stopPropagation();
                             closeDeletePostModal()}}>
                           Cancel
                         </button>
-                        <button className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300"
+                        <button className={`w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
+                          disabled={loading}
                           onClick={(e) => {
                             e.stopPropagation();
                             deletePost()}}>
-                          {loading ? 'Delete' : 'Deleting...'}
+                          {loading ? 'Deleting...' : 'Delete'}
                         </button>
                       </div>
                     </div>
@@ -909,12 +963,19 @@ const DashboardInfo = () => {
                 )}
               </div>
 
+              <h2 className="text-lg mb-4 font-bold text-red-500">
+                {/* Tell user how many credits are needed for posts */}
+                {confirmRequest ? `You need ${createPostCreditAmount} credits to make this post. Are you sure?` : "" }
+              </h2>
+
               <div className="flex flex-row w-full sm:space-x-2 mt-auto">
-                <button onClick={closeModal} className="w-full sm:w-[50%] cancel-button">
+                <button onClick={closeModal} className="w-full sm:w-[50%] cancel-button"
+                  disabled={loading}>
                   Cancel
                 </button>
-                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] confirm-button">
-                  Create
+                <button type="submit" className={`w-full sm:w-[50%] bg-[#49A078] confirm-button ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
+                  disabled={loading}>
+                  {loading ? 'Creating...' : 'Create'}
                 </button>
               </div>
             </form>
@@ -993,11 +1054,13 @@ const DashboardInfo = () => {
               </div>
 
               <div className="flex flex-row w-full sm:space-x-2 mt-auto">
-                <button onClick={closeUpdateModal} className="w-full sm:w-[50%] cancel-button">
+                <button onClick={closeUpdateModal} className="w-full sm:w-[50%] cancel-button"
+                  disabled={loading}>
                   Cancel
                 </button>
-                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] confirm-button">
-                  Update
+                <button type="submit" className="w-full sm:w-[50%] bg-[#49A078] confirm-button"
+                  disabled={loading}>
+                  {confirmRequest ? "Updating..." : "Update"}
                 </button>
               </div>
             </form>

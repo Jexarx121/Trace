@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "../../supabase/supabaseClient";
-import { LINKS } from "../constants";
+import { LINKS, DECIMALS } from "../constants";
 import { useState, useEffect, useContext } from "react";
 import { ethers } from "ethers";
 import { SessionContext } from "../Context/SessionContext";
@@ -11,7 +11,7 @@ import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { createInstance } from "../../eth/traceCredit";
 import { EthContext } from "../../eth/context";
 import { FaEthereum } from "react-icons/fa";
-import { getPrivateKey } from "../Dashboard/functions";
+import { getPrivateKey, getPublicKey } from "../Dashboard/functions";
 
 const AccountProfile = () => {
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ const AccountProfile = () => {
   const [ userId, setUserId ] = useState(0);
   const [ creditAmount, setCreditAmount ] = useState(-1);
   const [ sessionId, setSessionId ] = useState("");
+  const [ actualAccount, setActualAccount ] = useState("");
 
   const goToEditAccountPage = () => {
     navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
@@ -72,12 +73,12 @@ const AccountProfile = () => {
     return ethereumAddress;
   };
 
-  async function fundWalletTokens(receiverAddress : any) {
+  async function fundWalletTokens(receiverAddress : any, creditAmount : number) {
     const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     
     const wallet = new ethers.Wallet(adminPrivateKey);
     const signer = wallet.connect(provider?.provider);
-    const baseAmount = 100n * (10n ** 18n); // 100 credits to start off with
+    const baseAmount = BigInt(creditAmount) * (10n ** 18n); // 100 credits to start off with
 
     const contract = createInstance(signer);
     const tx = await contract.transfer(receiverAddress, baseAmount)
@@ -94,6 +95,22 @@ const AccountProfile = () => {
     if (data && data.user_id) {
       setUserId(data.user_id);
       navigate(`/account/${userId}`);
+    }
+  }
+
+  async function getBalance() {
+    const { data, error } = await supabase
+      .from('wallets')
+      .select("ethereum_address")
+      .eq('id', sessionId)
+      .single();
+
+    if (error) {
+      console.warn(error);
+    } else if (data) {
+      const contract = createInstance(provider);
+      const balance = await contract.balanceOf(data.ethereum_address);
+      setCreditAmount(parseInt(balance.toString()) / DECIMALS);
     }
   }
 
@@ -126,7 +143,7 @@ const AccountProfile = () => {
       // if data from database is null, user is newly joined
       if (data?.full_name === null) {
         let receiverAddress = createAndStoreWallet();
-        fundWalletTokens(receiverAddress);
+        fundWalletTokens(receiverAddress, 100);
         goToEditAccountPage();
       };
 
@@ -142,23 +159,6 @@ const AccountProfile = () => {
       }
     };
 
-    async function getBalance() {
-      const { data, error } = await supabase
-        .from('wallets')
-        .select("ethereum_address")
-        .eq('id', sessionId)
-        .single();
-
-      if (error) {
-        console.warn(error);
-      } else if (data) {
-        const contract = createInstance(provider);
-        const decimals = 10 ** 18;
-        const balance = await contract.balanceOf(data.ethereum_address);
-        setCreditAmount(parseInt(balance.toString()) / decimals);
-      }
-    }
-
     getProfile();
     if (creditAmount === -1) {
       getBalance();
@@ -169,8 +169,15 @@ const AccountProfile = () => {
   async function checkFunds(receiverAddress : string) {
     const contract = createInstance(provider);
     const balance = await contract.balanceOf(receiverAddress);
-    console.log(parseInt(balance.toString()) / 10**18 );
+    console.log(parseInt(balance.toString()) / DECIMALS );
   };
+
+  const getFreeFunds = async () => {
+    const creditAmount = 50;
+    const receiverAddress = await getPublicKey(session?.user.id);
+    fundWalletTokens(receiverAddress, creditAmount);
+    toast.success("Your credit amount will be updated soon.")
+  }
   
   // async function testTransferFrom(receiverAddress : string) {
   //   const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
@@ -200,7 +207,7 @@ const AccountProfile = () => {
     checkFunds(walletAddress);
     // testTransferFrom(walletAddress);
     // createAndStoreWallet();
-  }
+  };
 
   return (
     <div className="mb-10">
@@ -221,12 +228,18 @@ const AccountProfile = () => {
             </div>
 
             {/* Only render if this is the user's profile */}
-            <div className="ml-auto"> 
-              <Link className="m-4 bg-[#49A078] rounded-md font-bold text-lg text-white hover:bg-[#3e7d5a] transition duration-300"
+            <div className="ml-auto flex flex-col"> 
+              <Link className="m-4 rounded-md font-bold text-lg text-white"
                 to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
                 <HiOutlinePencilSquare className="sm:text-3xl text-2xl text-[#49A078] mr-10"/>
               </Link>
+              <button type="submit" 
+                className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
+                onClick={getFreeFunds}>
+                Get Funds
+              </button>
             </div>
+            
 
           </div>
           {/* Bio */}

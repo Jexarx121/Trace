@@ -39,10 +39,10 @@ const Navbar = () => {
             About
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
-            <Link to={LINKS.DASHBOARD}>Dashboard</Link>
+            <Link to={LINKS.DASHBOARD} >Dashboard</Link>
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
-            <Link to={`/account/${userId}`} onClick={handleLinkClick}>Profile</Link>
+            <Link to={`/account/${userId}`} onClick={handleLinkClick} >Profile</Link>
           </li>
           {!session ? (
             <li>

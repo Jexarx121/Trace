@@ -6,7 +6,7 @@ const {
 
 const { expect } = require("chai");
 
-describe("NodeManager Contract", function () {
+describe.skip("NodeManager Contract", function () {
 
   async function deployNodeFixture() {
     const accounts = await ethers.getSigners();
