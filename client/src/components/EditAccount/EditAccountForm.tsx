@@ -1,20 +1,26 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { profileSchema } from ".";
 import { supabase } from "../../supabase/supabaseClient";
 import { capitalize } from "../../helpers/functions";
-import { LINKS } from "../constants";
+import { SessionContext } from "../Context/SessionContext";
+import toast from "react-hot-toast";
 
 type ProfileSchema = z.infer<typeof profileSchema>;
 
 const EditAccountForm = () => {
+  const { user_id } = useParams();
   const [loading, setLoading] = useState(true);
+  const [descriptionLength, setDescriptionLength] = useState(0);
+
   const navigate = useNavigate();
   const location = useLocation();
-  const { session, fullName, age, bio, passedAvatarUrl } = location.state || {};
+  const { fullName, age, bio, passedAvatarUrl } = location.state || {};
+  const { session } = useContext(SessionContext);
+
   let firstName;
   let surname;
   let listOfNames;
@@ -25,12 +31,12 @@ const EditAccountForm = () => {
 
     for (let i=1; i < listOfNames.length; i++) {
       surname += capitalize(listOfNames[i]) + " ";
-    }
-  }
+    };
+  };
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: { session }});
-  }
+    navigate(`/account/${user_id}`);
+  };
 
   const {
     register,
@@ -40,6 +46,10 @@ const EditAccountForm = () => {
     resolver: zodResolver(profileSchema),
   });
   
+  const handleDescriptionChange = (event : any) => {
+    const descriptionValue = event.target.value;
+    setDescriptionLength(descriptionValue.length);
+  };
 
   async function uploadAvatar(profileImage : any): Promise<string> {
     try {
@@ -66,7 +76,7 @@ const EditAccountForm = () => {
   async function updatePosts(authId : any, newName: string) {
     const { error } = await supabase
       .from('posts')
-      .update({ created_by: newName})
+      .update({created_by: newName, assigned_to_name: newName})
       .eq('id', authId);
 
     if (error) {
@@ -107,7 +117,7 @@ const EditAccountForm = () => {
     };
 
     updatePosts(user.id, fullname);
-
+    toast.success("Your account has been updated.")
     setLoading(true);
     goToAccount();
   };
@@ -175,9 +185,11 @@ const EditAccountForm = () => {
               id="bio"
               placeholder="Feel free to enter stuff about yourself, previous work experience and why you joined!"
               className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
-              rows={8}
+              rows={15}
               defaultValue={bio}
-              {...register("bio")} />
+              {...register("bio")} 
+              onChange={handleDescriptionChange} />
+            <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 2000 characters</p>
             {errors.bio && (
               <p className="text-sm text-red-500 mt-2"> {errors.bio?.message}</p> 
             )}
@@ -186,7 +198,7 @@ const EditAccountForm = () => {
 
         {/* Update Profile Button */}
         <button type="submit" 
-          className="w-full md:w-auto mt-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center text-white md:mr-4">
+          className="w-full md:w-auto mt-4 px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center text-white md:mr-4 hover:bg-[#3e7d5a] transition duration-300">
           {loading ? 'Update' : 'Updating...'}
         </button>
 

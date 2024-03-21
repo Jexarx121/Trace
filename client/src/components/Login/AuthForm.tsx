@@ -1,41 +1,26 @@
 import { supabase } from "../../supabase/supabaseClient";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { Session } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 import { LINKS } from "../constants";
 import { useNavigate } from "react-router-dom";
+import { SessionContext } from "../Context/SessionContext";
+import { Link } from "react-router-dom";
 
 const AuthForm = () => {
   const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    })
-
-    return () => subscription.unsubscribe()
-  }, []);
+  const { session } = useContext(SessionContext);
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: { session }});
-  }
-
-  const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE);
-  }
+    navigate(LINKS.ACCOUNT);
+  };
 
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <h1 className="text-3xl font-bold mb-4 text-[#263228] cursor-pointer" onClick={goToHomepage}>Trace</h1>
+        <h1 className="text-3xl font-bold mb-4 text-[#263228]">
+          <Link to={LINKS.HOMEPAGE}>Trace</Link>
+        </h1>
         <div className="max-w-md w-full">
           <Auth supabaseClient={supabase}
             appearance={{ theme: ThemeSupa,
@@ -45,12 +30,10 @@ const AuthForm = () => {
                   brandAccent: '#49A078',
                   brandButtonText: '#263228',
                   defaultButtonText: '#263228',
-                  defaultButtonBorder: '#4d6551',
-                  defaultButtonBackgroundHover: '#b7c8b9',
+                  defaultButtonBorder: '#49A078',
+                  defaultButtonBackgroundHover: '#49A078',
                   inputBorder: '#263228',
                   dividerBackground: '#444444',
-                  inputBorderFocus: "#0000FF",
-                  inputBorderHover: '#263228',
                   anchorTextColor: '#49A078',
                   anchorTextHoverColor: '#49A078'
                 },
@@ -64,6 +47,10 @@ const AuthForm = () => {
                   labelFontFamily: 'Outfit',
                   inputFontFamily: 'Outfit',
                   buttonFontFamily: 'Outfit'
+                },
+                borderWidths: {
+                  buttonBorderWidth: '2px',
+                  inputBorderWidth: '2px'
                 }
               }
             }}}
@@ -81,6 +68,7 @@ const AuthForm = () => {
               }
             }}
             providers={["google"]}
+            redirectTo="/account/:user_id"
           />
         </div>
       </div>

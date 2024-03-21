@@ -62,7 +62,7 @@ const FAQ: React.FC = () => {
   return (
     <div className="bg-[#FFFFFF]">
       <div className="w-full md:w-[70vw] mx-auto flex flex-col lg:flex-row mt-20 mb-20">
-        <div className="w-full sm:p-5 md:p-0">
+        <div className="w-full sm:p-5 md:p-0 px-4">
           <h1 className="font-bold mb-4 mt-4 uppercase text-[#1f2421]">Frequently Asked Questions</h1>
           <div className='text-2xl'>
             {questionAnswers.map((faq, index) => (

@@ -1,47 +1,21 @@
-import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
-import { useEffect, useState } from "react";
-import { supabase } from "../../supabase/supabaseClient";
-import { Session } from "@supabase/supabase-js";
+import { Link } from "react-router-dom";
+import { UserIdContext } from "../Context/UserIdContext";
+import { useContext } from "react";
 
 const Footer = () => {
-  const navigate = useNavigate();
-  const [session, setSession] = useState<Session | null>(null);
+  const { userId } = useContext(UserIdContext);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    })
-
-    return () => subscription.unsubscribe()
-  }, []);
-  
-  const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE, {state: {session}});
-  };
-
-  const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: {session}});
-  };
-
-  const goToDashboard = () => {
-    navigate(LINKS.DASHBOARD, {state: {session}});
-  };
-  
   return (
     <div className="bg-[#216869] pt-1">
       <div className="w-full md:w-[70vw] mx-auto text-white">
         <div className="flex flex-col md:flex-row justify-between">
-          <h1 className="font-bold p-5 cursor-pointer" onClick={goToHomepage}>Trace</h1>
+          <h1 className="font-bold p-5 cursor-pointer">
+            <Link to={LINKS.HOMEPAGE}>Trace</Link>
+          </h1>
           <a className="p-5 cursor-pointer">About</a>
-          <a className="p-5 cursor-pointer" onClick={goToDashboard}>Dashboard</a>
-          <a className="p-5 cursor-pointer" onClick={goToAccount}>Profile</a>
+          <Link to={LINKS.DASHBOARD} className="p-5 cursor-pointer">Dashboard</Link>
+          <Link className="p-5 cursor-pointer" to={`/account/${userId}`}>Profile</Link>
         </div>
         <div className="border-t-2 border-gray-400 flex flex-col md:flex-row justify-start">
           <h1 className="font-bold p-5">&#169; 2024 Trace</h1> 

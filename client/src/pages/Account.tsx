@@ -1,11 +1,12 @@
-import { Navbar } from "../components/Homepage";
+import { Footer, Navbar } from "../components/Homepage";
 import { AccountProfile } from "../components/Account";
 
 const Account = () => {
   return (
     <div>
-      <Navbar />
-      <AccountProfile />
+      <Navbar/>
+      <AccountProfile/>
+      <Footer/>
     </div>
   );
 };

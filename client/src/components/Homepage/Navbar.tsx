@@ -1,74 +1,57 @@
-import { useState, useEffect } from "react";
-import { HiMenuAlt4 } from 'react-icons/hi';
+import { useState, useContext } from "react";
 import { AiOutlineClose } from 'react-icons/ai';
+import { MdMenu } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
 import { supabase } from "../../supabase/supabaseClient";
-import { Session } from "@supabase/supabase-js";
+import { SessionContext } from "../Context/SessionContext";
+import { Link } from "react-router-dom";
+import { UserIdContext } from "../Context/UserIdContext";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [toggleMenu, setToggleMenu] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    })
-
-    return () => subscription.unsubscribe()
-  }, []);
-
-  const goToLogin = () => {
-    navigate(LINKS.LOGIN, {state: {session}});
-  };
-
-  const goToHomepage = () => {
-    navigate(LINKS.HOMEPAGE, {state: { session }});
-  };
-
-  const goToAccount = () => {
-    navigate(LINKS.ACCOUNT, {state: { session }});
-  };
-
-  const goToDashboard = () => {
-    navigate(LINKS.DASHBOARD, {state: { session }});
-  }
+  const [ toggleMenu, setToggleMenu ] = useState(false);
+  const { session } = useContext(SessionContext);
+  const { userId } = useContext(UserIdContext);
 
   const handleLogout = () => {
+    toast.success("You have been logged out.");
     supabase.auth.signOut();
     navigate(LINKS.HOMEPAGE);
+    sessionStorage.clear();
   };
+
+  const handleLinkClick = () => {
+    // Force a page refresh after the navigation
+    navigate(`/account/${userId}`);
+    window.location.reload();
+  }
 
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
       <div className="w-[70vw] m-auto flex items-center">
-        <h1 className="text-white font-bold text-2xl cursor-pointer"
-          onClick={goToHomepage}>
-          Trace
+        <h1 className="text-white font-bold text-2xl cursor-pointer">
+          <Link to={LINKS.HOMEPAGE}>Trace</Link>
         </h1>
         <ul className='md:flex hidden flex-row list-none items-center px-4 ml-auto text-white flex-initial'>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
             About
           </li>
-          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToDashboard}>
-            Dashboard
+          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
+            <Link to={LINKS.DASHBOARD} >Dashboard</Link>
           </li>
-          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4" onClick={goToAccount}>
-            Profile
+          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
+            <Link to={`/account/${userId}`} onClick={handleLinkClick} >Profile</Link>
           </li>
           {!session ? (
-            <li className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold" onClick={goToLogin}>
-              Login
+            <li>
+              <Link className="ml-4 px-8 bg-[#49A078] py-2 rounded-md font-bold hover:bg-[#3e7d5a] transition duration-300" 
+                to={LINKS.LOGIN}>Login</Link>
             </li>
           ) : (
-            <button className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:mr-2"
+            // add flash alert for this
+            <button className="px-8 bg-[#49A078] py-2 rounded-md font-bold md:text-left md:ml-4 hover:bg-[#3e7d5a] transition duration-300"
               onClick={handleLogout}>
               Sign Out
             </button>
@@ -76,37 +59,40 @@ const Navbar = () => {
         </ul>
         <div className="flex relative ml-auto md:hidden">
           {!toggleMenu && (
-            <HiMenuAlt4 fontSize={28} className="text-white md:hidden cursor-pointer" onClick={() => setToggleMenu(true)} />
+            <MdMenu fontSize={28} className="text-white md:hidden cursor-pointer" onClick={() => setToggleMenu(true)} />
           )}
           {toggleMenu && (
             <AiOutlineClose fontSize={28} className="text-[#1f2421] md:hidden cursor-pointer" onClick={() => setToggleMenu(false)} />
           )}
           {toggleMenu && (
-            <ul
-              className="z-10 fixed -left-0 -top-0 w-[100vw] h-screen md:hidden list-non flex flex-col
+            <ul className="z-10 fixed -left-0 -top-0 w-[100vw] h-screen md:hidden list-non flex flex-col
               justify-start rounded-md bg-white text-[#1f2421] animate-slide-in">
-              <li className="text-3xl w-full my-2 mx-2"><AiOutlineClose className="cursor-pointer ml-2" onClick={() => setToggleMenu(false)}/></li>
-              <li className="mx-4 cursor-pointer font-bold text-xl pb-5">
+              <div className="flex items-center justify-between mb-6">
+                <h1 className="text-2xl text-center my-5 ml-8 flex-grow"><Link to={LINKS.HOMEPAGE}>Trace</Link></h1>
+                <AiOutlineClose className="cursor-pointer mr-4 text-3xl" onClick={() => setToggleMenu(false)}/>
+              </div>
+              <li className="mx-4 cursor-pointer text-xl mb-6 pb-6 border-b border-gray-300">
                 About
               </li>
-              <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToDashboard}>
-                Dashboard
+              <li className="mx-4 cursor-pointer text-xl mb-6 pb-6 border-b border-gray-300">
+                <Link to={LINKS.DASHBOARD}>Dashboard</Link>
               </li>
-              <li className="mx-4 cursor-pointer font-bold text-xl pb-5" onClick={goToAccount}>
-                Profile
+              <li className="mx-4 cursor-pointer text-xl mb-6 pb-6 border-b border-gray-300">
+                <Link to={`/account/${userId}`}>Profile</Link>
               </li>
               {!session ? (
-                <li className="px-4 cursor-pointer font-bold text-xl" onClick={goToLogin}>
-                  Login
+                <li >
+                  <Link className="px-4 cursor-pointer text-xl" 
+                    to={LINKS.LOGIN}>Login</Link>
                 </li>
               ) : (
-                <button className="px-4 cursor-pointer font-bold md:text-left md:mr-2"
+                <button className="px-4 text-xl text-left md:mr-2"
                   onClick={handleLogout}>
                   Sign Out
                 </button>
               )}
-                </ul>
-              )}
+            </ul>
+          )}
         </div> 
       </div>
     </nav>

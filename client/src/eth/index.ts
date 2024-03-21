@@ -1,0 +1,1 @@
+export { default as deploy } from '../../../backend/deploy.json';
