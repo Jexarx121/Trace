@@ -10,7 +10,7 @@ const profileSchema = z.object({
   age: z.preprocess((a) => parseInt(z.string().parse(a), 10), z.number().refine((value) => value >= 18 && value <= 110, {
     message: 'Age must be between 18 and 110 years old.',
   })),
-  bio: z.string().trim().min(5, {message: "Please enter a valid bio of at least 5 characters."}).max(1000, {message: "Bio cannot be over 1000 characters"}),
+  bio: z.string().trim().min(200, {message: "Bio must be at least 200 characters."}).max(2000, {message: "Bio cannot be over 2000 characters"}),
   profileImage: z
     .any()
     .optional()

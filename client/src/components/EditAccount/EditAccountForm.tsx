@@ -2,17 +2,17 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { useContext, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { profileSchema } from ".";
 import { supabase } from "../../supabase/supabaseClient";
 import { capitalize } from "../../helpers/functions";
-import { LINKS } from "../constants";
 import { SessionContext } from "../Context/SessionContext";
 import toast from "react-hot-toast";
 
 type ProfileSchema = z.infer<typeof profileSchema>;
 
 const EditAccountForm = () => {
+  const { user_id } = useParams();
   const [loading, setLoading] = useState(true);
   const [descriptionLength, setDescriptionLength] = useState(0);
 
@@ -35,7 +35,7 @@ const EditAccountForm = () => {
   };
 
   const goToAccount = () => {
-    navigate(LINKS.ACCOUNT);
+    navigate(`/account/${user_id}`);
   };
 
   const {
@@ -185,11 +185,11 @@ const EditAccountForm = () => {
               id="bio"
               placeholder="Feel free to enter stuff about yourself, previous work experience and why you joined!"
               className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
-              rows={8}
+              rows={15}
               defaultValue={bio}
               {...register("bio")} 
               onChange={handleDescriptionChange} />
-            <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 1000 characters</p>
+            <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 2000 characters</p>
             {errors.bio && (
               <p className="text-sm text-red-500 mt-2"> {errors.bio?.message}</p> 
             )}

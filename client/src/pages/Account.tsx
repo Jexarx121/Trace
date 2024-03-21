@@ -1,4 +1,4 @@
-import { Navbar } from "../components/Homepage";
+import { Footer, Navbar } from "../components/Homepage";
 import { AccountProfile } from "../components/Account";
 
 const Account = () => {
@@ -6,6 +6,7 @@ const Account = () => {
     <div>
       <Navbar/>
       <AccountProfile/>
+      <Footer/>
     </div>
   );
 };

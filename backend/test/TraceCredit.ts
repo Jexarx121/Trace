@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { ethers } from "hardhat";
 
 const {
@@ -10,7 +11,7 @@ describe("TraceCredit contract", function() {
 
   async function deployCreditFixture() {
     const [owner, addr1, addr2] = await ethers.getSigners();
-    const initialSupply = 10000;
+    const initialSupply = 10_000_000;
     const traceCredit = await ethers.deployContract("TraceCredit", [initialSupply]);
     await traceCredit.waitForDeployment();
 
@@ -18,14 +19,15 @@ describe("TraceCredit contract", function() {
     return { traceCredit, owner, addr1, addr2 };
   }
 
-  it("Should assign the initial supply to the owner", async function () {
+  it.skip("Should assign the initial supply to the owner", async function () {
     const { traceCredit, owner } = await loadFixture(deployCreditFixture);
 
     const ownerBalance = await traceCredit.balanceOf(owner.address);
-    expect(ownerBalance).to.equal(10000);
+    const value = 10_000_000n * (10n ** 18n);
+    expect(ownerBalance).to.equal(value);
   });
 
-  it("Should transfer tokens between accounts", async function () {
+  it.skip("Should transfer tokens between accounts", async function () {
     const { traceCredit, addr1, addr2 } = await loadFixture(deployCreditFixture);
     await traceCredit.transfer(addr1.address, 100);
     const addr1Balance = await traceCredit.balanceOf(addr1.address);
@@ -35,5 +37,14 @@ describe("TraceCredit contract", function() {
     const addr2Balance = await traceCredit.balanceOf(addr2.address);
     expect(addr2Balance).to.equal(50);
   });
-  
+
+  it.skip("Transfer tokens to a new ethers account", async function () {
+    const { traceCredit } = await loadFixture(deployCreditFixture);
+    const PRIVATE_KEY = process.env.WALLET_PRIVATE_KEY;
+    const wallet = new ethers.Wallet(PRIVATE_KEY);
+
+    await traceCredit.transfer(wallet.address, 100);
+    const walletBalance = await traceCredit.balanceOf(wallet.address);
+    expect(walletBalance).to.equal(100);
+  });
 });

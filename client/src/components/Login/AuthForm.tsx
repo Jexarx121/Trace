@@ -68,6 +68,7 @@ const AuthForm = () => {
               }
             }}
             providers={["google"]}
+            redirectTo="/account/:user_id"
           />
         </div>
       </div>

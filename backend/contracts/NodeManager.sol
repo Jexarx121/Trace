@@ -3,44 +3,37 @@ pragma solidity ^0.8.9;
 
 import "./TraceCredit.sol";
 import "hardhat/console.sol";
-import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
-import "@openzeppelin/contracts/metatx/ERC2771Forwarder.sol";
 
-contract NodeManager is ERC2771Context {
+contract NodeManager {
   struct Node {
     address sender;
     address receiver;
-    uint256 amount;
-    uint256 postId;
+    uint256 creditAmount;
+    uint256 hoursWorked; 
+    uint256 amountOfPeople;
   }
-
-  TraceCredit public traceCredit;
 
   mapping(uint256 => Node) public nodes;
   uint256 public nodesCount;
 
-  constructor(address creditTokenAddress, ERC2771Forwarder forwarder) ERC2771Context(address(forwarder)) {
-    traceCredit = TraceCredit(creditTokenAddress);
-  }
-
-  function createNode(address receiver, uint256 amount, uint256 postId) external {
-    // Approve transfer of tokens from traceCredit to this contract
-    traceCredit.approve(address(this), amount);
-    traceCredit.transferFrom(address(this), receiver, amount);
+  function createNode(uint256 postId, address sender, address receiver, uint256 creditAmount, uint256 hoursWorked, uint256 amountOfPeople) external {
+    // Require that the node with the given postId does not already exist
+    require(nodes[postId].sender == address(0), "Node with postId already exists");
 
     // Add to the chain
-    Node storage newNode = nodes[nodesCount];
-    newNode.sender = _msgSender(); // supporting meta transactions
+    Node storage newNode = nodes[postId];
+    newNode.sender = sender; // supporting meta transactions
     newNode.receiver = receiver;
-    newNode.amount = amount;
-    newNode.postId = postId;
+    newNode.creditAmount = creditAmount;
+    newNode.hoursWorked = hoursWorked;
+    newNode.amountOfPeople = amountOfPeople;
 
     nodesCount++;
   }
 
-  function getNodeDetails(uint256 nodeId) external view returns (address, address, uint256, uint256) {
-    require(nodeId < nodesCount, "Invalid node ID");
-    Node storage node = nodes[nodeId];
-    return (node.sender, node.receiver, node.amount, node.postId);
+  function getNodeDetails(uint256 nodePostId) external view returns (address, address, uint256, uint256, uint256) {
+    require(nodes[nodePostId].sender != address(0), "Node with nodePostId does not exist");
+    Node storage node = nodes[nodePostId];
+    return (node.sender, node.receiver, node.creditAmount, node.hoursWorked, node.amountOfPeople);
   }
 }

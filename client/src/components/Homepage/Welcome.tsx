@@ -1,14 +1,7 @@
-import { useNavigate } from "react-router-dom";
 import { LINKS } from "../constants";
-
+import { Link } from "react-router-dom";
 
 const Welcome = () => {
-  const navigate = useNavigate();
-
-  const goToLogin = () => {
-    navigate(LINKS.LOGIN);
-  }
-
   return (
     <div className="bg-[#216869]">
       <div className="w-[70vw] m-auto pt-12 flex flex-col md:flex-row">
@@ -20,10 +13,10 @@ const Welcome = () => {
             Securing a generational contract through crediting volunteering effort with the help of Distributed Ledger Technology (DLT).
           </p>
           <div className="flex flex-col md:flex-row items-center md:items-start text-white py-2">
-            <button className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:mr-2"
-              onClick={goToLogin}>
+            <Link className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:mr-2"
+              to={LINKS.LOGIN}>
               Try Now
-            </button>
+            </Link>
           </div>
         </div>
         <div className="md:w-1/2 flex justify-center items-center mt-5 md:mt-0">
