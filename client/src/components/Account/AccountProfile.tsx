@@ -235,6 +235,7 @@ const AccountProfile = () => {
                 </button>
               </div>
             )}
+            
           </div>
 
           {/* Bio */}
