@@ -537,45 +537,50 @@ const DashboardInfo = () => {
   return (
     <div className="w-[70vw] m-auto mt-12 mb-12">
       <div>
+
         <div className="flex flex-row justify-between mb-2">
           <h1 className="text-sm tracking-wider text-[#1f2421] font-bold uppercase my-2">Dashboard</h1>
           <button type="submit" 
             className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
             onClick={openModal}>
-            <i className="fa-regular fa-square-plus mr-2"/>Create Post
+            <i className="fa-regular fa-square-plus mr-2"/>Create
           </button>
         </div>
-        <div className="flex flex-row flex-wrap pt-1 pb-5 gap-5">
+
+        <div className="flex sm:flex-row flex-col sm:flex-wrap pt-1 pb-5 gap-5">
           <DashboardPostTypeItem title="Total" icon="fas fa-globe" number={`${postData.length}`}
-            onColor={`${(viewAvailablePosts && viewCompletePosts && viewPersonalPosts) ? "bg-[#41b87e] border-black border-2" : "bg-[#67c698]"} 
+            onColor={`${(viewAvailablePosts && viewCompletePosts && viewPersonalPosts) ? "bg-[#41b87e] border-black border-2 shadow-xl shadow-slate-500" : "bg-[#67c698]"} 
             hover:bg-[#41b87e]`} 
             onClickFunction={showTotalPosts}/>
           <DashboardPostTypeItem title="Available" icon="fa-solid fa-person-circle-plus" number={`${postData.filter(post => post.status === "free").length}`} 
-            onColor={`${viewAvailablePosts && !viewCompletePosts && !viewPersonalPosts ? "bg-[#ffcc4a] border-black border-2" : "bg-[#ffd66e]"} 
+            onColor={`${viewAvailablePosts && !viewCompletePosts && !viewPersonalPosts ? "bg-[#ffcc4a] border-black border-2 shadow-xl shadow-slate-500" : "bg-[#ffd66e]"} 
             hover:bg-[#ffcc4a]`} 
             onClickFunction={showAvailablePosts}/>
           <DashboardPostTypeItem title="Completed" icon="fa-solid fa-handshake" number={`${postData.filter(post => post.status === "completed").length}`} 
-            onColor={`${!viewAvailablePosts && viewCompletePosts && !viewPersonalPosts ? "bg-[#c17fd0] border-black border-2" : "bg-[#cd99d9]"} 
+            onColor={`${!viewAvailablePosts && viewCompletePosts && !viewPersonalPosts ? "bg-[#c17fd0] border-black border-2 shadow-xl shadow-slate-500" : "bg-[#cd99d9]"} 
             hover:bg-[#c17fd0]`} 
             onClickFunction={showCompletedPosts}/>
           <DashboardPostTypeItem title="Personal" icon="fa-solid fa-user" number={`${postData.filter(post => post.assigned_to === session?.user.id || post.id === session?.user.id).length}`} 
-            onColor={`${!viewAvailablePosts && !viewCompletePosts && viewPersonalPosts ? "bg-[#a2b0c1] border-black border-2" : "bg-[#b6c6d9]"} 
+            onColor={`${!viewAvailablePosts && !viewCompletePosts && viewPersonalPosts ? "bg-[#a2b0c1] border-black border-2 shadow-xl shadow-slate-500" : "bg-[#b6c6d9]"} 
             hover:bg-[#a2b0c1]`} 
             onClickFunction={showPersonalPosts}/>
         </div>
+
         <div className="mt-8">
           <input type="search" className="border-black border-2 w-full p-3 rounded-md" 
             placeholder="Search for posts"/>
         </div>
+
       </div>
 
       {/* Free posts */}
       {viewAvailablePosts && (
-        <div className="mt-8">
-          <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 sm:mx-0 mx-3 tracking-wider">Available Posts</h1>
+      <div>
+        <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Available Posts</h1>
+        <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           {postData.map((post) => (
             post.status === "free" && (
-              <div className="my-6 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2c6048] bg-white hover:shadow-slate-500 cursor-pointer" 
+              <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
                 key={post.post_id} onClick={() => showPost(post)}>
                 <div className="flex md:flex-row flex-col">
                   <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
@@ -609,7 +614,7 @@ const DashboardInfo = () => {
                     <div onClick={(e) => {
                       e.stopPropagation()}}
                       className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                      <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
+                      <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
                         <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
                         <div className="flex flex-row w-full sm:space-x-2 mt-auto space-x-2">
                           <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
@@ -638,7 +643,7 @@ const DashboardInfo = () => {
           {/* Modal for showing currently clicked free post */}
           {isModalVisible && selectedPost && (
             <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-              <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
+              <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
                 <div className="flex flex-row">
                   <div>
                     <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
@@ -659,7 +664,7 @@ const DashboardInfo = () => {
                 </div>
 
                 <h2 className="text-lg mb-4 font-bold text-red-500">
-                  {/* Set it so you can't be creator of own post */}
+                  {/* Set it so you can't be worker of own post */}
                   {confirmRequest ? "Please make sure to contact the creator of this post first to sort out any details before requesting!" : "" }
                 </h2>
                 
@@ -676,12 +681,13 @@ const DashboardInfo = () => {
             </div>
           )}
         </div> 
+      </div>
       )}
 
       {/* Accepted Posts */}
       {viewPersonalPosts && (
         <div className="mt-8">
-          <div className="flex flex-row border-b-black border-b-2 sm:mx-0 mx-3 justify-between">
+          <div className="flex flex-row border-b-black border-b-2 justify-between">
             <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider">Personal Posts</h1>
             <div>
               {/* <button className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
@@ -691,41 +697,43 @@ const DashboardInfo = () => {
             </div>
           </div>
           
-          {postData.map((post) => (
-            (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
-              <div className="my-6 rounded-xl shadow-2xl border-2 border-[#2c6048] bg-white hover:shadow-slate-500 cursor-pointer" 
-                key={post.post_id}  onClick={() => showAcceptedPost(post)}>
-                <div className="flex md:flex-row flex-col">
-                  <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                  <div>
-                    <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                    <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
-                  </div>
-                </div>  
-                <div className="p-4 flex items-center" >
-                  <div className="overflow-hidden">
-                    <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
-                    
-                    {/* Only render these icons if the posts are the users */}
-                    {post.id === session.user.id && (
-                      <div>
-                        <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPost(post);
-                            openUpdateModal()}}></i>
-                        <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedPost(post);
-                            openDeletePostModal()}}></i>
-                      </div>
-                    )}
+          <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {postData.map((post) => (
+              (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
+                <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                  key={post.post_id}  onClick={() => showAcceptedPost(post)}>
+                  <div className="flex md:flex-row flex-col">
+                    <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
+                    <div>
+                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
+                      <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+                    </div>
+                  </div>  
+                  <div className="p-4 flex items-center" >
+                    <div className="overflow-hidden">
+                      <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
+                      
+                      {/* Only render these icons if the posts are the users */}
+                      {post.id === session.user.id && (
+                        <div>
+                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedPost(post);
+                              openUpdateModal()}}></i>
+                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedPost(post);
+                              openDeletePostModal()}}></i>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )
-          ))}
+              )
+            ))}
+          </div>
         </div>
       )}
 
@@ -733,28 +741,30 @@ const DashboardInfo = () => {
       {/* Only shows completed posts */}
       {viewCompletePosts && (
         <div className="mt-8">
-          <h1 className="text-sm text-[#1f2421] font-bold py-4 border-b-black border-b-2 sm:mx-0 mx-3 uppercase tracking-wider">Completed Posts</h1>
+          <h1 className="text-sm text-[#1f2421] font-bold py-4 border-b-black border-b-2 uppercase tracking-wider">Completed Posts</h1>
 
-          {postData.map((post) => (
-            post.status === "completed" && (
-              <div className="my-6 rounded-xl shadow-2xl border-2 border-[#2c6048] bg-white hover:shadow-slate-500 cursor-pointer" 
-                key={post.post_id}  onClick={() => openCompleteModal(post)}>
-                <div className="flex md:flex-row flex-col">
-                  <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                  <div>
-                    <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                    <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+          <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {postData.map((post) => (
+              post.status === "completed" && (
+                <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                  key={post.post_id}  onClick={() => openCompleteModal(post)}>
+                  <div className="flex md:flex-row flex-col">
+                    <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
+                    <div>
+                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
+                      <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+                    </div>
+                  </div>  
+                  <div className="p-4 flex items-center">
+                    <div className="overflow-hidden">
+                      <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
+                    </div>
                   </div>
-                </div>  
-                <div className="p-4 flex items-center">
-                  <div className="overflow-hidden">
-                    <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
-                  </div>
+                  <p className="px-4 pb-3 text-[#1f2421] break-words">Completed by: {post.assigned_to_name}</p>
                 </div>
-                <p className="px-4 pb-3 text-[#1f2421] break-words">Completed by: {post.assigned_to_name}</p>
-              </div>
-            )
-          ))}
+              )
+            ))}
+          </div>
         </div>
       )}
 
@@ -762,7 +772,7 @@ const DashboardInfo = () => {
       {/* Post Modal for finished posts */}
       {completePostModal && selectedPost && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <div className="flex flex-row">
               <div>
                 <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
@@ -800,7 +810,7 @@ const DashboardInfo = () => {
       {/* Post Modal for accepted posts */}
       {isRequestModalOpen && selectedPost && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <div className="flex flex-row">
               <div>
                 <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>

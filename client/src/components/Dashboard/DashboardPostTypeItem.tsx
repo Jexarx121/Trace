@@ -1,6 +1,6 @@
 const DashboardPostTypeItem = ({ title, icon, number, onColor, onClickFunction } ) => {
   return (
-    <div className={`flex-grow rounded-md p-4 ${onColor} transition duration-200 cursor-pointer`}
+    <div className={`flex-grow rounded-md p-4 ${onColor} transition duration-200 cursor-pointer shadow-xl hover:shadow-slate-500`}
       onClick={onClickFunction}>
       <div className="">
         <div className="flex flex-row">
