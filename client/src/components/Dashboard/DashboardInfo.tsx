@@ -639,7 +639,7 @@ const DashboardInfo = () => {
             onClickFunction={showPersonalPosts}/>
         </div>
 
-        <div className="mt-8 relative">
+        <div className="mt-12 relative">
           <i className="fa-solid fa-magnifying-glass absolute p-5 opacity-50"/>
           <input type="search" className="border-black border-2 w-full p-4 pl-12 rounded-md" 
             placeholder="Search for posts" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
@@ -649,7 +649,7 @@ const DashboardInfo = () => {
 
       {/* Free posts */}
       {viewAvailablePosts && (
-      <div>
+      <div className="mt-12">
         <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Available Posts</h1>
         <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
           {filteredAvailablePosts.length > 0 ? (
@@ -671,12 +671,12 @@ const DashboardInfo = () => {
                       {/* Only render these icons if the posts are the users */}
                       {post.id === session?.user.id && (
                         <div>
-                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
+                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
                             onClick={(e) => {
                               e.stopPropagation();
                               setSelectedPost(post);
                               openUpdateModal()}}></i>
-                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
+                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
                             onClick={(e) => {
                               e.stopPropagation()
                               setSelectedPost(post);
@@ -770,7 +770,7 @@ const DashboardInfo = () => {
 
       {/* Personal Posts */}
       {viewPersonalPosts && (
-        <div className="mt-8">
+        <div className="mt-12">
           <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Personal Posts</h1>
           
           <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -793,12 +793,12 @@ const DashboardInfo = () => {
                         {/* Only render these icons if the posts are the users */}
                         {post.id === session.user.id && (
                           <div>
-                            <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
+                            <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setSelectedPost(post);
                                 openUpdateModal()}}></i>
-                            <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
+                            <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
                               onClick={(e) => {
                                 e.stopPropagation()
                                 setSelectedPost(post);
@@ -820,7 +820,7 @@ const DashboardInfo = () => {
 
       {/* Only shows completed posts */}
       {viewCompletePosts && (
-        <div className="mt-8">
+        <div className="mt-12">
           <h1 className="text-sm text-[#1f2421] font-bold py-4 border-b-black border-b-2 uppercase tracking-wider">Completed Posts</h1>
 
           <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
