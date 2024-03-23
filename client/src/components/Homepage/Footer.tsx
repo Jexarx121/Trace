@@ -10,9 +10,10 @@ const Footer = () => {
     <div className="bg-[#216869] pt-1">
       <div className="w-full md:w-[70vw] mx-auto text-white">
         <div className="flex flex-col md:flex-row justify-between">
-          <h1 className="font-bold p-5 cursor-pointer">
-            <Link to={LINKS.HOMEPAGE}>Trace</Link>
-          </h1>
+          <Link to={LINKS.HOMEPAGE} className="flex flex-row">
+            <img src="../images/favicon-32x32.png" alt="Logo of Trace" className="my-5 ml-5 mr-2 w-8 h-8"/>
+            <h1 className="font-bold py-5 pr-5  cursor-pointer">Trace</h1>
+          </Link>
           <a className="p-5 cursor-pointer">About</a>
           <Link to={LINKS.DASHBOARD} className="p-5 cursor-pointer">Dashboard</Link>
           <Link className="p-5 cursor-pointer" to={`/account/${userId}`}>Profile</Link>

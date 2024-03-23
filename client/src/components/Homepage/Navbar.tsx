@@ -31,9 +31,12 @@ const Navbar = () => {
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
       <div className="w-[70vw] m-auto flex items-center">
-        <h1 className="text-white font-bold text-2xl cursor-pointer">
-          <Link to={LINKS.HOMEPAGE}>Trace</Link>
-        </h1>
+        <Link to={LINKS.HOMEPAGE} className="flex flex-row">
+          <img src="../images/favicon-32x32.png" alt="Logo of Trace" className="mr-2"/>
+          <h1 className="text-white font-bold text-2xl cursor-pointer">
+            Trace
+          </h1>
+        </Link>
         <ul className='md:flex hidden flex-row list-none items-center px-4 ml-auto text-white flex-initial'>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
             About

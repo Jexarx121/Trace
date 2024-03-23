@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { DECIMALS, LINKS } from "../constants";
-import { Post } from "./Posts";
+import { Post, NoPostsFound } from "./Posts";
 import { truncateText, capitalize }from "../../helpers/functions";
 import { ethers } from "ethers";
 import { EthContext } from "../../eth/context";
@@ -28,7 +28,9 @@ const DashboardInfo = () => {
   let toastShown = false;
 
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [postData, setPostData] = useState<Post[]>([]);
+  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -44,6 +46,11 @@ const DashboardInfo = () => {
   const [completePostModal, setCompletePostModal] = useState(false);
   const [userId, setUserId] = useState(0);
   const [createPostCreditAmount, setCreatePostCreditAmount] = useState(0);
+  const [nodeDetails, setNodeDetails] = useState({
+    creditAmount: '',
+    hoursWorked: '',
+    amountOfPeople: ''
+  });
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -443,13 +450,24 @@ const DashboardInfo = () => {
 
   async function testBlock(blockNumber : number) {
     const nodeManagerContract = createInstance(provider);
-    const nodeDetails = await nodeManagerContract.getNodeDetails(blockNumber);
-    console.log(nodeDetails);
+    const [sender, receiver, creditAmount, hoursWorked, amountOfPeople] = await nodeManagerContract.getNodeDetails(blockNumber);
+    const credit = creditAmount.toString();
+    const hours = hoursWorked.toString();
+    const people = amountOfPeople.toString();
+    console.log(credit);
+
+    setNodeDetails({
+      creditAmount: credit,
+      hoursWorked: hours,
+      amountOfPeople: people
+    });
   }
 
-  const findBlock = () => {
-    const blockNumber = 20;
-    testBlock(blockNumber);
+  const findDetailsAboutCompletePost = () => {
+    const blockNumber = selectedPost?.post_id;
+    if (blockNumber) {
+      testBlock(blockNumber);
+    };
   }
 
   const openDeletePostModal = () => {
@@ -523,6 +541,18 @@ const DashboardInfo = () => {
       }));
     });
 
+    if (postData) {
+      setFilteredPosts(postData.filter(post => {
+        const createdByMatch = post.created_by.toLowerCase().includes(searchTerm.toLowerCase());
+        if (post.assigned_to_name) {
+          const assignedToMatch = post.assigned_to_name.toLowerCase().includes(searchTerm.toLowerCase());
+          return createdByMatch || assignedToMatch;
+        }
+        return createdByMatch;
+      })
+      );
+    }
+
     // get url links for each post creator
     if (selectedPost !== null) {
       const fetchUserId = async () => {
@@ -547,7 +577,14 @@ const DashboardInfo = () => {
           </button>
         </div>
 
-        <div className="flex sm:flex-row flex-col sm:flex-wrap pt-1 pb-5 gap-5">
+        <div>
+          <ol>
+            <li>Hello</li>
+            <li>Help</li>
+          </ol>
+        </div>
+
+        <div className="flex md:flex-row flex-col sm:flex-wrap pt-1 pb-5 gap-5">
           <DashboardPostTypeItem title="Total" icon="fas fa-globe" number={`${postData.length}`}
             onColor={`${(viewAvailablePosts && viewCompletePosts && viewPersonalPosts) ? "bg-[#41b87e] border-black border-2 shadow-xl shadow-slate-500" : "bg-[#67c698]"} 
             hover:bg-[#41b87e]`} 
@@ -566,9 +603,10 @@ const DashboardInfo = () => {
             onClickFunction={showPersonalPosts}/>
         </div>
 
-        <div className="mt-8">
-          <input type="search" className="border-black border-2 w-full p-3 rounded-md" 
-            placeholder="Search for posts"/>
+        <div className="mt-8 relative">
+          <i className="fa-solid fa-magnifying-glass absolute p-5 opacity-50"/>
+          <input type="search" className="border-black border-2 w-full p-4 pl-12 rounded-md" 
+            placeholder="Search for posts" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
         </div>
 
       </div>
@@ -578,67 +616,71 @@ const DashboardInfo = () => {
       <div>
         <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Available Posts</h1>
         <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {postData.map((post) => (
-            post.status === "free" && (
-              <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
-                key={post.post_id} onClick={() => showPost(post)}>
-                <div className="flex md:flex-row flex-col">
-                  <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                  <div>
-                    <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                    <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
-                  </div>
-                </div>  
-                <div className="p-4 flex items-center">
-                  <div>
-                    <p className="text-lg text-[#1f2421]">{truncateText(post.description, 150)}</p>
-                    
-                    {/* Only render these icons if the posts are the users */}
-                    {post.id === session?.user.id && (
-                      <div>
-                        <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPost(post);
-                            openUpdateModal()}}></i>
-                        <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedPost(post);
-                            openDeletePostModal()}}></i>
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map((post) => (
+              post.status === "free" && (
+                <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                  key={post.post_id} onClick={() => showPost(post)}>
+                  <div className="flex md:flex-row flex-col">
+                    <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
+                    <div>
+                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
+                      <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+                    </div>
+                  </div>  
+                  <div className="p-4 flex items-center">
+                    <div>
+                      <p className="text-lg text-[#1f2421]">{truncateText(post.description, 150)}</p>
+                      
+                      {/* Only render these icons if the posts are the users */}
+                      {post.id === session?.user.id && (
+                        <div>
+                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedPost(post);
+                              openUpdateModal()}}></i>
+                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedPost(post);
+                              openDeletePostModal()}}></i>
+                        </div>
+                      )}
+                    </div>
+
+                    {isDeleteModalOpen && (
+                      <div onClick={(e) => {
+                        e.stopPropagation()}}
+                        className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                        <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
+                          <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
+                          <div className="flex flex-row w-full sm:space-x-2 mt-auto space-x-2">
+                            <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
+                              disabled={loading}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                closeDeletePostModal()}}>
+                              Cancel
+                            </button>
+                            <button className={`w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
+                              disabled={loading}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deletePost()}}>
+                              {loading ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  {isDeleteModalOpen && (
-                    <div onClick={(e) => {
-                      e.stopPropagation()}}
-                      className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                      <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
-                        <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
-                        <div className="flex flex-row w-full sm:space-x-2 mt-auto space-x-2">
-                          <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
-                            disabled={loading}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              closeDeletePostModal()}}>
-                            Cancel
-                          </button>
-                          <button className={`w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
-                            disabled={loading}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deletePost()}}>
-                            {loading ? 'Deleting...' : 'Delete'}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
-              </div>
-            )
-          ))}
+              )
+            ))
+          ) : (
+            <NoPostsFound/>
+          )}
 
           {/* Modal for showing currently clicked free post */}
           {isModalVisible && selectedPost && (
@@ -687,52 +729,48 @@ const DashboardInfo = () => {
       {/* Accepted Posts */}
       {viewPersonalPosts && (
         <div className="mt-8">
-          <div className="flex flex-row border-b-black border-b-2 justify-between">
-            <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider">Personal Posts</h1>
-            <div>
-              {/* <button className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
-                onClick={testTransferFromAnotherWallet}>
-                  Find block
-              </button> */}
-            </div>
-          </div>
+          <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Personal Posts</h1>
           
           <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {postData.map((post) => (
-              (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
-                <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
-                  key={post.post_id}  onClick={() => showAcceptedPost(post)}>
-                  <div className="flex md:flex-row flex-col">
-                    <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                    <div>
-                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                      <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
-                    </div>
-                  </div>  
-                  <div className="p-4 flex items-center" >
-                    <div className="overflow-hidden">
-                      <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
-                      
-                      {/* Only render these icons if the posts are the users */}
-                      {post.id === session.user.id && (
-                        <div>
-                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedPost(post);
-                              openUpdateModal()}}></i>
-                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedPost(post);
-                              openDeletePostModal()}}></i>
-                        </div>
-                      )}
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((post) => (
+                (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
+                  <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                    key={post.post_id}  onClick={() => showAcceptedPost(post)}>
+                    <div className="flex md:flex-row flex-col">
+                      <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
+                      <div>
+                        <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
+                        <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+                      </div>
+                    </div>  
+                    <div className="p-4 flex items-center" >
+                      <div className="overflow-hidden">
+                        <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
+                        
+                        {/* Only render these icons if the posts are the users */}
+                        {post.id === session.user.id && (
+                          <div>
+                            <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPost(post);
+                                openUpdateModal()}}></i>
+                            <i className="text-red-500 fa-regular fa-trash-can hover:font-bold"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedPost(post);
+                                openDeletePostModal()}}></i>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )
-            ))}
+                )
+              ))
+            ) : (
+              <NoPostsFound/>
+            )}
           </div>
         </div>
       )}
@@ -744,26 +782,30 @@ const DashboardInfo = () => {
           <h1 className="text-sm text-[#1f2421] font-bold py-4 border-b-black border-b-2 uppercase tracking-wider">Completed Posts</h1>
 
           <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {postData.map((post) => (
-              post.status === "completed" && (
-                <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
-                  key={post.post_id}  onClick={() => openCompleteModal(post)}>
-                  <div className="flex md:flex-row flex-col">
-                    <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                    <div>
-                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                      <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((post) => (
+                post.status === "completed" && (
+                  <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                    key={post.post_id}  onClick={() => openCompleteModal(post)}>
+                    <div className="flex md:flex-row flex-col">
+                      <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
+                      <div>
+                        <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
+                        <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+                      </div>
+                    </div>  
+                    <div className="p-4 flex items-center">
+                      <div className="overflow-hidden">
+                        <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
+                      </div>
                     </div>
-                  </div>  
-                  <div className="p-4 flex items-center">
-                    <div className="overflow-hidden">
-                      <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
-                    </div>
+                    <p className="px-4 pb-3 text-[#1f2421] break-words">Completed by: {post.assigned_to_name}</p>
                   </div>
-                  <p className="px-4 pb-3 text-[#1f2421] break-words">Completed by: {post.assigned_to_name}</p>
-                </div>
-              )
-            ))}
+                )
+              ))
+            ) : (
+              <NoPostsFound/>
+            )}
           </div>
         </div>
       )}
@@ -796,11 +838,19 @@ const DashboardInfo = () => {
             <div className="mb-4">
               <a className="text-md">Completed by: <b>{selectedPost.assigned_to_name} on {selectedPost.date_finished.toLocaleString()}</b></a>
             </div>
+
+            <div className="mb-4">
+              {/* Add icons to this later and reset after closing*/}
+              <h1>{nodeDetails.creditAmount} | {nodeDetails.hoursWorked} | {nodeDetails.amountOfPeople}</h1>
+            </div>
             
             {/* Modal buttons */}
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
-              <button onClick={closeCompleteModal} className="w-full cancel-button mr-0">
+            <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+              <button onClick={closeCompleteModal} className="w-full sm:w-[50%] cancel-button">
                 Close
+              </button>
+              <button onClick={findDetailsAboutCompletePost} className="w-full sm:w-[50%] confirm-button">
+                Show details
               </button>
             </div>
           </div>
