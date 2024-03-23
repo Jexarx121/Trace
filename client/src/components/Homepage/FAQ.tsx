@@ -9,13 +9,12 @@ const questionAnswers: FAQComponents[] = [
   {
     question: 'What is Trace?',
     answer: 'Trace is a web app built on the blockchain for the purpose of your tracking volunteering work in a tamper-proof manner. \
-    Trace aims to work in tandem with volunteers, company or singular and reward them for their efforts in the form of credits that they can later \
-    redeem on the web app.',
+    \nTrace aims to work in tandem with volunteers, company or singular and reward them for their efforts in the form of credits that they can later redeem on the web app.',
   },
   {
     question: 'What is Blockchain?',
-    answer: 'Blockchain is a decentralized and distributed ledger technology that securely records and verifies transactions across a network of computers. \
-    It consists of a chain of blocks, each containing a list of transactions, and is maintained by a network of nodes (computers) that reach consensus on the validity of these transactions. \
+    answer: 'Blockchain is a decentralized and distributed ledger technology that securely records and verifies transactions across a network of computers.\n \
+    \nIt consists of a chain of blocks, each containing a list of transactions, and is maintained by a network of nodes (computers) that reach consensus on the validity of these transactions. \
     The tamper-proof nature of blockchain is achieved through cryptographic hashing and consensus mechanisms. Each block contains a hash of the previous block, creating a chain. \
     Once a block is added, altering any previous block would require changing the information in all subsequent blocks, making tampering practically impossible.',
   },
@@ -76,7 +75,7 @@ const FAQ: React.FC = () => {
                 </div>
                 {activeIndex === index && (
                   <div className="p-4 bg-#333c3a text-[#1f2421]">
-                    <p>{faq.answer}</p>
+                    <p style={{ whiteSpace: "pre-wrap"}}>{faq.answer}</p>
                   </div>
                 )}
               </div>

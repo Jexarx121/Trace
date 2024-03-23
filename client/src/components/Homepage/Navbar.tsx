@@ -39,9 +39,6 @@ const Navbar = () => {
         </Link>
         <ul className='md:flex hidden flex-row list-none items-center px-4 ml-auto text-white flex-initial'>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
-            About
-          </li>
-          <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
             <Link to={LINKS.DASHBOARD} >Dashboard</Link>
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">

@@ -14,7 +14,6 @@ const Footer = () => {
             <img src="../images/favicon-32x32.png" alt="Logo of Trace" className="my-5 ml-5 mr-2 w-8 h-8"/>
             <h1 className="font-bold py-5 pr-5  cursor-pointer">Trace</h1>
           </Link>
-          <a className="p-5 cursor-pointer">About</a>
           <Link to={LINKS.DASHBOARD} className="p-5 cursor-pointer">Dashboard</Link>
           <Link className="p-5 cursor-pointer" to={`/account/${userId}`}>Profile</Link>
         </div>

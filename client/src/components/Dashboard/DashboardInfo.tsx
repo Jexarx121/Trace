@@ -43,6 +43,7 @@ const DashboardInfo = () => {
   const [confirmRequest, setConfirmRequest] = useState(false);
   const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
   const [finishPostModal, setFinishPostModal] = useState(false);
+  const [showDetailsAboutCompletePost, setShowDetailsAboutCompletePost] = useState(false);
   const [viewCompletePosts, setViewCompletePosts] = useState(false);
   const [viewAvailablePosts, setViewAvailablePosts] = useState(true);
   const [viewPersonalPosts, setViewPersonalPosts] = useState(false);
@@ -91,6 +92,7 @@ const DashboardInfo = () => {
   const closeCompleteModal = () => {
     setCompletePostModal(false);
     setSelectedPost(null);
+    setShowDetailsAboutCompletePost(false);
   }
 
   const closeModal = () => {
@@ -110,6 +112,7 @@ const DashboardInfo = () => {
     setSelectedPost(null);
     setConfirmRequest(false);
     setIsRequestModalOpen(false);
+    setShowDetailsAboutCompletePost(false);
   }
 
   const openUpdateModal = () => {
@@ -410,15 +413,12 @@ const DashboardInfo = () => {
     const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     const adminWallet = new ethers.Wallet(adminPrivateKey);
     const signer = adminWallet.connect(provider?.provider);
-    console.log("Signer: ", signer);
 
     const nodeManagerContract = createInstance(signer);
     const traceCreditContract = createTraceInstance(signer);
 
     const senderAddress = await getPublicKey(selectedPost?.id);
-    console.log(senderAddress)
     const receiverAddress = await getPublicKey(selectedPost?.assigned_to!);
-    console.log("Receiver: ", receiverAddress);
     const creditAmountNode = calculateCredit(data, postType);
     const creditAmountTrace = BigInt(creditAmountNode) * (10n ** 18n);
     const postId = selectedPost?.post_id;
@@ -451,9 +451,9 @@ const DashboardInfo = () => {
     setFinishPostModal(false);
   };
 
-  async function testBlock(blockNumber : number) {
+  async function fetchNode(nodeNumber : number) {
     const nodeManagerContract = createInstance(provider);
-    const [sender, receiver, creditAmount, hoursWorked, amountOfPeople] = await nodeManagerContract.getNodeDetails(blockNumber);
+    const [sender, receiver, creditAmount, hoursWorked, amountOfPeople] = await nodeManagerContract.getNodeDetails(nodeNumber);
     const credit = creditAmount.toString();
     const hours = hoursWorked.toString();
     const people = amountOfPeople.toString();
@@ -467,9 +467,10 @@ const DashboardInfo = () => {
   }
 
   const findDetailsAboutCompletePost = () => {
-    const blockNumber = selectedPost?.post_id;
-    if (blockNumber) {
-      testBlock(blockNumber);
+    setShowDetailsAboutCompletePost(true);
+    const nodeNumber = selectedPost?.post_id;
+    if (nodeNumber) {
+      fetchNode(nodeNumber);
     };
   }
 
@@ -651,7 +652,7 @@ const DashboardInfo = () => {
       {viewAvailablePosts && (
       <div className="mt-12">
         <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Available Posts</h1>
-        <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
           {filteredAvailablePosts.length > 0 ? (
             filteredAvailablePosts.map((post) => (
               post.status === "free" && (
@@ -773,7 +774,7 @@ const DashboardInfo = () => {
         <div className="mt-12">
           <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Personal Posts</h1>
           
-          <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
             {filteredPersonalPosts.length > 0 ? (
               filteredPersonalPosts.map((post) => (
                 (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
@@ -823,7 +824,7 @@ const DashboardInfo = () => {
         <div className="mt-12">
           <h1 className="text-sm text-[#1f2421] font-bold py-4 border-b-black border-b-2 uppercase tracking-wider">Completed Posts</h1>
 
-          <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
             {filteredCompletePosts.length > 0 ? (
               filteredCompletePosts.map((post) => (
                 post.status === "completed" && (
@@ -877,15 +878,24 @@ const DashboardInfo = () => {
               <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
             </div>
 
+            {showDetailsAboutCompletePost && (
+              <div className="mb-4 flex flex-col">
+                <div className="flex flex-row">
+                  <i className="fa-brands fa-ethereum text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.creditAmount} credits</h1>
+                </div>
+                <div className="flex flex-row">
+                  <i className="fa-regular fa-clock text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.hoursWorked} hours</h1>
+                </div>
+                <div className="flex flex-row">
+                  <i className="fa-solid fa-user-group text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.amountOfPeople} people</h1>
+                </div>
+              </div>
+            )}
+
             <div className="mb-4">
               <a className="text-md">Completed by: <b>{selectedPost.assigned_to_name} on {selectedPost.date_finished.toLocaleString()}</b></a>
             </div>
 
-            <div className="mb-4">
-              {/* Add icons to this later and reset after closing*/}
-              <h1>{nodeDetails.creditAmount} | {nodeDetails.hoursWorked} | {nodeDetails.amountOfPeople}</h1>
-            </div>
-            
             {/* Modal buttons */}
             <div className="flex flex-row w-full sm:space-x-2 mt-auto">
               <button onClick={closeCompleteModal} className="w-full sm:w-[50%] cancel-button">
@@ -923,6 +933,20 @@ const DashboardInfo = () => {
               <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
             </div>
 
+            {showDetailsAboutCompletePost && (
+              <div className="mb-4 flex flex-col">
+                <div className="flex flex-row">
+                  <i className="fa-brands fa-ethereum text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.creditAmount} credits</h1>
+                </div>
+                <div className="flex flex-row">
+                  <i className="fa-regular fa-clock text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.hoursWorked} hours</h1>
+                </div>
+                <div className="flex flex-row">
+                  <i className="fa-solid fa-user-group text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.amountOfPeople} people</h1>
+                </div>
+              </div>
+            )}
+
             <div className="mb-4">
               {selectedPost.status === "completed" && (
                 <a className="text-md">Completed by: <b>{selectedPost.assigned_to_name} on {selectedPost.date_finished.toLocaleString()}</b></a>
@@ -934,12 +958,14 @@ const DashboardInfo = () => {
 
             {selectedPost.id !== session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
-                {confirmRequest ? "Are you sure you want to cancel this work? You won't receive the full amount of credits." : "" }</h2>
+                {confirmRequest ? "Are you sure you want to cancel this work? You won't receive the full amount of credits." : "" }
+              </h2>
             )}
 
             {selectedPost.id === session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
-              {confirmRequest ? "Are you sure you want to cancel this work? The volunteer won't receive the full amount of credits." : "" }</h2>
+                {confirmRequest ? "Are you sure you want to cancel this work? The volunteer won't receive the full amount of credits." : "" }
+              </h2>
             )}
             
             {/* Modal buttons */}
