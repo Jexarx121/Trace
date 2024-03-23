@@ -30,7 +30,10 @@ const DashboardInfo = () => {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [postData, setPostData] = useState<Post[]>([]);
-  const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
+  const [filteredAvailablePosts, setFilteredAvailablePosts] = useState<Post[]>([]);
+  const [filteredCompletePosts, setFilteredCompletePosts] = useState<Post[]>([]);
+  const [filteredPersonalPosts, setFilteredPersonalPosts] = useState<Post[]>([]);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -533,24 +536,38 @@ const DashboardInfo = () => {
     getPosts();
 
     // Fetch profile images for each post
-    postData.forEach(async (post) => {
-      const imageUrl = await getProfileImage(post.id);
-      setAvatarUrlList((prevImages : Record<string, string>) => ({
-        ...prevImages,
-        [post.id]: imageUrl || '',
-      }));
-    });
-
     if (postData) {
-      setFilteredPosts(postData.filter(post => {
+      postData.forEach(async (post) => {
+        const imageUrl = await getProfileImage(post.id);
+        setAvatarUrlList((prevImages : Record<string, string>) => ({
+          ...prevImages,
+          [post.id]: imageUrl || '',
+        }));
+      });
+    }
+
+    // Set each feature so that the no posts show independently
+    if (postData) {
+      setFilteredAvailablePosts(postData.filter(post => {
         const createdByMatch = post.created_by.toLowerCase().includes(searchTerm.toLowerCase());
-        if (post.assigned_to_name) {
-          const assignedToMatch = post.assigned_to_name.toLowerCase().includes(searchTerm.toLowerCase());
-          return createdByMatch || assignedToMatch;
-        }
-        return createdByMatch;
-      })
-      );
+        const assignedToNameExists = post.assigned_to_name && post.assigned_to_name.toLowerCase().includes(searchTerm.toLowerCase());
+        const titleMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+        return createdByMatch || assignedToNameExists || titleMatch;
+      }));
+      
+      setFilteredPersonalPosts(postData.filter(post => {
+        const createdByMatch = post.created_by.toLowerCase().includes(searchTerm.toLowerCase());
+        const assignedToNameExists = post.assigned_to_name && post.assigned_to_name.toLowerCase().includes(searchTerm.toLowerCase());
+        const titleMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+        return createdByMatch || assignedToNameExists || titleMatch;
+      }));
+      
+      setFilteredCompletePosts(postData.filter(post => {
+        const createdByMatch = post.created_by.toLowerCase().includes(searchTerm.toLowerCase());
+        const assignedToNameExists = post.assigned_to_name && post.assigned_to_name.toLowerCase().includes(searchTerm.toLowerCase());
+        const titleMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+        return createdByMatch || assignedToNameExists || titleMatch;
+      }));
     }
 
     // get url links for each post creator
@@ -577,12 +594,31 @@ const DashboardInfo = () => {
           </button>
         </div>
 
-        <div>
-          <ol>
-            <li>Hello</li>
-            <li>Help</li>
-          </ol>
-        </div>
+        {showTutorial ? (
+          <i className="fa-regular fa-eye cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(false)} />
+        ) : (
+          <i className="fa-regular fa-eye-slash cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(true)} />
+        )}
+
+        {showTutorial && (
+          <div>
+            <h1 className="text-lg uppercase font-bold mb-4">Tutorial</h1>
+            <ul className="list-disc list-inside pl-2 mb-6 mt-2 text-lg">
+              <li className="mb-2">To create posts, you can use your account's credits.</li>
+              <li className="mb-2">To gain credit, you can assign yourself to an available post.</li>
+              <ul className="list-disc list-inside pl-4">
+                <li className="mb-2 text-red-600">Make sure to contact the person first before requesting!</li>
+                <li className="mb-2">Only the creator of the post can finish the job.</li>
+                <li className="mb-2">When you finish a post, it may take a while for credit to show up in your account.</li>
+              </ul>
+              <li className="mb-2">You can filter certain posts using the tabs below or by searching.</li>
+              <ul className="list-disc list-inside pl-4">
+                <li className="mb-2">You can view the details of a finished post through clicking one and requesting info about it.</li>
+              </ul>
+              <li className="mb-2">You can hide this section by clicking the eye icon above.</li>
+            </ul>
+          </div>
+        )}
 
         <div className="flex md:flex-row flex-col sm:flex-wrap pt-1 pb-5 gap-5">
           <DashboardPostTypeItem title="Total" icon="fas fa-globe" number={`${postData.length}`}
@@ -616,8 +652,8 @@ const DashboardInfo = () => {
       <div>
         <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Available Posts</h1>
         <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {filteredPosts.length > 0 ? (
-            filteredPosts.map((post) => (
+          {filteredAvailablePosts.length > 0 ? (
+            filteredAvailablePosts.map((post) => (
               post.status === "free" && (
                 <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
                   key={post.post_id} onClick={() => showPost(post)}>
@@ -688,7 +724,7 @@ const DashboardInfo = () => {
               <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
                 <div className="flex flex-row">
                   <div>
-                    <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
+                    <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
                     <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
                   </div>
                   <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closePost}>
@@ -715,9 +751,15 @@ const DashboardInfo = () => {
                   <button onClick={closePost} className="w-full sm:w-[50%] cancel-button">
                     Cancel
                   </button>
-                  <button onClick={requestPost} className="w-full sm:w-[50%] confirm-button">
-                    {confirmRequest ? "Confirm" : "Request"}
-                  </button>
+                  {(selectedPost.id === session?.user.id) ? (
+                    <button className="w-full sm:w-[50%] confirm-button" disabled={true}>
+                      You can't accept your own post
+                    </button>
+                  ) : (
+                    <button onClick={requestPost} className="w-full sm:w-[50%] confirm-button">
+                      {confirmRequest ? "Confirm" : "Request"}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -726,14 +768,14 @@ const DashboardInfo = () => {
       </div>
       )}
 
-      {/* Accepted Posts */}
+      {/* Personal Posts */}
       {viewPersonalPosts && (
         <div className="mt-8">
           <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Personal Posts</h1>
           
           <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
+            {filteredPersonalPosts.length > 0 ? (
+              filteredPersonalPosts.map((post) => (
                 (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
                   <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
                     key={post.post_id}  onClick={() => showAcceptedPost(post)}>
@@ -782,8 +824,8 @@ const DashboardInfo = () => {
           <h1 className="text-sm text-[#1f2421] font-bold py-4 border-b-black border-b-2 uppercase tracking-wider">Completed Posts</h1>
 
           <div className="my-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
+            {filteredCompletePosts.length > 0 ? (
+              filteredCompletePosts.map((post) => (
                 post.status === "completed" && (
                   <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
                     key={post.post_id}  onClick={() => openCompleteModal(post)}>
@@ -817,7 +859,7 @@ const DashboardInfo = () => {
           <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <div className="flex flex-row">
               <div>
-                <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
+                <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
                 <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
               </div>
               
@@ -863,7 +905,7 @@ const DashboardInfo = () => {
           <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <div className="flex flex-row">
               <div>
-                <h2 className="text-4xl text-[#2c6048] font-semibold mb-2">{selectedPost.title}</h2>
+                <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
                 <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
               </div>
               
@@ -882,7 +924,12 @@ const DashboardInfo = () => {
             </div>
 
             <div className="mb-4">
-              <a className="text-md">Assigned To: <b>{selectedPost.assigned_to_name}</b></a>
+              {selectedPost.status === "completed" && (
+                <a className="text-md">Completed by: <b>{selectedPost.assigned_to_name} on {selectedPost.date_finished.toLocaleString()}</b></a>
+              )}
+              {selectedPost.status === "accepted" && (
+                <a className="text-md">Assigned To: <b>{selectedPost.assigned_to_name}</b></a>
+              )}
             </div>
 
             {selectedPost.id !== session?.user.id && (
@@ -897,15 +944,9 @@ const DashboardInfo = () => {
             
             {/* Modal buttons */}
             <div className={`flex ${selectedPost.id === session?.user.id ? 'flex-row' : 'flex-col'} space-y-2 sm:space-y-0 sm:space-x-2 mt-auto`}>
-              {selectedPost.id !== session?.user.id && (
-                <button onClick={cancelAcceptedRequest}
-                  className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
-                  Cancel Work
-                </button>
-              )}
-
+             
               {/* Only creator of post can finish it */}
-              {selectedPost.id === session?.user.id && (
+              {selectedPost.status === "accepted" && selectedPost.id === session?.user.id && (
                 <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                   <button onClick={cancelAcceptedRequest}
                     className="w-full sm:w-[50%] cancel-button">
@@ -915,6 +956,44 @@ const DashboardInfo = () => {
                     className="w-full sm:w-[50%] confirm-button">
                     Finish Work
                   </button>
+                </div>
+              )}
+
+              {/* If user isn't the creator of an post but assigned to one */}
+              {selectedPost.status === "accepted" && selectedPost.id !== session?.user.id && (
+                <button onClick={cancelAcceptedRequest}
+                  className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                  Cancel Work
+               </button>
+              )}
+
+              {/* If user has any completed posts */}
+              {selectedPost.status === "completed" && (
+                <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+                  <button onClick={closeCompleteModal} className="w-full sm:w-[50%] cancel-button">
+                    Close
+                  </button>
+                  <button onClick={findDetailsAboutCompletePost} className="w-full sm:w-[50%] confirm-button">
+                    Show details
+                  </button>
+                </div>
+              )}
+
+              {/* If user has any free posts */}
+              {selectedPost.status === "free" && (
+                <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+                  <button onClick={closePost} className="w-full sm:w-[50%] cancel-button">
+                    Cancel
+                  </button>
+                  {(selectedPost.id === session?.user.id) ? (
+                    <button className="w-full sm:w-[50%] confirm-button" disabled={true}>
+                      You can't accept your own post
+                    </button>
+                  ) : (
+                    <button onClick={requestPost} className="w-full sm:w-[50%] confirm-button">
+                      {confirmRequest ? "Confirm" : "Request"}
+                    </button>
+                  )}
                 </div>
               )}
             </div>

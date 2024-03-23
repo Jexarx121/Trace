@@ -27,6 +27,6 @@ export const postTypes : PostTypes = {
 
 export const NoPostsFound = () => {
   return (
-    <h1 className="text-center lg:col-span-2 text-5xl my-10 uppercase font-bold text-gray-400">No posts found</h1>
+    <h1 className="text-center lg:col-span-2 text-5xl my-16 uppercase font-bold text-gray-400">No posts found</h1>
   );
 }
