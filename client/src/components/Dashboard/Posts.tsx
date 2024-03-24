@@ -23,4 +23,10 @@ export type PostTypes = {
 export const postTypes : PostTypes = {
   "short": 5,
   "long" : 10
+};
+
+export const NoPostsFound = () => {
+  return (
+    <h1 className="text-center lg:col-span-2 text-5xl my-16 uppercase font-bold text-gray-400">No posts found</h1>
+  );
 }
