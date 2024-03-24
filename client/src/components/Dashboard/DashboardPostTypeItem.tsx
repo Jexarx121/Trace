@@ -1,4 +1,12 @@
-const DashboardPostTypeItem = ({ title, icon, number, onColor, onClickFunction } ) => {
+type DashboardPostTypeItemProps = {
+  title: string;
+  icon: string;
+  number: string;
+  onColor: string;
+  onClickFunction: () => void;
+}
+
+const DashboardPostTypeItem = ( { title, icon, number, onColor, onClickFunction } : DashboardPostTypeItemProps ) => {
   return (
     <div className={`flex-grow rounded-md p-4 ${onColor} transition duration-200 cursor-pointer shadow-xl hover:shadow-slate-500 xl:basis-1/5 basis-1/3`}
       onClick={onClickFunction}>

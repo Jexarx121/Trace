@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { supabase } from "../../supabase/supabaseClient";
-import { postSchema, finishedPostSchema } from ".";
+import { postSchema, finishedPostSchema, DashboardPostTypeItem } from ".";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -16,7 +16,6 @@ import { createInstance } from "../../eth/nodeManager";
 import { createInstance as createTraceInstance } from "../../eth/traceCredit";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import DashboardPostTypeItem from "./DashboardPostTypeItem";
 
 type PostSchema = z.infer<typeof postSchema>;
 type FinishedPostSchema = z.infer<typeof finishedPostSchema>;

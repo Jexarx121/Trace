@@ -1,10 +1,11 @@
-import { About, FAQ, Footer, Navbar, Welcome } from "./index";
+import { About, FAQ, Footer, Icons, Navbar, Welcome } from "./index";
 
 const HomepageComponent = () => {
   return (
     <div>
       <Navbar/>
       <Welcome/>
+      <Icons/>
       <About/>
       <FAQ/>
       <Footer/>
