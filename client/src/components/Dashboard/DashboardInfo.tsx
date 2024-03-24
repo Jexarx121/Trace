@@ -199,7 +199,7 @@ const DashboardInfo = () => {
     } else {
       setConfirmRequest(true);
     }
-  }
+  };
 
   async function getProfileImage(authID: string) {
     if (avatarUrlList[authID]) {
@@ -582,7 +582,7 @@ const DashboardInfo = () => {
   }, [session, postData, navigate, selectedPost]);
 
   return (
-    <div className="w-[70vw] m-auto mt-12 mb-12">
+    <div className="w-[70vw] m-auto mt-12 mb-28">
       <div>
 
         <div className="flex flex-row justify-between mb-2">
@@ -655,7 +655,7 @@ const DashboardInfo = () => {
           {filteredAvailablePosts.length > 0 ? (
             filteredAvailablePosts.map((post) => (
               post.status === "free" && (
-                <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#e6b843] hover:shadow-slate-500 cursor-pointer" 
                   key={post.post_id} onClick={() => showPost(post)}>
                   <div className="flex md:flex-row flex-col">
                     <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
@@ -777,8 +777,12 @@ const DashboardInfo = () => {
             {filteredPersonalPosts.length > 0 ? (
               filteredPersonalPosts.map((post) => (
                 (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
-                  <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
-                    key={post.post_id}  onClick={() => showAcceptedPost(post)}>
+                  <div className={`rounded-xl shadow-2xl border-2 hover:shadow-slate-500 cursor-pointer ${
+                    post.status === 'free' ? 'border-[#e6b843]' : 
+                    post.status === 'completed' ? 'border-[#ae72bb]' : 
+                    'border-[#929eae]'}`} 
+                    key={post.post_id}  onClick={() => showAcceptedPost(post)}
+                  > 
                     <div className="flex md:flex-row flex-col">
                       <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
                       <div>
@@ -827,7 +831,7 @@ const DashboardInfo = () => {
             {filteredCompletePosts.length > 0 ? (
               filteredCompletePosts.map((post) => (
                 post.status === "completed" && (
-                  <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
+                  <div className="rounded-xl shadow-2xl border-2 border-[#ae72bb] hover:shadow-slate-500 cursor-pointer" 
                     key={post.post_id}  onClick={() => openCompleteModal(post)}>
                     <div className="flex md:flex-row flex-col">
                       <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
@@ -957,13 +961,13 @@ const DashboardInfo = () => {
 
             {selectedPost.id !== session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
-                {confirmRequest ? "Are you sure you want to cancel this work? You won't receive the full amount of credits." : "" }
+                {confirmRequest ? "Are you sure you want to cancel this work? You won't receive any credits for this." : "" }
               </h2>
             )}
 
             {selectedPost.id === session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
-                {confirmRequest ? "Are you sure you want to cancel this work? The volunteer won't receive the full amount of credits." : "" }
+                {confirmRequest ? "Are you sure you want to cancel this work? The volunteer won't receive any credits for this." : "" }
               </h2>
             )}
             

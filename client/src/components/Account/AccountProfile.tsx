@@ -249,8 +249,12 @@ const AccountProfile = () => {
             <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-10">
               {postData.length > 0 ? (
                 postData.map((post) => (
-                  <div className="rounded-xl shadow-2xl border-2 border-[#2c6048] hover:shadow-slate-500 cursor-pointer" 
-                    key={post.post_id}>
+                  <div className={`rounded-xl shadow-2xl border-2 hover:shadow-slate-500 cursor-pointer ${
+                    post.status === 'free' ? 'border-[#e6b843]' : 
+                    post.status === 'completed' ? 'border-[#ae72bb]' : 
+                    'border-[#929eae]'}`}
+                      key={post.post_id}
+                  >
                     <div className="flex md:flex-row flex-col">
                       <div>
                         <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
