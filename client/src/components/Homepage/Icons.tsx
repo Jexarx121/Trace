@@ -5,10 +5,10 @@ type iconItemProps = {
 }
 
 const IconItems = ({ icon, title, content } : iconItemProps) => (
-  <div className="flex flex-col md:mx-8 my-8 lg:my-0">
+  <div className="flex flex-col md:mx-6 my-8 lg:my-0">
     <i className={`${icon} text-center text-5xl mb-5 text-[#49a078]`}/>
     <h1 className="text-center text-3xl font-bold">{title}</h1>
-    <p className="text-center p-5 lg:text-2xl text-3xl">{content}</p>
+    <p className="text-center p-5 lg:text-xl text-2xl">{content}</p>
   </div>
 )
 
