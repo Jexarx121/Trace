@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -134,6 +134,13 @@ const EditAccountForm = () => {
   const onSubmit: SubmitHandler<ProfileSchema> = (data) => {
     updateProfile(data);
   };
+
+  useEffect(() => {
+    // Check if bio exists and set descriptionLength accordingly
+    if (bio) {
+      setDescriptionLength(bio.length);
+    }
+  }, [bio]); 
   
   return (
     <div>

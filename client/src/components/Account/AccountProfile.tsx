@@ -285,7 +285,7 @@ const AccountProfile = () => {
           {/* Bio */}
           <div className="mb-10">
             <h1 className="text-md uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8 md:mx-0 mx-4">About Me</h1>
-            <p className="sm:text-xl text-lg text-md text-[#1f2421] py-4 md:mx-0 mx-4" style={{ whiteSpace: "pre-wrap"}}>{bio}</p>
+            <p className="sm:text-xl text-lg text-md text-[#1f2421] py-4 md:mx-0 mx-4 whitespace-pre-wrap">{bio}</p>
           </div>
           <div className="md:mx-0 mx-4">
             <h1 className="text-md uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Latest Work</h1>
@@ -342,7 +342,7 @@ const AccountProfile = () => {
                 className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
                 <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
                   <div className="flex flex-row">
-                    <h1 className="text-2xl mb-8 font-bold">You have to go to the Dashboard to edit these posts.</h1>
+                    <h1 className="text-2xl mb-8 font-bold">You have to go to the Dashboard to interact with these posts.</h1>
                     <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={() => setSelectedPostModal(false)}>
                       &times;
                     </span>

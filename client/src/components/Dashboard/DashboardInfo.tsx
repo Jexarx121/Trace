@@ -49,6 +49,7 @@ const DashboardInfo = () => {
   const [completePostModal, setCompletePostModal] = useState(false);
   const [userId, setUserId] = useState(0);
   const [createPostCreditAmount, setCreatePostCreditAmount] = useState(0);
+  const [descriptionLength, setDescriptionLength] = useState(0);
   const [nodeDetails, setNodeDetails] = useState({
     creditAmount: '',
     hoursWorked: '',
@@ -100,6 +101,7 @@ const DashboardInfo = () => {
     setCreatePostCreditAmount(0);
     setLoading(false);
     setIsModalOpen(false);
+    setDescriptionLength(0);
   };
 
   const showAcceptedPost = (post : Post) => {
@@ -121,6 +123,7 @@ const DashboardInfo = () => {
   const closeUpdateModal = () => {
     resetUpdate();
     setIsUpdateModalOpen(false);
+    setDescriptionLength(0);
   };
 
   const openFinishModal = () => {
@@ -145,6 +148,11 @@ const DashboardInfo = () => {
     setSelectedPost(null);
     setModalVisible(false);
     setConfirmRequest(false);
+  };
+
+  const handleDescriptionChange = (event : any) => {
+    const descriptionValue = event.target.value;
+    setDescriptionLength(descriptionValue.length);
   };
 
   // form layouts using react hook forms and zod
@@ -680,6 +688,7 @@ const DashboardInfo = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedPost(post);
+                          setDescriptionLength(post.description.length);
                           openUpdateModal()}}></i>
                       <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
                         onClick={(e) => {
@@ -798,6 +807,7 @@ const DashboardInfo = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedPost(post);
+                            setDescriptionLength(post.description.length);
                             openUpdateModal()}}></i>
                         <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
                           onClick={(e) => {
@@ -927,8 +937,6 @@ const DashboardInfo = () => {
               <Link to={`/account/${userId}`} 
                 className="text-md font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
             </div>
-
-
 
             {showDetailsAboutCompletePost && (
               <div className="mb-4 flex flex-col">
@@ -1152,9 +1160,11 @@ const DashboardInfo = () => {
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
                   id="description"
                   placeholder="Enter a suitable description for the task."
-                  rows={10}
+                  rows={12}
                   {...register("description")}
+                  onChange={handleDescriptionChange}
                 />
+                <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 750 characters</p>
                 {errors.description && (
                   <p className="text-sm text-red-500 mt-2"> {errors.description?.message}</p> 
                 )}
@@ -1243,7 +1253,9 @@ const DashboardInfo = () => {
                   rows={10}
                   {...registerUpdate("description")}
                   defaultValue={selectedPost?.description}
+                  onChange={handleDescriptionChange}
                 />
+                <p className="text-sm text-gray-500 mt-2">{descriptionLength} / 750 characters</p>
                 {errorsUpdate.description && (
                   <p className="text-sm text-red-500 mt-2"> {errorsUpdate.description?.message}</p> 
                 )}
