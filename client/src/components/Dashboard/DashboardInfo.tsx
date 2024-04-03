@@ -702,7 +702,7 @@ const DashboardInfo = () => {
                 <div className="flex flex-row">
                   <div>
                     <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
-                    <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
+                    <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
                   </div>
                   <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closePost}>
                     &times;
@@ -711,11 +711,10 @@ const DashboardInfo = () => {
                 
                 <p className="text-lg text-[#1f2421] mb-4 break-words">{selectedPost.description}</p>
 
-                <div className="flex items-center mb-4">
-                  <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
-                  <p className="text-[#2c6048] font-semibold mr-2">{selectedPost.contact} |</p>
-                  <i className="fa-solid fa-user text-[#2c6048] mr-2"></i>
-                  <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
+                <div className="mb-4">
+                  <p className="font-bold"><i className="fa-solid fa-phone text-[#2c6048] mr-2"/>{selectedPost.contact}</p>
+                  <Link to={`/account/${userId}`} 
+                    className="text-md font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
                 </div>
 
                 <h2 className="text-lg mb-4 font-bold text-red-500">
@@ -858,7 +857,7 @@ const DashboardInfo = () => {
             <div className="flex flex-row">
               <div>
                 <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
-                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
+                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
               </div>
               
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeCompleteModal}>
@@ -868,11 +867,15 @@ const DashboardInfo = () => {
             
             <p className="text-lg text-[#1f2421] mb-4 break-words">{selectedPost.description}</p>
             
-            <div className="flex items-center mb-4">
-              <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
-              <p className="text-[#2c6048] font-semibold mr-2">{selectedPost.contact} |</p>
-              <i className="fa-solid fa-user text-[#2c6048] mr-2"></i>
-              <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
+            <div className="mb-4">
+              <p className="font-bold"><i className="fa-solid fa-phone text-[#2c6048] mr-2"/>{selectedPost.contact}</p>
+              <Link to={`/account/${userId}`} 
+                className="text-md font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
+            </div>
+
+            <div className="mb-4 flex flex-col">
+              <a className="font-bold"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+              <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
             </div>
 
             {showDetailsAboutCompletePost && (
@@ -888,11 +891,6 @@ const DashboardInfo = () => {
                 </div>
               </div>
             )}
-
-            <div className="mb-4 flex flex-col">
-              <a className="font-bold"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
-              <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
-            </div>
 
             {/* Modal buttons */}
             <div className="flex flex-row w-full sm:space-x-2 mt-auto">
@@ -914,7 +912,7 @@ const DashboardInfo = () => {
             <div className="flex flex-row">
               <div>
                 <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
-                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} | {selectedPost.post_id} </p>
+                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
               </div>
               
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeAcceptedPost}>
@@ -924,12 +922,13 @@ const DashboardInfo = () => {
             
             <p className="text-lg text-[#1f2421] mb-4 break-words">{selectedPost.description}</p>
             
-            <div className="flex items-center mb-4">
-              <i className="fa-solid fa-phone text-[#2c6048] mr-2"></i>
-              <p className="text-[#2c6048] font-semibold mr-2">{selectedPost.contact} |</p>
-              <i className="fa-solid fa-user text-[#2c6048] mr-2"></i>
-              <Link to={`/account/${userId}`} className="text-md font-bold text-[#2c6048] hover:underline hover:underline-offset-2">{selectedPost.created_by} </Link>
+            <div className="mb-4">
+              <p className="font-bold"><i className="fa-solid fa-phone text-[#2c6048] mr-2"/>{selectedPost.contact}</p>
+              <Link to={`/account/${userId}`} 
+                className="text-md font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
             </div>
+
+
 
             {showDetailsAboutCompletePost && (
               <div className="mb-4 flex flex-col">
