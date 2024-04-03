@@ -226,7 +226,10 @@ const AccountProfile = () => {
     };
 
     checkIfAccountIsCurrentUser();
-    getPosts();
+    
+    if (!postData.length) {
+      getPosts();
+    }
 
     if (postData) {
       if (Object.keys(avatarUrlList).length === 0) {

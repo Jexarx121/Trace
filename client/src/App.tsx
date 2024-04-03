@@ -1,4 +1,4 @@
-import { Homepage, Login, Account, EditAccount, Dashboard } from "./pages";
+import { Homepage, Login, Account, EditAccount, Dashboard, ErrorPage } from "./pages";
 import { Routes, Route } from "react-router-dom";
 import { LINKS } from "./components/constants";
 import { EthContext } from "./eth/context";
@@ -60,6 +60,7 @@ const App = () => {
             <Route path={LINKS.EDIT_ACCOUNT} element={<EditAccount/>}/>
             <Route path={LINKS.LOGIN} element={<Login/>}/>
             <Route path={LINKS.DASHBOARD} element={<Dashboard/>}/>
+            <Route path="*" element={<ErrorPage/>}/>
           </Routes>
         </EthContext.Provider>
         <Toaster toastOptions={{
