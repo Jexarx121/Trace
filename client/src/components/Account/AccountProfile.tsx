@@ -7,7 +7,6 @@ import { SessionContext } from "../Context/SessionContext";
 import Security, { truncateText } from "../../helpers/functions";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { createInstance } from "../../eth/traceCredit";
 import { EthContext } from "../../eth/context";
 import { FaEthereum } from "react-icons/fa";
@@ -187,8 +186,11 @@ const AccountProfile = () => {
         setSessionId(data.id);
       }
     };
+    
+    if (!fullName) {
+      getProfile();
+    }
 
-    getProfile();
     if (creditAmount === -1) {
       getBalance();
     };
