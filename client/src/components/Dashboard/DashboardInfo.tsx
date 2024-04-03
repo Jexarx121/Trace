@@ -594,15 +594,17 @@ const DashboardInfo = () => {
           </button>
         </div>
 
-        {showTutorial ? (
-          <i className="fa-regular fa-eye cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(false)} />
-        ) : (
-          <i className="fa-regular fa-eye-slash cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(true)} />
-        )}
-
+        <div className="flex flex-row">
+          {showTutorial ? (
+            <i className="fa-regular fa-eye cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(false)} />
+          ) : (
+            <i className="fa-regular fa-eye-slash cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(true)} />
+          )}
+          <h1 className="pl-4 text-lg uppercase font-bold mb-4">Tutorial</h1>
+        </div>
+        
         {showTutorial && (
           <div>
-            <h1 className="text-lg uppercase font-bold mb-4">Tutorial</h1>
             <ul className="list-disc list-inside pl-2 mb-6 mt-2 text-lg">
               <li className="mb-2">To create posts, you can use your account's credits.</li>
               <li className="mb-2">To gain credit, you can assign yourself to an available post.</li>
@@ -657,60 +659,35 @@ const DashboardInfo = () => {
               post.status === "free" && (
                 <div className="rounded-xl overflow-hidden shadow-2xl border-2 border-[#e6b843] hover:shadow-slate-500 cursor-pointer" 
                   key={post.post_id} onClick={() => showPost(post)}>
-                  <div className="flex md:flex-row flex-col">
-                    <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                    <div>
-                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                      <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
-                    </div>
-                  </div>  
-                  <div className="p-4 flex items-center">
-                    <div>
-                      <p className="text-lg text-[#1f2421]">{truncateText(post.description, 150)}</p>
-                      
-                      {/* Only render these icons if the posts are the users */}
-                      {post.id === session?.user.id && (
-                        <div>
-                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedPost(post);
-                              openUpdateModal()}}></i>
-                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setSelectedPost(post);
-                              openDeletePostModal()}}></i>
-                        </div>
-                      )}
-                    </div>
-
-                    {isDeleteModalOpen && (
-                      <div onClick={(e) => {
-                        e.stopPropagation()}}
-                        className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-                        <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
-                          <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
-                          <div className="flex flex-row w-full sm:space-x-2 mt-auto space-x-2">
-                            <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
-                              disabled={loading}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                closeDeletePostModal()}}>
-                              Cancel
-                            </button>
-                            <button className={`w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
-                              disabled={loading}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                deletePost()}}>
-                              {loading ? 'Deleting...' : 'Delete'}
-                            </button>
-                          </div>
-                        </div>
+                  <div>
+                    <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
+                    <div className="flex flex-row items-center">
+                      <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
+                      <div>
+                        <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
+                        <p className="px-4 break-words py-1 text-gray-500"><i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>Free</p>
                       </div>
-                    )}
+                    </div>
+                    <div className="overflow-hidden px-4 pt-4 pb-1">
+                      <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
+                    </div>
                   </div>
+                      
+                  {/* Only render these icons if the posts are the users */}
+                  {post.id === session?.user.id && (
+                    <div className="px-4 pb-2">
+                      <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedPost(post);
+                          openUpdateModal()}}></i>
+                      <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setSelectedPost(post);
+                          openDeletePostModal()}}></i>
+                    </div>
+                  )}
                 </div>
               )
             ))
@@ -781,36 +758,55 @@ const DashboardInfo = () => {
                     post.status === 'free' ? 'border-[#e6b843]' : 
                     post.status === 'completed' ? 'border-[#ae72bb]' : 
                     'border-[#929eae]'}`} 
-                    key={post.post_id}  onClick={() => showAcceptedPost(post)}
-                  > 
-                    <div className="flex md:flex-row flex-col">
-                      <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
-                      <div>
-                        <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                        <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
+                    key={post.post_id}  onClick={() => showAcceptedPost(post)}> 
+
+                    <div>
+                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
+                      <div className="flex flex-row items-center">
+                        <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
+                        <div>
+                          <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
+                          {post.status === 'free' && (
+                          <p className="px-4 break-words py-1 text-gray-500">
+                            <i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>
+                            Free
+                          </p>
+                          )}
+                          {post.status === 'accepted' && (
+                          <p className="px-4 break-words py-1 text-gray-500">
+                            <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>
+                            {post.assigned_to_name}
+                          </p>
+                          )}
+                          {post.status === 'completed' && (
+                          <p className="px-4 break-words py-1 text-gray-500">
+                            <i className="fa-solid fa-square-check mr-1 text-[#2c6048]"/>
+                            {post.assigned_to_name}
+                          </p>
+                          )}
+                          
+                        </div>
                       </div>
-                    </div>  
-                    <div className="p-4 flex items-center" >
-                      <div className="overflow-hidden">
-                        <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
-                        
-                        {/* Only render these icons if the posts are the users */}
-                        {post.id === session.user.id && (
-                          <div>
-                            <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedPost(post);
-                                openUpdateModal()}}></i>
-                            <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                setSelectedPost(post);
-                                openDeletePostModal()}}></i>
-                          </div>
-                        )}
+                      <div className="overflow-hidden px-4 pt-4 pb-1">
+                        <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
                       </div>
                     </div>
+                      
+                    {/* Only render these icons if the posts are the users */}
+                    {post.id === session?.user.id && (
+                      <div className="px-4 pb-2">
+                        <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedPost(post);
+                            openUpdateModal()}}></i>
+                        <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedPost(post);
+                            openDeletePostModal()}}></i>
+                      </div>
+                    )}
                   </div>
                 )
               ))
@@ -833,19 +829,17 @@ const DashboardInfo = () => {
                 post.status === "completed" && (
                   <div className="rounded-xl shadow-2xl border-2 border-[#ae72bb] hover:shadow-slate-500 cursor-pointer" 
                     key={post.post_id}  onClick={() => openCompleteModal(post)}>
-                    <div className="flex md:flex-row flex-col">
-                      <img className="w-20 h-20 object-cover rounded-full m-4" src={avatarUrlList[post.id]}/>
+                    <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
+                    <div className="flex flex-row items-center">
+                      <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
                       <div>
-                        <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                        <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
-                      </div>
-                    </div>  
-                    <div className="p-4 flex items-center">
-                      <div className="overflow-hidden">
-                        <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
+                        <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
+                        <p className="px-4 break-words py-1 text-gray-500"><i className="fa-solid fa-square-check mr-1 text-[#2c6048]"/> {post.assigned_to_name}</p>
                       </div>
                     </div>
-                    <p className="px-4 pb-3 text-[#1f2421] break-words">Completed by: {post.assigned_to_name}</p>
+                    <div className="overflow-hidden p-4">
+                      <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
+                    </div>
                   </div>
                 )
               ))
@@ -1276,6 +1270,33 @@ const DashboardInfo = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {isDeleteModalOpen && (
+        <div onClick={(e) => {
+          e.stopPropagation()}}
+          className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
+            <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
+            <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+              <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
+                disabled={loading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  closeDeletePostModal()}}>
+                Cancel
+              </button>
+              <button className={`w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
+                disabled={loading}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deletePost()}}>
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
         </div>
       )}
