@@ -668,7 +668,7 @@ const DashboardInfo = () => {
                         <p className="px-4 break-words py-1 text-gray-500"><i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>Free</p>
                       </div>
                     </div>
-                    <div className="overflow-hidden px-4 pt-4 pb-1">
+                    <div className="overflow-hidden px-4 pt-4 pb-2">
                       <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
                     </div>
                   </div>
@@ -889,8 +889,9 @@ const DashboardInfo = () => {
               </div>
             )}
 
-            <div className="mb-4">
-              <a className="text-md">Completed by: <b>{selectedPost.assigned_to_name} on {selectedPost.date_finished.toLocaleString()}</b></a>
+            <div className="mb-4 flex flex-col">
+              <a className="font-bold"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+              <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
             </div>
 
             {/* Modal buttons */}
@@ -944,15 +945,20 @@ const DashboardInfo = () => {
               </div>
             )}
 
-            <div className="mb-4">
-              {selectedPost.status === "completed" && (
-                <a className="text-md">Completed by: <b>{selectedPost.assigned_to_name} on {selectedPost.date_finished.toLocaleString()}</b></a>
-              )}
-              {selectedPost.status === "accepted" && (
-                <a className="text-md">Assigned To: <b>{selectedPost.assigned_to_name}</b></a>
-              )}
-            </div>
-
+            {selectedPost.status !== "free" && (
+              <div className="mb-4 flex flex-col">
+                {selectedPost.status === "completed" && (
+                  <div>
+                    <a className="font-bold"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+                    <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
+                  </div>
+                )}
+                {selectedPost.status === "accepted" && (
+                  <a className="font-bold"><i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+                )}
+              </div>
+            )}
+            
             {selectedPost.id !== session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
                 {confirmRequest ? "Are you sure you want to cancel this work? You won't receive any credits for this." : "" }
