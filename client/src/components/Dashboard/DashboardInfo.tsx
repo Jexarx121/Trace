@@ -48,6 +48,7 @@ const DashboardInfo = () => {
   const [viewPersonalPosts, setViewPersonalPosts] = useState(false);
   const [completePostModal, setCompletePostModal] = useState(false);
   const [userId, setUserId] = useState(0);
+  const [assignedUserId, setAssignedUserId] = useState(0);
   const [createPostCreditAmount, setCreatePostCreditAmount] = useState(0);
   const [descriptionLength, setDescriptionLength] = useState(0);
   const [nodeDetails, setNodeDetails] = useState({
@@ -583,6 +584,11 @@ const DashboardInfo = () => {
       const fetchUserId = async () => {
         const userId = await getUserIdFromId(selectedPost.id);
         setUserId(userId);
+
+        if (selectedPost.assigned_to) {
+          const assignUserId = await getUserIdFromId(selectedPost.assigned_to);
+          setAssignedUserId(assignUserId);
+        }
       };
   
       fetchUserId();
@@ -724,6 +730,10 @@ const DashboardInfo = () => {
                   <p className="font-bold"><i className="fa-solid fa-phone text-[#2c6048] mr-2"/>{selectedPost.contact}</p>
                   <Link to={`/account/${userId}`} 
                     className="text-md font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
+                </div>
+
+                <div>
+                  <p className="font-bold"><i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>Free</p>
                 </div>
 
                 <h2 className="text-lg mb-4 font-bold text-red-500">
@@ -880,11 +890,11 @@ const DashboardInfo = () => {
             <div className="mb-4">
               <p className="font-bold"><i className="fa-solid fa-phone text-[#2c6048] mr-2"/>{selectedPost.contact}</p>
               <Link to={`/account/${userId}`} 
-                className="text-md font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
+                className="font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
             </div>
 
             <div className="mb-4 flex flex-col">
-              <a className="font-bold"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+              <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</Link>
               <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
             </div>
 
@@ -956,12 +966,16 @@ const DashboardInfo = () => {
               <div className="mb-4 flex flex-col">
                 {selectedPost.status === "completed" && (
                   <div>
-                    <a className="font-bold"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+                    <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
+                      <i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
+                    </Link>
                     <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
                   </div>
                 )}
                 {selectedPost.status === "accepted" && (
-                  <a className="font-bold"><i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</a>
+                  <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
+                    <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
+                  </Link>
                 )}
               </div>
             )}
