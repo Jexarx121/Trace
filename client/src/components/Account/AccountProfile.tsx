@@ -183,21 +183,22 @@ const AccountProfile = () => {
       .eq('assigned_to_name', fullName);
 
     let count = 0;
-    let average = 0;
+    let sum = 0;
 
     if (data) {
       data?.forEach((post) => { 
         if (post.rating !== null) {
           count++;
-          average += (post.rating / count);
+          sum += post.rating;
         }
       });
 
-      setUserRating(average);
-  
-      if (average === 0) {
+      if (count > 0) {
+        const average = (sum / count).toFixed(1);
+        setUserRating(parseFloat(average));
+      } else {
         setUserRating(-1);
-      };
+      }
     };
   };
 
@@ -289,7 +290,7 @@ const AccountProfile = () => {
           <div className="flex flex-row h-48">
             <img className="sm:h-48 sm:w-48 sm:-translate-y-24 h-36 w-36 -translate-y-20 m-4 mr-6 border-white border-8 rounded-full" src={avatarUrl}/>
             <div>
-              <h1 className="sm:text-4xl text-xl font-bold text-[#1f2421] mt-4">{fullName} {userRating !== 0 && (<small className="text-sm">({userRating} <i className="fa-solid fa-star text-yellow-500"/>)</small>)}</h1>
+              <h1 className="sm:text-4xl text-xl font-bold text-[#1f2421] mt-4">{fullName} {userRating > 0 && (<small className="text-sm">({userRating} <i className="fa-solid fa-star text-yellow-500"/>)</small>)}</h1>
               <div className="flex flex-row">
                 <p className="sm:text-lg text-md text-gray-600 mt-2">{age} |</p>
                 <FaEthereum className="sm:text-lg text-md text-[#49A078] mt-3 ml-1"/>
