@@ -895,11 +895,12 @@ const DashboardInfo = () => {
 
             <div className="mb-4 flex flex-col">
               <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</Link>
+              <p className="font-bold ml-[-2.5px]"><i className="fa-solid fa-star mr-2 text-[#2c6048]"/>{selectedPost.rating}</p>
               <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
             </div>
 
             {showDetailsAboutCompletePost && (
-              <div className="mb-4 flex flex-col">
+              <div className="mb-4 flex flex-col ">
                 <div className="flex flex-row">
                   <i className="fa-brands fa-ethereum text-xl mr-4"/><h1 className="text-lg pb-3">{nodeDetails.creditAmount} credits</h1>
                 </div>
@@ -969,6 +970,7 @@ const DashboardInfo = () => {
                     <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
                       <i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
                     </Link>
+                    <p className="font-bold ml-[-2.5px]"><i className="fa-solid fa-star mr-2 text-[#2c6048]"/>{selectedPost.rating}</p>
                     <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
                   </div>
                 )}

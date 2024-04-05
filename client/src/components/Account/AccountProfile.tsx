@@ -34,6 +34,7 @@ const AccountProfile = () => {
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [selectedPostModal, setSelectedPostModal] = useState(false);
   const [toggleAccountMenu, setToggleAccountMenu] = useState(false);
+  const [userRating, setUserRating] = useState(0);
 
   const goToEditAccountPage = () => {
     navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
@@ -175,6 +176,31 @@ const AccountProfile = () => {
     }
   };
 
+  const getRating = async () => {
+    const { data } = await supabase
+      .from('posts')
+      .select('rating')
+      .eq('assigned_to_name', fullName);
+
+    let count = 0;
+    let average = 0;
+
+    if (data) {
+      data?.forEach((post) => { 
+        if (post.rating !== null) {
+          count++;
+          average += (post.rating / count);
+        }
+      });
+
+      setUserRating(average);
+  
+      if (average === 0) {
+        setUserRating(-1);
+      };
+    };
+  };
+
   useEffect(() => {
     // Go back to auth page if not login
     if (!session) {
@@ -220,7 +246,9 @@ const AccountProfile = () => {
     
     if (!fullName) {
       getProfile();
-    }
+    };
+
+    getRating();
 
     if (creditAmount === -1) {
       getBalance();
@@ -261,11 +289,11 @@ const AccountProfile = () => {
           <div className="flex flex-row h-48">
             <img className="sm:h-48 sm:w-48 sm:-translate-y-24 h-36 w-36 -translate-y-20 m-4 mr-6 border-white border-8 rounded-full" src={avatarUrl}/>
             <div>
-              <h1 className="sm:text-4xl text-xl font-bold text-[#1f2421] mt-4">{fullName}</h1>
+              <h1 className="sm:text-4xl text-xl font-bold text-[#1f2421] mt-4">{fullName} {userRating !== 0 && (<small className="text-sm">({userRating} <i className="fa-solid fa-star text-yellow-500"/>)</small>)}</h1>
               <div className="flex flex-row">
                 <p className="sm:text-lg text-md text-gray-600 mt-2">{age} |</p>
-                <p className="sm:text-lg text-md font-bold text-[#49A078] mt-2 ml-2">{creditAmount}</p>
                 <FaEthereum className="sm:text-lg text-md text-[#49A078] mt-3 ml-1"/>
+                <p className="sm:text-lg text-md font-bold text-[#49A078] mt-2 ml-1">{creditAmount}</p>
               </div>
             </div>
 
