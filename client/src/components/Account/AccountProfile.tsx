@@ -33,6 +33,7 @@ const AccountProfile = () => {
   const [postData, setPostData] = useState<Post[]>([]);
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [selectedPostModal, setSelectedPostModal] = useState(false);
+  const [toggleAccountMenu, setToggleAccountMenu] = useState(false);
 
   const goToEditAccountPage = () => {
     navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
@@ -248,7 +249,7 @@ const AccountProfile = () => {
     const creditAmount = 50;
     const receiverAddress = await getPublicKey(session?.user.id);
     fundWalletTokens(receiverAddress, creditAmount);
-    toast.success("Your credit amount will be updated soon.")
+    toast.success("Your credit amount will updated soon.")
   };
 
   return (
@@ -270,19 +271,25 @@ const AccountProfile = () => {
 
             {/* Only render if this is the user's profile */}
             {actualAccount && (
-              <div className="ml-auto flex flex-col"> 
-                <Link className="m-4 rounded-md font-bold text-lg text-white flex justify-center items-center md:mx-0 mx-4"
-                  to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
-                  <i className="fa-regular fa-pen-to-square sm:text-3xl text-2xl text-[#49A078] hover:font-bold text-center" />
-                </Link>
-                <button type="submit" 
-                  className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300 md:mx-0 mx-4"
-                  onClick={getFreeFunds}>
-                  Get Funds
-                </button>
+              <div className="relative ml-auto mr-6 mt-4">
+                <div className="flex flex-col">
+                  <i className="fa-solid fa-ellipsis-vertical text-2xl cursor-pointer" onClick={() => setToggleAccountMenu(!toggleAccountMenu)}/>
+
+                  {toggleAccountMenu && (
+                    <div className="absolute top-[20%] right-0 border bg-[#1f2421] border-gray-200 rounded-md shadow-2xl">
+                      <Link className="p-4  flex justify-center items-center border-[#49A078] border-b text-white hover:bg-[#353a37] transition duration-200"
+                        to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
+                        <i className="fa-regular fa-pen-to-square text-xl text-[#49A078] text-center hover:font-bold p-2"/>Edit
+                      </Link>
+                      <p className="p-4 flex justify-center items-center cursor-pointer text-white hover:bg-[#353a37] transition duration-200"
+                        onClick={getFreeFunds}>
+                        <i className="fa-solid fa-hand-holding-dollar text-xl text-[#49A078] text-center hover:font-bold p-2"/>Funds
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-            
           </div>
 
           {/* Bio */}
@@ -365,7 +372,7 @@ const AccountProfile = () => {
                         setSelectedPostModal(false);
                         navigate(LINKS.DASHBOARD);
                       }}>
-                      Go to Dashboard.
+                      Dashboard
                     </button>
                   </div>
                 </div>

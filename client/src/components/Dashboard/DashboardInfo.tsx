@@ -596,10 +596,10 @@ const DashboardInfo = () => {
   }, [session, postData, navigate, selectedPost]);
 
   return (
-    <div className="w-[70vw] m-auto mt-12 mb-28">
+    <div className="w-full md:w-[70vw] m-auto mt-12 mb-28 p-4 md:p-0">
       <div>
 
-        <div className="flex flex-row justify-between mb-2">
+        <div className="flex flex-row justify-between sm:mb-2 mb-4">
           <h1 className="text-sm tracking-wider text-[#1f2421] font-bold uppercase my-2">Dashboard</h1>
           <button type="submit" 
             className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300"
@@ -608,7 +608,7 @@ const DashboardInfo = () => {
           </button>
         </div>
 
-        <div className="flex flex-row">
+        <div className="flex flex-row my-2">
           {showTutorial ? (
             <i className="fa-regular fa-eye cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(false)} />
           ) : (
@@ -1000,11 +1000,11 @@ const DashboardInfo = () => {
                 <div className="flex flex-row w-full sm:space-x-2 mt-auto">
                   <button onClick={cancelAcceptedRequest}
                     className="w-full sm:w-[50%] cancel-button">
-                    Cancel Work
+                    Cancel Post
                   </button>
                   <button onClick={openFinishModal}
                     className="w-full sm:w-[50%] confirm-button">
-                    Finish Work
+                    Complete Post
                   </button>
                 </div>
               )}
@@ -1013,7 +1013,7 @@ const DashboardInfo = () => {
               {selectedPost.status === "accepted" && selectedPost.id !== session?.user.id && (
                 <button onClick={cancelAcceptedRequest}
                   className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
-                  Cancel Work
+                  Cancel Post
                </button>
               )}
 
@@ -1054,7 +1054,7 @@ const DashboardInfo = () => {
       {/* Modal for finishing the post */}
       {finishPostModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-[50%] md:h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Complete Work</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeFinishModal}>
@@ -1113,13 +1113,13 @@ const DashboardInfo = () => {
                 {confirmRequest ? "Make sure all the details are correct. You won't be able to change them afterwards!" : "" }
               </h2>
 
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 mt-auto pt-2">
-                <button onClick={closeFinishModal} className="w-full sm:w-[50%] bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300 mr-4">
+              <div className="flex flex-row space-x-2 mt-auto pt-2">
+                <button onClick={closeFinishModal} className="w-full sm:w-[50%] cancel-button ">
                   Cancel
                 </button>
                 {/* HELP, make all buttons disabled when clicked once using loading */}
                 <button type="submit" 
-                  className={`w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300 ml-4 ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
+                  className={`w-full sm:w-[50%] confirm-button bg-[#49A078] ${loading ? 'cursor-wait' : 'cursor-pointer'}`}
                   disabled={loading}>
                   {loading ? 'Completing...' : 'Complete'}
                 </button>
@@ -1132,7 +1132,7 @@ const DashboardInfo = () => {
       {/* Form Modal for creating posts */}
       {isModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-full">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Create Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeModal}>
@@ -1174,7 +1174,7 @@ const DashboardInfo = () => {
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
                   id="description"
                   placeholder="Enter a suitable description for the task."
-                  rows={12}
+                  rows={15}
                   {...register("description")}
                   onChange={handleDescriptionChange}
                 />
@@ -1221,7 +1221,7 @@ const DashboardInfo = () => {
       {/* Form for updating the post */}
       {isUpdateModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col h-auto">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Update Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeUpdateModal}>
@@ -1264,7 +1264,7 @@ const DashboardInfo = () => {
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
                   id="description"
                   placeholder="Enter a suitable description for the task."
-                  rows={10}
+                  rows={15}
                   {...registerUpdate("description")}
                   defaultValue={selectedPost?.description}
                   onChange={handleDescriptionChange}
@@ -1275,7 +1275,7 @@ const DashboardInfo = () => {
                 )}
               </div>
 
-              <div>
+              <div className="">
                 <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Contact Info</label>
                 <input
                   type="text"
@@ -1290,7 +1290,7 @@ const DashboardInfo = () => {
                 )}
               </div>
 
-              <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+              <div className="flex flex-row w-full space-x-2 mt-auto">
                 <button onClick={closeUpdateModal} className="w-full sm:w-[50%] cancel-button"
                   disabled={loading}>
                   Cancel
@@ -1307,12 +1307,10 @@ const DashboardInfo = () => {
 
       {/* Delete Modal */}
       {isDeleteModalOpen && (
-        <div onClick={(e) => {
-          e.stopPropagation()}}
-          className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
             <h1 className="text-xl mb-4">Are you sure you want to <b>delete</b> this post?</h1>
-            <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+            <div className="flex flex-row w-full space-x-2 mt-auto">
               <button className="w-full sm:w-[50%] bg-[#49A078] text-white py-2 rounded-md hover:bg-[#3e7d5a] transition duration-300"
                 disabled={loading}
                 onClick={(e) => {

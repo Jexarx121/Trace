@@ -20,9 +20,9 @@ const Icons = () => {
         <IconItems icon="fa-solid fa-shield-halved" title="Secure" 
           content="Using the decentralised, immutable property of blockchain technology to ensure your work is properly recorded." />
         <IconItems icon="fa-solid fa-clock" title="Convenient" 
-          content="Everything including custodial wallets and key management, we manage for you so you can focus only on volunteering." />
+          content="Everything including custodial wallets and key management, we manage so you can focus only on volunteering." />
         <IconItems icon="fa-solid fa-handshake-angle" title="Compensation" 
-          content="Giving back to volunteers who so selflessly help others, an oppurtunity for others to do the same for them." />
+          content="Giving back to those who have dedicated their time and effort to helping others." />
       </div>
     </div>
   )

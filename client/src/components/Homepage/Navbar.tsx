@@ -30,7 +30,7 @@ const Navbar = () => {
 
   return (
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
-      <div className="w-[70vw] m-auto flex items-center">
+      <div className="w-full md:w-[70vw] m-auto flex items-center">
         <Link to={LINKS.HOMEPAGE} className="flex flex-row">
           <img src="../images/favicon-32x32.png" alt="Logo of Trace" className="mr-2"/>
           <h1 className="text-white font-bold text-2xl cursor-pointer">
@@ -42,7 +42,7 @@ const Navbar = () => {
             <Link to={LINKS.DASHBOARD} >Dashboard</Link>
           </li>
           <li className="mx-4 cursor-pointer font-bold px-3 hover:underline hover:underline-offset-4">
-            <Link to={`/account/${userId}`} onClick={handleLinkClick} >Profile</Link>
+            <Link to={`/account/${userId}`} onClick={handleLinkClick}>Profile</Link>
           </li>
           {!session ? (
             <li>
@@ -68,12 +68,9 @@ const Navbar = () => {
             <ul className="z-10 fixed -left-0 -top-0 w-[100vw] h-screen md:hidden list-non flex flex-col
               justify-start rounded-md bg-white text-[#1f2421] animate-slide-in">
               <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl text-center my-5 ml-8 flex-grow"><Link to={LINKS.HOMEPAGE}>Trace</Link></h1>
+                <h1 className="text-2xl my-5 mx-4 flex-grow font-bold"><Link to={LINKS.HOMEPAGE}>Trace</Link></h1>
                 <AiOutlineClose className="cursor-pointer mr-4 text-3xl" onClick={() => setToggleMenu(false)}/>
               </div>
-              <li className="mx-4 cursor-pointer text-xl mb-6 pb-6 border-b border-gray-300">
-                About
-              </li>
               <li className="mx-4 cursor-pointer text-xl mb-6 pb-6 border-b border-gray-300">
                 <Link to={LINKS.DASHBOARD}>Dashboard</Link>
               </li>
