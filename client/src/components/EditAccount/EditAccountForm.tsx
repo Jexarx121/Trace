@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -73,15 +73,24 @@ const EditAccountForm = () => {
     } 
   };
 
-  async function updatePosts(authId : any, newName: string) {
+  async function updatePosts(newName: string) {
     const { error } = await supabase
       .from('posts')
-      .update({created_by: newName, assigned_to_name: newName})
-      .eq('id', authId);
+      .update({ created_by: newName })
+      .eq('created_by', fullName) // Update only where old name occurs in created_by
 
-    if (error) {
-      alert(error.message);
-    };
+    if (!error) {
+      const { error } = await supabase
+        .from('posts')
+        .update({ assigned_to_name: newName })
+        .eq('assigned_to_name', fullName) // Update only where old name occurs in assigned_to_name
+
+      if (error) {
+        console.warn(error.message);
+      }
+    } else {
+      console.warn(error.message);
+    }
   };
 
   async function updateProfile(data : any) {
@@ -116,7 +125,7 @@ const EditAccountForm = () => {
       alert(error.message);
     };
 
-    updatePosts(user.id, fullname);
+    updatePosts(fullname);
     toast.success("Your account has been updated.")
     setLoading(true);
     goToAccount();
@@ -125,6 +134,13 @@ const EditAccountForm = () => {
   const onSubmit: SubmitHandler<ProfileSchema> = (data) => {
     updateProfile(data);
   };
+
+  useEffect(() => {
+    // Check if bio exists and set descriptionLength accordingly
+    if (bio) {
+      setDescriptionLength(bio.length);
+    }
+  }, [bio]); 
   
   return (
     <div>

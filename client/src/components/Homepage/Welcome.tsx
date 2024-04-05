@@ -6,8 +6,8 @@ const Welcome = () => {
     <div className="bg-[#216869] pb-20">
       <div className="w-[70vw] m-auto pt-12 flex flex-col lg:flex-row">
         <div className="lg:w-1/2">
-          <h1 className="text-white text-4xl md:text-5xl lg:text-[4rem] xl:text-[5rem] font-bold pb-5 text-center md:text-left">
-            Track Volunteer Work Effortlessly
+          <h1 className="text-white text-4xl md:text-5xl lg:text-[4rem] xl:text-[4.5rem] font-bold pb-5 text-center md:text-left">
+            Record Volunteer Work
           </h1>
           <p className="text-white text-2xl lg:text-2xl xl:text-3xl pb-5 text-center md:text-left">
             Securing a generational contract through crediting volunteering effort with the help of Distributed Ledger Technology (DLT).

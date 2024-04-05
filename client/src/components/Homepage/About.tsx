@@ -19,17 +19,17 @@ const aboutTitles: string[] = [
 ]
 
 const AboutItem = ({title, content} : aboutItemProps) => (
-  <div className="mb-12">
-    <h2 className="text-[#49A078] font-bold pb-6 text-3xl">{title}</h2>
+  <div className="mb-6">
+    <h2 className="text-[#49A078] font-bold pb-3 text-3xl">{title}</h2>
     <p className="pb-5 text-2xl">{content}</p>
   </div>
 )
 
 const About = () => {
   return (
-    <div className="bg-[#FFFFFF] mt-24 mb-36 overflow-hidden">
+    <div className="bg-[#FFFFFF] mt-12 mb-36 overflow-hidden">
       <div className="w-full md:w-[70vw] mx-auto flex flex-col lg:flex-row mt-20">
-        <div className="lg:w-1/2 sm:p-5 md:p-0 px-4">
+        <div className="lg:w-1/2 sm:p-5 md:p-0 px-4 mr-6">
           <h1 className="font-bold mb-4 mt-4 uppercase text-[#1f2421]">About</h1>
           <div>
             {aboutTitles.map((item, index) => (

@@ -7,11 +7,10 @@ import { SessionContext } from "../Context/SessionContext";
 import Security, { truncateText } from "../../helpers/functions";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
-import { HiOutlinePencilSquare } from "react-icons/hi2";
 import { createInstance } from "../../eth/traceCredit";
 import { EthContext } from "../../eth/context";
 import { FaEthereum } from "react-icons/fa";
-import { getPublicKey } from "../Dashboard/functions";
+import { downloadImage, getPublicKey } from "../Dashboard/functions";
 import { NoPostsFound, Post } from "../Dashboard/Posts";
 
 const AccountProfile = () => {
@@ -32,12 +31,15 @@ const AccountProfile = () => {
   const [actualAccount, setActualAccount] = useState(false);
   const [toastShown, setToastShown] = useState(false);
   const [postData, setPostData] = useState<Post[]>([]);
+  const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
+  const [selectedPostModal, setSelectedPostModal] = useState(false);
+  const [toggleAccountMenu, setToggleAccountMenu] = useState(false);
 
   const goToEditAccountPage = () => {
     navigate(`/edit_account/${user_id}`, { state: { session, fullName, age, passedAvatarUrl, bio }});
   };
 
-  async function downloadImage(path : string) {
+  async function downloadProfileImage(path : string) {
     try {
       setPassedAvatarUrl(path);
       const { data, error } = await supabase.storage.from('avatars').download(path);
@@ -89,16 +91,17 @@ const AccountProfile = () => {
   };
 
   async function fundWalletTokens(receiverAddress : any, creditAmount : number) {
-    const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
-    
-    const wallet = new ethers.Wallet(adminPrivateKey);
-    const signer = wallet.connect(provider?.provider);
-    const baseAmount = BigInt(creditAmount) * (10n ** 18n); // 100 credits to start off with
+    if (provider) {
+      const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
+      const wallet = new ethers.Wallet(adminPrivateKey);
+      const signer = wallet.connect(provider?.provider);
+      const baseAmount = BigInt(creditAmount) * (10n ** 18n); // 100 credits to start off with
 
-    const contract = createInstance(signer);
-    const tx = await contract.transfer(receiverAddress, baseAmount)
-    console.log(tx);
-  }
+      const contract = createInstance(signer);
+      const tx = await contract.transfer(receiverAddress, baseAmount)
+      console.log(tx);
+    };
+  };
 
   async function getUserId() {
     const { data } = await supabase
@@ -145,6 +148,33 @@ const AccountProfile = () => {
     };
   };
 
+  async function getProfileImage(authID: string) {
+    if (avatarUrlList[authID]) {
+      // If the image URL is already in the state, return it.
+      return avatarUrlList[authID];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', authID)
+        .single();
+
+      if (error) {
+        console.warn(error);
+        return '';
+      }
+
+      const imageUrl = await downloadImage(data?.avatar_url);
+
+      return imageUrl;
+    } catch (error) {
+      console.log('Error fetching profile image: ', error);
+      return '';
+    }
+  };
+
   useEffect(() => {
     // Go back to auth page if not login
     if (!session) {
@@ -182,27 +212,44 @@ const AccountProfile = () => {
       } else if (data) {
         setFullName(data.full_name);
         setAge(data.age);
-        downloadImage(data.avatar_url);
+        downloadProfileImage(data.avatar_url);
         setBio(data.bio);
         setSessionId(data.id);
       }
     };
+    
+    if (!fullName) {
+      getProfile();
+    }
 
-    getProfile();
     if (creditAmount === -1) {
       getBalance();
     };
 
     checkIfAccountIsCurrentUser();
-    getPosts();
+    
+    if (!postData.length) {
+      getPosts();
+    }
 
+    if (postData) {
+      if (Object.keys(avatarUrlList).length === 0) {
+        postData.forEach(async (post) => {
+          const imageUrl = await getProfileImage(post.id);
+          setAvatarUrlList((prevImages : Record<string, string>) => ({
+            ...prevImages,
+            [post.id]: imageUrl || '',
+          }));
+        });
+      };
+    };
   });
 
   const getFreeFunds = async () => {
     const creditAmount = 50;
     const receiverAddress = await getPublicKey(session?.user.id);
     fundWalletTokens(receiverAddress, creditAmount);
-    toast.success("Your credit amount will be updated soon.")
+    toast.success("Your credit amount will updated soon.")
   };
 
   return (
@@ -224,25 +271,31 @@ const AccountProfile = () => {
 
             {/* Only render if this is the user's profile */}
             {actualAccount && (
-              <div className="ml-auto flex flex-col"> 
-                <Link className="m-4 rounded-md font-bold text-lg text-white flex justify-center items-center md:mx-0 mx-4"
-                  to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
-                  <i className="fa-regular fa-pen-to-square sm:text-3xl text-2xl text-[#49A078] hover:font-bold text-center" />
-                </Link>
-                <button type="submit" 
-                  className="px-8 bg-[#49A078] py-2 rounded-md font-bold text-white hover:bg-[#3e7d5a] transition duration-300 md:mx-0 mx-4"
-                  onClick={getFreeFunds}>
-                  Get Funds
-                </button>
+              <div className="relative ml-auto mr-6 mt-4">
+                <div className="flex flex-col">
+                  <i className="fa-solid fa-ellipsis-vertical text-2xl cursor-pointer" onClick={() => setToggleAccountMenu(!toggleAccountMenu)}/>
+
+                  {toggleAccountMenu && (
+                    <div className="absolute top-[20%] right-0 border bg-[#1f2421] border-gray-200 rounded-md shadow-2xl">
+                      <Link className="p-4  flex justify-center items-center border-[#49A078] border-b text-white hover:bg-[#353a37] transition duration-200"
+                        to={`/edit_account/${user_id}`} state={{ session: session, fullName: fullName, passedAvatarUrl: passedAvatarUrl, age: age, bio: bio}}>
+                        <i className="fa-regular fa-pen-to-square text-xl text-[#49A078] text-center hover:font-bold p-2"/>Edit
+                      </Link>
+                      <p className="p-4 flex justify-center items-center cursor-pointer text-white hover:bg-[#353a37] transition duration-200"
+                        onClick={getFreeFunds}>
+                        <i className="fa-solid fa-hand-holding-dollar text-xl text-[#49A078] text-center hover:font-bold p-2"/>Funds
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
-            
           </div>
 
           {/* Bio */}
           <div className="mb-10">
             <h1 className="text-md uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8 md:mx-0 mx-4">About Me</h1>
-            <p className="sm:text-xl text-lg text-md text-[#1f2421] py-4 md:mx-0 mx-4" style={{ whiteSpace: "pre-wrap"}}>{bio}</p>
+            <p className="sm:text-xl text-lg text-md text-[#1f2421] py-4 md:mx-0 mx-4 whitespace-pre-wrap">{bio}</p>
           </div>
           <div className="md:mx-0 mx-4">
             <h1 className="text-md uppercase text-[#1f2421] font-bold py-4 border-b-black border-b-2 tracking-wider mt-8">Latest Work</h1>
@@ -251,36 +304,80 @@ const AccountProfile = () => {
                 postData.map((post) => (
                   <div className={`rounded-xl shadow-2xl border-2 hover:shadow-slate-500 cursor-pointer ${
                     post.status === 'free' ? 'border-[#e6b843]' : 
-                    post.status === 'completed' ? 'border-[#ae72bb]' : 
-                    'border-[#929eae]'}`}
+                    post.status === 'completed' ? 'border-[#ae72bb]' : 'border-[#929eae]'}`}
                       key={post.post_id}
-                  >
-                    <div className="flex md:flex-row flex-col">
-                      <div>
-                        <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 60)}</h2>
-                        <p className="text-sm text-gray-500 pl-4 mr-2">{post.created_by} | {post.date_created.toLocaleString()}</p>
-                      </div>
-                    </div>  
-                    <div className="p-4 flex items-center">
-                      <div className="overflow-hidden">
-                        <p className="text-lg text-[#1f2421] break-words">{truncateText(post.description, 150)}</p>
-                      </div>
-                    </div>
-                    <div className="mb-4 p-4">
-                      {post.status === "completed" && (
-                        <a className="text-md">Completed by: <b>{post.assigned_to_name} on {post.date_finished.toLocaleString()}</b></a>
-                      )}
-                      {post.status === "accepted" && (
-                        <a className="text-md">Assigned To: <b>{post.assigned_to_name}</b></a>
-                      )}
-                    </div>
+                      onClick={() => setSelectedPostModal(true)}>
 
+                    <div>
+                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
+                      <div className="flex flex-row items-center">
+                        <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
+                        <div>
+                          <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
+                          {post.status === 'free' && (
+                          <p className="px-4 break-words py-1 text-gray-500">
+                            <i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>
+                            Free
+                          </p>
+                          )}
+                          {post.status === 'accepted' && (
+                          <p className="px-4 break-words py-1 text-gray-500">
+                            <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>
+                            {post.assigned_to_name}
+                          </p>
+                          )}
+                          {post.status === 'completed' && (
+                          <p className="px-4 break-words py-1 text-gray-500">
+                            <i className="fa-solid fa-square-check mr-1 text-[#2c6048]"/>
+                            {post.assigned_to_name}
+                          </p>
+                          )} 
+                        </div>
+                      </div>
+
+                      <div className="overflow-hidden px-4 my-3">
+                        <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
+                      </div>
+                    </div>
                   </div>
                 ))
               ) : (
                 <NoPostsFound/>
               )}
             </div>
+
+            {selectedPostModal && (
+              <div onClick={(e) => {
+                e.stopPropagation()}}
+                className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
+                  <div className="flex flex-row">
+                    <h1 className="text-2xl mb-8 font-bold">You have to go to the Dashboard to interact with these posts.</h1>
+                    <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={() => setSelectedPostModal(false)}>
+                      &times;
+                    </span>
+                  </div>
+                
+                  <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+                    <button className="w-full sm:w-[50%] cancel-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPostModal(false);
+                      }}>
+                      Cancel
+                    </button>
+                    <button className="w-full sm:w-[50%] bg-[#49A078] confirm-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPostModal(false);
+                        navigate(LINKS.DASHBOARD);
+                      }}>
+                      Dashboard
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
