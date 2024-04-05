@@ -21,7 +21,7 @@ const AuthForm = () => {
         <h1 className="text-3xl font-bold mb-4 text-[#263228]">
           <Link to={LINKS.HOMEPAGE}>Trace</Link>
         </h1>
-        <div className="max-w-md w-full">
+        <div className="max-w-md w-full sm:p-0 p-4">
           <Auth supabaseClient={supabase}
             appearance={{ theme: ThemeSupa,
             variables: {
