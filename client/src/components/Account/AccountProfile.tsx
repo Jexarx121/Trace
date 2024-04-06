@@ -302,7 +302,7 @@ const AccountProfile = () => {
             {actualAccount && (
               <div className="relative ml-auto mr-6 mt-4">
                 <div className="flex flex-col">
-                  <i className="fa-solid fa-ellipsis-vertical text-2xl cursor-pointer" onClick={() => setToggleAccountMenu(!toggleAccountMenu)}/>
+                  <i className="fa-solid fa-ellipsis-vertical text-2xl cursor-pointer hover:bg-[#3e7d5a] rounded-md px-3 transition duration-200" onClick={() => setToggleAccountMenu(!toggleAccountMenu)}/>
 
                   {toggleAccountMenu && (
                     <div className="absolute top-[20%] right-0 border bg-[#1f2421] border-gray-200 rounded-md shadow-2xl">
