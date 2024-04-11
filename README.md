@@ -27,6 +27,7 @@ This was a final year project and a first real experience into React, Typescript
 - [ ] Free funds for a user should be linked to charity donation
 - [ ] Meta transactions
 - [ ] Gas optimizations
+- [ ] Metamask and other wallet integrations
 - [ ] Security audit
 - [ ] Proper Credit system with volunteers.
 - [ ] Improvment of loading times using server side rendering.
