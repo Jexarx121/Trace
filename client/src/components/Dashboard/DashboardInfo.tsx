@@ -614,7 +614,7 @@ const DashboardInfo = () => {
           ) : (
             <i className="fa-regular fa-eye-slash cursor-pointer text-2xl mb-4" onClick={() => setShowTutorial(true)} />
           )}
-          <h1 className="pl-4 text-lg uppercase font-bold mb-4">Tutorial</h1>
+          <h1 className="pl-4 text-lg uppercase font-bold mb-4 cursor-pointer hover:underline hover:underline-offset-4" onClick={() => setShowTutorial(!showTutorial)}>Tutorial</h1>
         </div>
         
         {showTutorial && (
@@ -963,24 +963,28 @@ const DashboardInfo = () => {
               </div>
             )}
 
-            {selectedPost.status !== "free" && (
-              <div className="mb-4 flex flex-col">
-                {selectedPost.status === "completed" && (
-                  <div>
-                    <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
-                      <i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
-                    </Link>
-                    <p className="font-bold ml-[-2.5px]"><i className="fa-solid fa-star mr-2 text-[#2c6048]"/>{selectedPost.rating}</p>
-                    <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
-                  </div>
-                )}
-                {selectedPost.status === "accepted" && (
+            <div className="mb-4 flex flex-col">
+              {selectedPost.status === "completed" && (
+                <div>
                   <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
-                    <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
+                    <i className="fa-solid fa-square-check mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
                   </Link>
-                )}
-              </div>
-            )}
+                  <p className="font-bold ml-[-2.5px]"><i className="fa-solid fa-star mr-2 text-[#2c6048]"/>{selectedPost.rating}</p>
+                  <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
+                </div>
+              )}
+              {selectedPost.status === "accepted" && (
+                <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
+                  <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
+                </Link>
+              )}
+              {selectedPost.status === "free" && (
+                <p className="font-bold">
+                  <i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>
+                  Free
+                </p>
+              )}
+            </div>
             
             {selectedPost.id !== session?.user.id && (
               <h2 className="text-lg mb-4 font-bold text-red-500">
@@ -1134,7 +1138,7 @@ const DashboardInfo = () => {
       {/* Form Modal for creating posts */}
       {isModalOpen && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-full">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-full overflow-y-auto">
             <div className="flex flex-row">
               <h1 className="text-3xl my-2 pb-2">Create Post</h1>
               <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeModal}>
@@ -1176,7 +1180,7 @@ const DashboardInfo = () => {
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
                   id="description"
                   placeholder="Enter a suitable description for the task."
-                  rows={15}
+                  rows={9}
                   {...register("description")}
                   onChange={handleDescriptionChange}
                 />
@@ -1266,7 +1270,7 @@ const DashboardInfo = () => {
                   className="w-full px-3 py-2 border-2 rounded-md border-[#1f2421]"
                   id="description"
                   placeholder="Enter a suitable description for the task."
-                  rows={15}
+                  rows={9}
                   {...registerUpdate("description")}
                   defaultValue={selectedPost?.description}
                   onChange={handleDescriptionChange}
