@@ -186,7 +186,7 @@ const DashboardInfo = () => {
 
   const onSubmit: SubmitHandler<PostSchema> = (data) => {
     if (confirmRequest) {
-      setLoading(false);
+      setLoading(true);
       createPostTokensFromUser(createPostCreditAmount, data);
     } else {
       if (data.type === "short") {
