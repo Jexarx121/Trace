@@ -32,6 +32,7 @@ const DashboardInfo = () => {
   const [filteredAvailablePosts, setFilteredAvailablePosts] = useState<Post[]>([]);
   const [filteredCompletePosts, setFilteredCompletePosts] = useState<Post[]>([]);
   const [filteredPersonalPosts, setFilteredPersonalPosts] = useState<Post[]>([]);
+  const [filteredPendingPosts, setFilteredPendingPosts] = useState<Post[]>([]);
   const [showTutorial, setShowTutorial] = useState(false);
   const [avatarUrlList, setAvatarUrlList] = useState<Record<string, string>>({});
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -47,6 +48,7 @@ const DashboardInfo = () => {
   const [viewAvailablePosts, setViewAvailablePosts] = useState(true);
   const [viewPersonalPosts, setViewPersonalPosts] = useState(false);
   const [completePostModal, setCompletePostModal] = useState(false);
+  const [requestPostModal, setRequestPostModal] = useState(false);
   const [userId, setUserId] = useState(0);
   const [assignedUserId, setAssignedUserId] = useState(0);
   const [createPostCreditAmount, setCreatePostCreditAmount] = useState(0);
@@ -104,6 +106,18 @@ const DashboardInfo = () => {
     setIsModalOpen(false);
     setDescriptionLength(0);
   };
+  
+  const showRequestedPost = (post: Post) => {
+    setSelectedPost(post);
+    setRequestPostModal(true);
+  }
+
+  const closeRequestedPost = () => {
+    setSelectedPost(null);
+    setConfirmRequest(false);
+    setRequestPostModal(false);
+    setShowDetailsAboutCompletePost(false);
+  }
 
   const showAcceptedPost = (post : Post) => {
     setSelectedPost(post);
@@ -357,7 +371,7 @@ const DashboardInfo = () => {
       const updates = {
         assigned_to_name: data?.[0]?.full_name,
         assigned_to: user.id,
-        status: "accepted"
+        status: "pending"
       };
 
       try {
@@ -376,6 +390,44 @@ const DashboardInfo = () => {
       closePost();
 
       toast.success('Post has been requested.') 
+
+    } else {
+      setConfirmRequest(true);
+    }
+  }
+
+  async function approvePost() {
+    if (confirmRequest) {
+      const { user } = session;
+
+      // get user's name from id and put it into profile
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", user.id)
+
+      const updates = {
+        assigned_to_name: data?.[0]?.full_name,
+        assigned_to: user.id,
+        status: "accepted"
+      };
+
+      try {
+        const { error } = await supabase
+          .from('posts')
+          .update(updates)
+          .eq('post_id', selectedPost?.post_id);
+
+        if (error) {
+          alert(error.message);
+        }
+      } catch (error) {
+        alert(error);
+      };
+      setConfirmRequest(false);
+      closeRequestedPost();
+
+      toast.success('Post has been assigned to the volunteer.');
 
     } else {
       setConfirmRequest(true);
@@ -577,7 +629,14 @@ const DashboardInfo = () => {
         const titleMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
         return createdByMatch || assignedToNameExists || titleMatch;
       }));
-    }
+
+      setFilteredPendingPosts(postData.filter(post => {
+        const createdByMatch = post.created_by.toLowerCase().includes(searchTerm.toLowerCase());
+        const assignedToNameExists = post.assigned_to_name && post.assigned_to_name.toLowerCase().includes(searchTerm.toLowerCase());
+        const titleMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
+        return createdByMatch || assignedToNameExists || titleMatch;
+      }));
+    };
 
     // get url links for each post creator
     if (selectedPost !== null) {
@@ -592,7 +651,8 @@ const DashboardInfo = () => {
       };
   
       fetchUserId();
-    }
+    };
+
   }, [session, postData, navigate, selectedPost]);
 
   return (
@@ -766,72 +826,131 @@ const DashboardInfo = () => {
       {/* Personal Posts */}
       {viewPersonalPosts && (
         <div className="mt-12">
-          <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Personal Posts</h1>
-          
-          <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {filteredPersonalPosts.length > 0 ? (
-              filteredPersonalPosts.map((post) => (
-                (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
-                  <div className={`rounded-xl shadow-2xl border-2 hover:shadow-slate-500 cursor-pointer ${
-                    post.status === 'free' ? 'border-[#e6b843]' : 
-                    post.status === 'completed' ? 'border-[#ae72bb]' : 
-                    'border-[#929eae]'}`} 
-                    key={post.post_id}  onClick={() => showAcceptedPost(post)}> 
+          <div>
+          {filteredPendingPosts.some(post => post.status === "pending" && post.id === session?.user.id) ? (
+            filteredPendingPosts.map((post) => (
+                (post.status === "pending" && post.id === session?.user.id) &&  (
+                  <div>
+                    <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Pending Posts</h1>
+                    <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      <div className={`rounded-xl shadow-2xl border-2 hover:shadow-slate-500 cursor-pointer ${'border-[#929eae]'}`} 
+                        key={post.post_id}  onClick={() => showRequestedPost(post)}> 
 
-                    <div>
-                      <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
-                      <div className="flex flex-row items-center">
-                        <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
                         <div>
-                          <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
-                          {post.status === 'free' && (
-                          <p className="px-4 break-words py-1 text-gray-500">
-                            <i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>
-                            Free
-                          </p>
-                          )}
-                          {post.status === 'accepted' && (
-                          <p className="px-4 break-words py-1 text-gray-500">
-                            <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>
-                            {post.assigned_to_name}
-                          </p>
-                          )}
-                          {post.status === 'completed' && (
-                          <p className="px-4 break-words py-1 text-gray-500">
-                            <i className="fa-solid fa-square-check mr-1 text-[#2c6048]"/>
-                            {post.assigned_to_name}
-                          </p>
-                          )}
-                          
+                          <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
+                          <div className="flex flex-row items-center">
+                            <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
+                            <div>
+                              <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
+                              <p className="px-4 break-words py-1 text-gray-500">
+                                <i className="fa-solid fa-person-circle-question mr-2 text-[#2c6048]"/>
+                                {post.assigned_to_name}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="overflow-hidden px-4 pt-4 pb-1">
+                            <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="overflow-hidden px-4 pt-4 pb-1">
-                        <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
+                        {post.id === session?.user.id && (
+                          <div className="px-4 pb-2">
+                            <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPost(post);
+                                setDescriptionLength(post.description.length);
+                                openUpdateModal()}}></i>
+                            <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedPost(post);
+                                openDeletePostModal()}}></i>
+                          </div>
+                        )}
                       </div>
                     </div>
-                      
-                    {/* Only render these icons if the posts are the users */}
-                    {post.id === session?.user.id && (
-                      <div className="px-4 pb-2">
-                        <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setSelectedPost(post);
-                            setDescriptionLength(post.description.length);
-                            openUpdateModal()}}></i>
-                        <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setSelectedPost(post);
-                            openDeletePostModal()}}></i>
-                      </div>
-                    )}
+                    
                   </div>
                 )
               ))
             ) : (
-              <NoPostsFound/>
+              <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider mb-6">No Pending Posts</h1>
             )}
+          </div>
+
+          <div>
+            <h1 className="text-sm uppercase text-[#1f2421] font-bold py-4 tracking-wider border-b-black border-b-2">Personal Posts</h1>
+            <div className="my-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {filteredPersonalPosts.length > 0 ? (
+                filteredPersonalPosts.map((post) => (
+                  (post.id === session?.user.id || post.assigned_to === session?.user.id) && (
+                    <div className={`rounded-xl shadow-2xl border-2 hover:shadow-slate-500 cursor-pointer ${
+                      post.status === 'free' ? 'border-[#e6b843]' : 
+                      post.status === 'completed' ? 'border-[#ae72bb]' : 
+                      'border-[#929eae]'}`} 
+                      key={post.post_id}  onClick={() => showAcceptedPost(post)}> 
+
+                      <div>
+                        <h2 className="text-3xl text-[#2c6048] p-4 mr-2">{truncateText(post.title, 35)}</h2>
+                        <div className="flex flex-row items-center">
+                          <img className="w-16 h-16 object-cover rounded-full ml-4" src={avatarUrlList[post.id]}/>
+                          <div>
+                            <p className="text-xl text-black font-bold pl-4 mr-2">{post.created_by}</p>
+                            {post.status === 'free' && (
+                            <p className="px-4 break-words py-1 text-gray-500">
+                              <i className="fa-solid fa-person-circle-plus mr-2 text-[#2c6048]"/>
+                              Free
+                            </p>
+                            )}
+                            {post.status === 'pending' && (
+                            <p className="px-4 break-words py-1 text-gray-500">
+                              <i className="fa-solid fa-person-circle-question mr-2 text-[#2c6048]"/>
+                              {post.assigned_to_name}
+                            </p>
+                            )}
+                            {post.status === 'accepted' && (
+                            <p className="px-4 break-words py-1 text-gray-500">
+                              <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>
+                              {post.assigned_to_name}
+                            </p>
+                            )}
+                            {post.status === 'completed' && (
+                            <p className="px-4 break-words py-1 text-gray-500">
+                              <i className="fa-solid fa-square-check mr-1 text-[#2c6048]"/>
+                              {post.assigned_to_name}
+                            </p>
+                            )}
+                            
+                          </div>
+                        </div>
+                        <div className="overflow-hidden px-4 pt-4 pb-1">
+                          <p className="text-lg text-[#1f2421] break-words mt-3">{truncateText(post.description, 70)}</p>
+                        </div>
+                      </div>
+                        
+                      {/* Only render these icons if the posts are the users */}
+                      {post.id === session?.user.id && (
+                        <div className="px-4 pb-2">
+                          <i className="fa-regular fa-pen-to-square text-[#49A078] hover:font-bold pr-4 text-xl"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedPost(post);
+                              setDescriptionLength(post.description.length);
+                              openUpdateModal()}}></i>
+                          <i className="text-red-500 fa-regular fa-trash-can hover:font-bold text-xl"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setSelectedPost(post);
+                              openDeletePostModal()}}></i>
+                        </div>
+                      )}
+                    </div>
+                  )
+                ))
+              ) : (
+                <NoPostsFound/>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -869,6 +988,49 @@ const DashboardInfo = () => {
         </div>
       )}
 
+      {/* Post Modal for pending posts */}
+      {requestPostModal && selectedPost && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-md w-full max-w-[100%] sm:w-[90%] md:w-[70%] lg:w-[50%] flex flex-col md:h-auto h-[100%]">
+            <div className="flex flex-row">
+              <div>
+                <h2 className="text-4xl text-[#2c6048] font-semibold mb-2 pr-4">{selectedPost.title}</h2>
+                <p className="text-sm text-gray-600 mb-4">{capitalize(selectedPost.type)} | {selectedPost.date_created.toLocaleString()} </p>
+              </div>
+              
+              <span className="cursor-pointer ml-auto text-3xl text-gray-600" onClick={closeRequestedPost}>
+                &times;
+              </span>
+            </div>
+            
+            <p className="text-lg text-[#1f2421] mb-4 break-words">{selectedPost.description}</p>
+            
+            <div className="mb-4">
+              <p className="font-bold"><i className="fa-solid fa-phone text-[#2c6048] mr-2"/>{selectedPost.contact}</p>
+              <Link to={`/account/${userId}`} 
+                className="font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-user text-[#2c6048] mr-2"/>{selectedPost.created_by}</Link>
+            </div>
+
+            <div className="mb-4 flex flex-col">
+              <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2"><i className="fa-solid fa-person-circle-question mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}</Link>
+            </div>
+
+            <h2 className="text-lg mb-4 font-bold text-red-500">
+              {confirmRequest ? "Are you sure you want to assign this volunteer to your request?" : "" }
+            </h2>
+
+            {/* Modal buttons */}
+            <div className="flex flex-row w-full sm:space-x-2 mt-auto">
+              <button onClick={closeRequestedPost} className="w-full sm:w-[50%] cancel-button">
+                Close
+              </button>
+              <button onClick={approvePost} className="w-full sm:w-[50%] confirm-button">
+                Approve Volunteer 
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Post Modal for finished posts */}
       {completePostModal && selectedPost && (
@@ -973,6 +1135,11 @@ const DashboardInfo = () => {
                   <p className="font-bold"><i className="fa-solid fa-calendar-check mr-2 text-[#2c6048]"/>{selectedPost.date_finished.toLocaleString()}</p>
                 </div>
               )}
+              {selectedPost.status === "pending" && (
+                <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
+                  <i className="fa-solid fa-person-circle-question mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
+                </Link>
+              )}
               {selectedPost.status === "accepted" && (
                 <Link to={`/account/${assignedUserId}`} className="font-bold hover:underline hover:underline-offset-2">
                   <i className="fa-solid fa-handshake mr-2 text-[#2c6048]"/>{selectedPost.assigned_to_name}
@@ -1013,6 +1180,13 @@ const DashboardInfo = () => {
                     Complete Post
                   </button>
                 </div>
+              )}
+
+              {selectedPost.status === "pending" && selectedPost.id !== session?.user.id && (
+                <button onClick={closeAcceptedPost}
+                className="w-full bg-red-600 text-white py-2 rounded-md hover:bg-red-700 transition duration-300">
+                  The creator has not approved the post yet.
+                </button>
               )}
 
               {/* If user isn't the creator of an post but assigned to one */}
