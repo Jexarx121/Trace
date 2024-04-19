@@ -281,6 +281,10 @@ const AccountProfile = () => {
     toast.success("Your credit amount will updated soon.")
   };
 
+  const createWallet = () => {
+    createAndStoreWallet();
+  }
+
   return (
     <div className="mb-10">
       <div>
