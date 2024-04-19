@@ -14,7 +14,7 @@ const Welcome = () => {
           </p>
           <div className="flex flex-col md:flex-row items-center md:items-start text-white py-2">
             <Link className="px-8 bg-[#49A078] py-2 rounded-md cursor-pointer font-bold text-center md:text-left md:mr-2"
-              to={LINKS.LOGIN}>
+              to={LINKS.ACCOUNT}>
               Try Now
             </Link>
           </div>

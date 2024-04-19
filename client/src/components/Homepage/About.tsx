@@ -41,7 +41,7 @@ const About = () => {
           <img className="w-full mb-4 max-w-[500px] h-auto " src="../images/volunteering_about.svg" alt="Volunteering by cleaning up garbage"/>
           <p className="font-bold">Free forever</p>
           <Link className="text-[#49A078] hover:underline hover:underline-offset-4 cursor-pointer"
-            to={LINKS.LOGIN}>Get started now
+            to={LINKS.ACCOUNT}>Get started now
           </Link>
         </div>
       </div>
