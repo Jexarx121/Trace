@@ -14,6 +14,8 @@ This was a final year project and a first real experience into React, Typescript
 - [x] Account
 - [x] Users can create posts
 - [x] Users can update and delete posts
+- [x] Users can assign themselves to posts
+- [x] Creators can approve volunteers to posts
 - [x] Create a smart contract for credits and posts
 - [x] Automatically creates user's wallets after registration with ethers
 - [x] ERC20 Smart contract for tokens
