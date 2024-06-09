@@ -485,9 +485,7 @@ const DashboardInfo = () => {
 
     const creditTransaction = await traceCreditContract.transfer(receiverAddress, creditAmountTrace)
     await creditTransaction.wait();
-    console.log(creditTransaction);
     const nodeTransaction = await nodeManagerContract.createNode(postId, senderAddress, receiverAddress, creditAmountNode, data.time, data.amountPeople);
-    console.log(nodeTransaction);
     
     // update post in database
     const updates = {
@@ -517,7 +515,6 @@ const DashboardInfo = () => {
     const credit = creditAmount.toString();
     const hours = hoursWorked.toString();
     const people = amountOfPeople.toString();
-    console.log(credit);
 
     setNodeDetails({
       creditAmount: credit,
@@ -573,10 +570,8 @@ const DashboardInfo = () => {
     });
 
     await transactionEth.wait();
-    console.log(transactionEth);  
 
     const transaction = await contract.transfer(adminWallet.address, baseAmount);
-    console.log(transaction);
 
     createPost(data);
   }
