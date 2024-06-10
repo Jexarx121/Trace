@@ -101,4 +101,4 @@ const FAQ: React.FC = () => {
   );
 }
 
-export default FAQ;
+export default FAQ; // eslint-disable-line

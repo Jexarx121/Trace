@@ -22,7 +22,7 @@ type FinishedPostSchema = z.infer<typeof finishedPostSchema>;
 
 const DashboardInfo = () => { 
   const navigate = useNavigate();
-  const { session } = useContext(SessionContext);;
+  const { session } = useContext(SessionContext);
   const provider = useContext(EthContext);
   let toastShown = false;
 
@@ -165,7 +165,7 @@ const DashboardInfo = () => {
     setConfirmRequest(false);
   };
 
-  const handleDescriptionChange = (event : any) => {
+  const handleDescriptionChange = (event : any) => { // eslint-disable-line
     const descriptionValue = event.target.value;
     setDescriptionLength(descriptionValue.length);
   };
@@ -249,7 +249,7 @@ const DashboardInfo = () => {
       console.log('Error fetching profile image: ', error);
       return '';
     }
-  };
+  }
 
   async function getPosts() {
     const { data, error } = await supabase
@@ -258,10 +258,10 @@ const DashboardInfo = () => {
     
     if (error) {
       console.warn(error);
-    };
+    }
 
     setPostData(data as Post[]);
-  };
+  }
 
   async function _getUserIdFromId(postUserId : string) {
     const { data } = await supabase
@@ -274,7 +274,7 @@ const DashboardInfo = () => {
     }
   }
 
-  async function createPost(postData: any) {
+  async function createPost(postData: any) { // eslint-disable-line
     const { user } = session;
 
     // to get full name of user making post
@@ -300,15 +300,15 @@ const DashboardInfo = () => {
 
     if (error) {
       alert(error.message)
-    };
+    }
 
     setLoading(false);
     toast.success('Post has been created.');
     setConfirmRequest(false);
     closeModal();
-  };
+  }
 
-  async function updatePost(data : any) {
+  async function updatePost(data : any) { // eslint-disable-line
     setLoading(true);
     
     const updates = {
@@ -330,12 +330,12 @@ const DashboardInfo = () => {
       }
     } catch (error) {
       alert(error);
-    };
+    }
 
     setLoading(false);
     toast.success('Post has been updated.');
     closeUpdateModal();
-  };
+  }
 
   async function deletePost() {
     setLoading(true);
@@ -348,7 +348,7 @@ const DashboardInfo = () => {
 
       if (error) {
         alert(error.message);
-      };
+      }
     } catch (error) {
       alert(error);
     }
@@ -356,7 +356,7 @@ const DashboardInfo = () => {
     setLoading(false);
     toast.success('Post has been deleted.');
     closeDeletePostModal();
-  };
+  }
 
   async function requestPost() {
     if (confirmRequest) {
@@ -385,7 +385,7 @@ const DashboardInfo = () => {
         }
       } catch (error) {
         alert(error);
-      };
+      }
       setConfirmRequest(false);
       closePost();
 
@@ -423,7 +423,7 @@ const DashboardInfo = () => {
         }
       } catch (error) {
         alert(error);
-      };
+      }
       setConfirmRequest(false);
       closeRequestedPost();
 
@@ -432,7 +432,7 @@ const DashboardInfo = () => {
     } else {
       setConfirmRequest(true);
     }
-  };
+  }
 
   async function cancelAcceptedRequest() {
     if (confirmRequest) {
@@ -450,10 +450,10 @@ const DashboardInfo = () => {
 
         if (error) {
           alert(error.message);
-        };
+        }
       } catch (error) {
         alert(error);
-      };
+      }
 
       setConfirmRequest(false);
       toast.success("Post has been unassigned.")
@@ -461,14 +461,14 @@ const DashboardInfo = () => {
     } else {
       setConfirmRequest(true);
     }
-  };
+  }
 
   const getUserIdFromId = async (postUserId: string) => {
     const userId = await _getUserIdFromId(postUserId);
     return userId;
   }
 
-  async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) {
+  async function completePost(data : { time: string; amountPeople: string; rating: string; }, postType : any) { // eslint-disable-line
     setLoading(true);
     const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     const adminWallet = new ethers.Wallet(adminPrivateKey);
@@ -478,14 +478,14 @@ const DashboardInfo = () => {
     const traceCreditContract = createTraceInstance(signer);
 
     const senderAddress = await getPublicKey(selectedPost?.id);
-    const receiverAddress = await getPublicKey(selectedPost?.assigned_to!);
+    const receiverAddress = await getPublicKey(selectedPost?.assigned_to!); // eslint-disable-line
     const creditAmountNode = calculateCredit(data, postType);
     const creditAmountTrace = BigInt(creditAmountNode) * (10n ** 18n);
     const postId = selectedPost?.post_id;
 
     const creditTransaction = await traceCreditContract.transfer(receiverAddress, creditAmountTrace)
     await creditTransaction.wait();
-    const nodeTransaction = await nodeManagerContract.createNode(postId, senderAddress, receiverAddress, creditAmountNode, data.time, data.amountPeople);
+    const nodeTransaction = await nodeManagerContract.createNode(postId, senderAddress, receiverAddress, creditAmountNode, data.time, data.amountPeople); // eslint-disable-line
     
     // update post in database
     const updates = {
@@ -501,17 +501,17 @@ const DashboardInfo = () => {
 
     if (error) {
       alert(error.message);
-    };
+    }
 
     setConfirmRequest(false);
     setLoading(false);
     toast.success(`Post ${selectedPost?.post_id} has been completed! Your funds will shortly arrive.`);
     setFinishPostModal(false);
-  };
+  }
 
   async function fetchNode(nodeNumber : number) {
     const nodeManagerContract = createInstance(provider);
-    const [sender, receiver, creditAmount, hoursWorked, amountOfPeople] = await nodeManagerContract.getNodeDetails(nodeNumber);
+    const [sender, receiver, creditAmount, hoursWorked, amountOfPeople] = await nodeManagerContract.getNodeDetails(nodeNumber); // eslint-disable-line
     const credit = creditAmount.toString();
     const hours = hoursWorked.toString();
     const people = amountOfPeople.toString();
@@ -528,7 +528,7 @@ const DashboardInfo = () => {
     const nodeNumber = selectedPost?.post_id;
     if (nodeNumber) {
       fetchNode(nodeNumber);
-    };
+    }
   }
 
   const openDeletePostModal = () => {
@@ -539,7 +539,7 @@ const DashboardInfo = () => {
     setIsDeleteModalOpen(false);
   };
 
-  const createPostTokensFromUser = async (creditAmount : number, data : any) => {
+  const createPostTokensFromUser = async (creditAmount : number, data : any) => { // eslint-disable-line
     const PRIVATE_KEY = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     const adminWallet = new ethers.Wallet(PRIVATE_KEY);
     const adminSigner = adminWallet.connect(provider?.provider);
@@ -571,7 +571,7 @@ const DashboardInfo = () => {
 
     await transactionEth.wait();
 
-    const transaction = await contract.transfer(adminWallet.address, baseAmount);
+    const transaction = await contract.transfer(adminWallet.address, baseAmount); // eslint-disable-line
 
     createPost(data);
   }
@@ -583,11 +583,11 @@ const DashboardInfo = () => {
       // Stored session since context variable doesn't persist after page refresh
       if (!storedSession && !toastShown) {
         toast.error("Login required.");
-        toastShown = true;
+        toastShown = true; // eslint-disable-line
         navigate(LINKS.LOGIN);
         return;
       }
-    };
+    }
     
     getPosts();
 
@@ -631,7 +631,7 @@ const DashboardInfo = () => {
         const titleMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
         return createdByMatch || assignedToNameExists || titleMatch;
       }));
-    };
+    }
 
     // get url links for each post creator
     if (selectedPost !== null) {
@@ -646,7 +646,7 @@ const DashboardInfo = () => {
       };
   
       fetchUserId();
-    };
+    }
 
   }, [session, postData, navigate, selectedPost]);
 

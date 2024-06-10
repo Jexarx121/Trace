@@ -44,7 +44,7 @@ const App = () => {
     }
     
     setUserId(data?.user_id);
-  };
+  }
 
   useEffect(() => {
     getUserId();

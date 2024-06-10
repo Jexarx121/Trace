@@ -52,7 +52,7 @@ const AccountProfile = () => {
     } catch (error) {
       console.log('Error downloading image: ', error);
     }
-  };
+  }
 
   async function getPosts() {
     const { data, error } = await supabase
@@ -62,10 +62,10 @@ const AccountProfile = () => {
     
     if (error) {
       console.warn(error);
-    };
+    }
 
     setPostData(data as Post[]);
-  };
+  }
 
   // Called when users register for the first time to create a wallet for each
   async function createAndStoreWallet() {
@@ -86,12 +86,12 @@ const AccountProfile = () => {
       // Throw 404 page here
       console.error('Error storing wallet:', error);
       throw error;
-    };
+    }
 
     return ethereumAddress;
-  };
+  }
 
-  async function fundWalletTokens(receiverAddress : any, creditAmount : number) {
+  async function fundWalletTokens(receiverAddress : any, creditAmount : number) { // eslint-disable-line
     if (provider) {
       const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
       const wallet = new ethers.Wallet(adminPrivateKey);
@@ -99,10 +99,9 @@ const AccountProfile = () => {
       const baseAmount = BigInt(creditAmount) * (10n ** 18n); // 100 credits to start off with
 
       const contract = createInstance(signer);
-      const tx = await contract.transfer(receiverAddress, baseAmount)
-      console.log(tx);
-    };
-  };
+      const tx = await contract.transfer(receiverAddress, baseAmount); // eslint-disable-line
+    }
+  }
 
   async function getUserId() {
     const { data } = await supabase
@@ -131,7 +130,7 @@ const AccountProfile = () => {
       const balance = await contract.balanceOf(data.ethereum_address);
       setCreditAmount(parseInt(balance.toString()) / DECIMALS);
     }
-  };
+  }
 
   const checkIfAccountIsCurrentUser = async () => {
     const { data } = await supabase
@@ -146,7 +145,7 @@ const AccountProfile = () => {
       } else {
         setActualAccount(true);
       }
-    };
+    }
   };
 
   async function getProfileImage(authID: string) {
@@ -174,7 +173,7 @@ const AccountProfile = () => {
       console.log('Error fetching profile image: ', error);
       return '';
     }
-  };
+  }
 
   const getRating = async () => {
     const { data } = await supabase
@@ -199,10 +198,10 @@ const AccountProfile = () => {
       } else {
         setUserRating(-1);
       }
-    };
+    }
   };
 
-  useEffect(() => {
+  useEffect(() => { // eslint-disable-line
     // Go back to auth page if not login
     if (!session) {
       const storedSession = JSON.parse(sessionStorage.getItem("session"));
@@ -213,7 +212,7 @@ const AccountProfile = () => {
         navigate(LINKS.LOGIN);
         return;
       }
-    };
+    }
 
     if (user_id === ":user_id" || user_id === '0') {
       getUserId();
@@ -228,10 +227,10 @@ const AccountProfile = () => {
 
       // if data from database is null, user is newly joined
       if (data?.full_name === null) {
-        let receiverAddress = createAndStoreWallet();
+        const receiverAddress = createAndStoreWallet();
         fundWalletTokens(receiverAddress, 100);
         goToEditAccountPage();
-      };
+      }
 
       if (error) {
         // 404 page here
@@ -243,17 +242,17 @@ const AccountProfile = () => {
         setBio(data.bio);
         setSessionId(data.id);
       }
-    };
+    }
     
     if (!fullName) {
       getProfile();
-    };
+    }
 
     getRating();
 
     if (creditAmount === -1) {
       getBalance();
-    };
+    }
 
     checkIfAccountIsCurrentUser();
     
@@ -270,8 +269,8 @@ const AccountProfile = () => {
             [post.id]: imageUrl || '',
           }));
         });
-      };
-    };
+      }
+    }
   });
 
   const getFreeFunds = async () => {
@@ -280,10 +279,6 @@ const AccountProfile = () => {
     fundWalletTokens(receiverAddress, creditAmount);
     toast.success("Your credit amount will updated soon.")
   };
-
-  const createWallet = () => {
-    createAndStoreWallet();
-  }
 
   return (
     <div className="mb-10">

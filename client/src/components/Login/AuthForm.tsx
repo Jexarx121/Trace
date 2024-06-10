@@ -75,7 +75,7 @@ const AuthForm = () => {
     );
   } else {
     goToAccount();
-  };
+  }
 };
 
 export default AuthForm;

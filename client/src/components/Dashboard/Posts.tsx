@@ -13,14 +13,14 @@ export interface Post {
   assigned_to_name: string,
   status: string,
   rating: number
-};
+}
 
 export type PostTypes = {
   short: number,
   long: number;
 }
 
-export const postTypes : PostTypes = {
+export const postTypes : PostTypes = { // eslint-disable-line
   "short": 5,
   "long" : 10
 };

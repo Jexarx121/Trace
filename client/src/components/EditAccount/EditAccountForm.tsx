@@ -31,8 +31,8 @@ const EditAccountForm = () => {
 
     for (let i=1; i < listOfNames.length; i++) {
       surname += capitalize(listOfNames[i]) + " ";
-    };
-  };
+    }
+  }
 
   const goToAccount = () => {
     navigate(`/account/${user_id}`);
@@ -46,12 +46,12 @@ const EditAccountForm = () => {
     resolver: zodResolver(profileSchema),
   });
   
-  const handleDescriptionChange = (event : any) => {
+  const handleDescriptionChange = (event : any) => { // eslint-disable-line
     const descriptionValue = event.target.value;
     setDescriptionLength(descriptionValue.length);
   };
 
-  async function uploadAvatar(profileImage : any): Promise<string> {
+  async function uploadAvatar(profileImage : any): Promise<string> { // eslint-disable-line
     try {
       const fileExt = profileImage.name.split('.').pop();
       const fileName = `${Math.random()}.${fileExt}`;
@@ -71,7 +71,7 @@ const EditAccountForm = () => {
       alert(error);
       return "";
     } 
-  };
+  }
 
   async function updatePosts(newName: string) {
     const { error } = await supabase
@@ -91,9 +91,9 @@ const EditAccountForm = () => {
     } else {
       console.warn(error.message);
     }
-  };
+  }
 
-  async function updateProfile(data : any) {
+  async function updateProfile(data : any) { // eslint-disable-line
     setLoading(false);
     const { user } = session;
     const fullname : string = capitalize(data.firstName) + " " + capitalize(data.surname);
@@ -102,10 +102,8 @@ const EditAccountForm = () => {
     // Check if user uploaded an image
     if (data.profileImage.length > 0) {
       avatarUrl = await uploadAvatar(data.profileImage[0]);
-      console.log(avatarUrl);
     } else if (passedAvatarUrl != "") {
       avatarUrl = passedAvatarUrl;
-      console.log(avatarUrl);
     } else {
       avatarUrl = 'defaultImage.png';
     }
@@ -123,13 +121,13 @@ const EditAccountForm = () => {
 
     if (error) {
       alert(error.message);
-    };
+    }
 
     updatePosts(fullname);
     toast.success("Your account has been updated.")
     setLoading(true);
     goToAccount();
-  };
+  }
 
   const onSubmit: SubmitHandler<ProfileSchema> = (data) => {
     updateProfile(data);

@@ -12,7 +12,7 @@ export async function getPrivateKey(userId : string) {
 
   const privateKey = security.decrypt(data[0].ethereum_private_address);
   return privateKey;
-};
+}
 
 
 export async function getPublicKey(userId : string) {
@@ -23,7 +23,7 @@ export async function getPublicKey(userId : string) {
 
   const publicKey = data[0].ethereum_address;
   return publicKey;
-};
+}
 
 
 export async function downloadImage(path : string) {
@@ -31,13 +31,13 @@ export async function downloadImage(path : string) {
     const { data, error } = await supabase.storage.from('avatars').download(path);
     if (error) {
       throw error;
-    };
+    }
     const url = URL.createObjectURL(data);
     return url;
   } catch (error) {
     console.log('Error downloading image: ', error);
-  };   
-};
+  }   
+}
 
 
 export const calculateCredit = (data: { time: string; amountPeople: string; rating: string; }, postType : keyof PostTypes) => {

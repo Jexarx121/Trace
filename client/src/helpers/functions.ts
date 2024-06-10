@@ -7,7 +7,7 @@ export const capitalize = (str: string = "", lowerRest = true): string =>
 export const truncateText = (text : string, maxLength : number) => {
   if (text.length > maxLength) {
     return `${text.slice(0, maxLength)}...`;
-  };
+  }
 
   return text;
 };
@@ -42,7 +42,7 @@ export default class Security {
     } catch (e) {
       console.error(e);
     }
-  };
+  }
 
   decrypt(cipherText: string) {
     const { encryptedDataString, ivString } = splitEncryptedText(cipherText);
