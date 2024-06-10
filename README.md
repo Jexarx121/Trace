@@ -7,6 +7,7 @@ The credits and requests are stored on the blockchain through smart contracts. T
 
 This was a final year project and a first real experience into React, Typescript, Solidity and Blockchain. Tailwind CSS for used for design. To run this, you need env variables for both folders.
 
+If the website stops working at any point, it most likely is either the Supabase database is down or the ethereum wallet is out of funds.
 ![image](https://github.com/Jexarx121/Trace/assets/98361548/a65904da-3244-42ec-a924-27172a7b38af)
 
 ## To do list
@@ -33,3 +34,4 @@ This was a final year project and a first real experience into React, Typescript
 - [ ] Security audit
 - [ ] Proper Credit system with volunteers.
 - [ ] Improvment of loading times using server side rendering.
+- [ ] Lots of try catch blocks to be properly implemented.
