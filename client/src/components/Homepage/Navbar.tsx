@@ -25,7 +25,7 @@ const Navbar = () => {
   const handleLinkClick = () => {
     // Force a page refresh after the navigation
     navigate(`/account/${userId}`);
-    window.location.reload();
+    navigate(0);
   }
 
   return (
