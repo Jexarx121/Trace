@@ -20,7 +20,7 @@ const Welcome = () => {
           </div>
         </div>
         <div className="lg:w-1/2 flex justify-center items-center mt-12 lg:mt-0">
-          <img className="max-w-[500px] h-auto" src="../images/volunteering_welcome.svg" alt="Volunteering with the elderly"/>
+          <img className="max-w-[500px] h-auto" src="/volunteering_welcome.svg" alt="Volunteering with the elderly"/>
         </div>
       </div>
     </div>

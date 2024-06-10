@@ -32,7 +32,7 @@ const Navbar = () => {
     <nav className="flex bg-[#1f2421] items-center p-5 m-auto relative flex-initial">
       <div className="w-full md:w-[70vw] m-auto flex items-center">
         <Link to={LINKS.HOMEPAGE} className="flex flex-row">
-          <img src="../images/favicon-32x32.png" alt="Logo of Trace" className="mr-2"/>
+          <img src="/favicon-32x32.png" alt="Logo of Trace" className="mr-2"/>
           <h1 className="text-white font-bold text-2xl cursor-pointer">
             Trace
           </h1>

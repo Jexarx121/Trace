@@ -11,7 +11,7 @@ const Footer = () => {
       <div className="w-full md:w-[70vw] mx-auto text-white">
         <div className="flex flex-col md:flex-row justify-between">
           <Link to={LINKS.HOMEPAGE} className="flex flex-row">
-            <img src="../images/favicon-32x32.png" alt="Logo of Trace" className="my-5 ml-5 mr-2 w-8 h-8"/>
+            <img src="/favicon-32x32.png" alt="Logo of Trace" className="my-5 ml-5 mr-2 w-8 h-8"/>
             <h1 className="font-bold py-5 pr-5  cursor-pointer">Trace</h1>
           </Link>
           <Link to={LINKS.DASHBOARD} className="p-5 cursor-pointer">Dashboard</Link>

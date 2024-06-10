@@ -18,7 +18,7 @@ const AccountProfile = () => {
   const { user_id } = useParams();
   const { session } = useContext(SessionContext);
   const provider = useContext(EthContext);
-  const backgroundGradient = "../images/background_gradient.jpg";
+  const backgroundGradient = "/background_gradient.jpg";
   
   const [fullName, setFullName] = useState(null);
   const [age, setAge] = useState(null);

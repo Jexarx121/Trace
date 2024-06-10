@@ -38,7 +38,7 @@ const About = () => {
           </div>
         </div>
         <div className="w-full lg:w-1/2 p-4 text-center text-xl flex flex-col justify-center items-center">
-          <img className="w-full mb-4 max-w-[500px] h-auto " src="../images/volunteering_about.svg" alt="Volunteering by cleaning up garbage"/>
+          <img className="w-full mb-4 max-w-[500px] h-auto " src="volunteering_about.svg" alt="Volunteering by cleaning up garbage"/>
           <p className="font-bold">Free forever</p>
           <Link className="text-[#49A078] hover:underline hover:underline-offset-4 cursor-pointer"
             to={LINKS.ACCOUNT}>Get started now
