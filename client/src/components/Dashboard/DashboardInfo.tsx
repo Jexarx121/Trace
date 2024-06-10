@@ -275,7 +275,7 @@ const DashboardInfo = () => {
   }
 
   async function createPost(postData: any) { // eslint-disable-line
-    const { user } = session;
+    const user  = session?.user;
 
     // to get full name of user making post
     const { data } = await supabase
@@ -285,7 +285,7 @@ const DashboardInfo = () => {
       .single();
 
     const updates = {
-      id: user.id,
+      id: user?.id,
       created_by: data?.full_name,
       date_created: new Date(),
       type: postData.type,
@@ -360,17 +360,17 @@ const DashboardInfo = () => {
 
   async function requestPost() {
     if (confirmRequest) {
-      const { user } = session;
+      const user = session?.user;
 
       // get user's name from id and put it into profile
       const { data } = await supabase
         .from("profiles")
         .select("full_name")
-        .eq("id", user.id)
+        .eq("id", user?.id)
 
       const updates = {
         assigned_to_name: data?.[0]?.full_name,
-        assigned_to: user.id,
+        assigned_to: user?.id,
         status: "pending"
       };
 
@@ -398,17 +398,17 @@ const DashboardInfo = () => {
 
   async function approvePost() {
     if (confirmRequest) {
-      const { user } = session;
+      const user = session?.user;
 
       // get user's name from id and put it into profile
       const { data } = await supabase
         .from("profiles")
         .select("full_name")
-        .eq("id", user.id)
+        .eq("id", user?.id)
 
       const updates = {
         assigned_to_name: data?.[0]?.full_name,
-        assigned_to: user.id,
+        assigned_to: user?.id,
         status: "accepted"
       };
 
@@ -472,20 +472,24 @@ const DashboardInfo = () => {
     setLoading(true);
     const adminPrivateKey = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     const adminWallet = new ethers.Wallet(adminPrivateKey);
-    const signer = adminWallet.connect(provider?.provider);
+    const signer = adminWallet.connect(provider?.provider ?? null);
 
     const nodeManagerContract = createInstance(signer);
     const traceCreditContract = createTraceInstance(signer);
 
-    const senderAddress = await getPublicKey(selectedPost?.id);
+    const senderAddress = await getPublicKey(selectedPost?.id ?? '');
     const receiverAddress = await getPublicKey(selectedPost?.assigned_to!); // eslint-disable-line
     const creditAmountNode = calculateCredit(data, postType);
     const creditAmountTrace = BigInt(creditAmountNode) * (10n ** 18n);
     const postId = selectedPost?.post_id;
 
-    const creditTransaction = await traceCreditContract.transfer(receiverAddress, creditAmountTrace)
+    if (senderAddress === "") {
+      return;
+    }
+
+    const creditTransaction = await traceCreditContract.transfer(receiverAddress, creditAmountTrace);
     await creditTransaction.wait();
-    const nodeTransaction = await nodeManagerContract.createNode(postId, senderAddress, receiverAddress, creditAmountNode, data.time, data.amountPeople); // eslint-disable-line
+    await nodeManagerContract.createNode(postId, senderAddress, receiverAddress, creditAmountNode, data.time, data.amountPeople); // eslint-disable-line
     
     // update post in database
     const updates = {
@@ -511,10 +515,10 @@ const DashboardInfo = () => {
 
   async function fetchNode(nodeNumber : number) {
     const nodeManagerContract = createInstance(provider);
-    const [sender, receiver, creditAmount, hoursWorked, amountOfPeople] = await nodeManagerContract.getNodeDetails(nodeNumber); // eslint-disable-line
-    const credit = creditAmount.toString();
-    const hours = hoursWorked.toString();
-    const people = amountOfPeople.toString();
+    const nodeDetails = await nodeManagerContract.getNodeDetails(nodeNumber); // eslint-disable-line
+    const credit = nodeDetails[2].toString();
+    const hours = nodeDetails[3].toString();
+    const people = nodeDetails[4].toString();
 
     setNodeDetails({
       creditAmount: credit,
@@ -542,11 +546,15 @@ const DashboardInfo = () => {
   const createPostTokensFromUser = async (creditAmount : number, data : any) => { // eslint-disable-line
     const PRIVATE_KEY = import.meta.env.VITE_ADMIN_PRIVATE_KEY;
     const adminWallet = new ethers.Wallet(PRIVATE_KEY);
-    const adminSigner = adminWallet.connect(provider?.provider);
+    const adminSigner = adminWallet.connect(provider?.provider ?? null);
 
-    const receiverKey = await getPrivateKey(session?.user.id);
-    const receiverWallet = new ethers.Wallet(receiverKey);
-    const receiverSigner = receiverWallet.connect(provider?.provider);
+    const receiverKey = await getPrivateKey(session?.user.id ?? '');
+    const receiverWallet = new ethers.Wallet(receiverKey ?? '');
+    const receiverSigner = receiverWallet.connect(provider?.provider ?? null);
+
+    if (receiverKey === "") {
+      return;
+    }
 
     const baseAmount = BigInt(creditAmount) * (10n ** 18n);
     const contract = createTraceInstance(receiverSigner);
@@ -571,7 +579,7 @@ const DashboardInfo = () => {
 
     await transactionEth.wait();
 
-    const transaction = await contract.transfer(adminWallet.address, baseAmount); // eslint-disable-line
+    await contract.transfer(adminWallet.address, baseAmount);
 
     createPost(data);
   }
@@ -579,7 +587,8 @@ const DashboardInfo = () => {
   useEffect(() => {
     // User can only view posts if logged in
     if (!session) {
-      const storedSession = JSON.parse(sessionStorage.getItem("session"));
+      const sessionData = sessionStorage.getItem("session");
+      const storedSession = sessionData ? JSON.parse(sessionData) : null;
       // Stored session since context variable doesn't persist after page refresh
       if (!storedSession && !toastShown) {
         toast.error("Login required.");

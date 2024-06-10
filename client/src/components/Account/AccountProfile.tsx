@@ -99,7 +99,7 @@ const AccountProfile = () => {
       const baseAmount = BigInt(creditAmount) * (10n ** 18n); // 100 credits to start off with
 
       const contract = createInstance(signer);
-      const tx = await contract.transfer(receiverAddress, baseAmount); // eslint-disable-line
+      await contract.transfer(receiverAddress, baseAmount); // eslint-disable-line
     }
   }
 
@@ -204,7 +204,7 @@ const AccountProfile = () => {
   useEffect(() => { // eslint-disable-line
     // Go back to auth page if not login
     if (!session) {
-      const storedSession = JSON.parse(sessionStorage.getItem("session"));
+      const storedSession = JSON.parse(sessionStorage.getItem("session")!);
       // Stored session since context variable doesn't persist after page refresh
       if (!storedSession && !toastShown) {
         toast.error("Login required.");
@@ -275,7 +275,7 @@ const AccountProfile = () => {
 
   const getFreeFunds = async () => {
     const creditAmount = 50;
-    const receiverAddress = await getPublicKey(session?.user.id);
+    const receiverAddress = await getPublicKey(session?.user.id!);
     fundWalletTokens(receiverAddress, creditAmount);
     toast.success("Your credit amount will updated soon.")
   };

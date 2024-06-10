@@ -95,7 +95,7 @@ const EditAccountForm = () => {
 
   async function updateProfile(data : any) { // eslint-disable-line
     setLoading(false);
-    const { user } = session;
+    const user = session?.user;
     const fullname : string = capitalize(data.firstName) + " " + capitalize(data.surname);
     let avatarUrl;
 
@@ -109,7 +109,7 @@ const EditAccountForm = () => {
     }
 
     const updates = {
-      id: user.id,
+      id: user?.id,
       full_name: fullname,
       avatar_url: avatarUrl,
       age: data.age,

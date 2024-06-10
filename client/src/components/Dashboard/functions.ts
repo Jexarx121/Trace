@@ -10,8 +10,10 @@ export async function getPrivateKey(userId : string) {
     .select("ethereum_private_address")
     .eq("id", userId)
 
-  const privateKey = security.decrypt(data[0].ethereum_private_address);
-  return privateKey;
+  if (data) {
+    const privateKey = security.decrypt(data[0].ethereum_private_address);
+    return privateKey;
+  }
 }
 
 
@@ -21,8 +23,10 @@ export async function getPublicKey(userId : string) {
     .select("ethereum_address")
     .eq("id", userId)
 
-  const publicKey = data[0].ethereum_address;
-  return publicKey;
+  if (data) {
+    const publicKey = data[0].ethereum_address;
+    return publicKey;
+  }
 }
 
 
